@@ -1,0 +1,32 @@
+{
+  "name": "jar",
+  "title": "jar",
+  "description": "-",
+  "version": "0.1.0",
+  "homepage": "",
+  "author": {
+    "name": "Oleg",
+    "email": "markelog@gmail.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.yandex-team.ru/arkel/jar.git"
+  },
+  "bugs": {
+    "url": ""
+  },
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "/blob/master/LICENSE-MIT"
+    },
+    {
+      "type": "GPL",
+      "url": "/blob/master/LICENSE-GPL"
+    }
+  ],
+  "dependencies": {
+    "jquery": "-"
+  },
+  "keywords": []
+}

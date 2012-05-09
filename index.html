@@ -1,0 +1,29 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" dir="ltr" id="html">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+    <script>(window.indexedDB || window.webkitIndexedDB || window.mozIndexedDB || window.msIndexedDB).deleteDatabase( "jar" )</script>
+    <script src="src/core.js"></script>
+    <script src="src/log.js"></script>
+    <script src="src/filters.js"></script>
+    <script src="src/prefixes.js"></script>
+    <script src="src/deferred.js"></script>
+    <script src="src/actions.js"></script>
+    <script src="src/storages/localstorage.js"></script>
+    <script src="libs/jquery.js"></script>
+    <script>
+        window.t = jar().set( "bla", { "bla": "bla" } ).done(function( data ) {
+        }).get( "bla" ).done(function( data ) {
+            console.log( data )
+        }).remove( "bla" ).done(function() {
+            console.log( "bla" )
+        });
+    </script>
+
+</head>
+
+<body id="body">
+
+</body>
+</html>
