@@ -5,13 +5,12 @@
 
     <script>(window.indexedDB || window.webkitIndexedDB || window.mozIndexedDB || window.msIndexedDB).deleteDatabase( "jar" )</script>
     <script src="src/core.js"></script>
-    <script src="src/log.js"></script>
+    <script src="src/meta.js"></script>
     <script src="src/filters.js"></script>
     <script src="src/prefixes.js"></script>
     <script src="src/deferred.js"></script>
     <script src="src/actions.js"></script>
     <script src="src/storages/localstorage.js"></script>
-    <script src="libs/jquery.js"></script>
     <script>
         window.t = jar().set( "bla", { "bla": "bla" } ).done(function( data ) {
         }).get( "bla" ).done(function( data ) {
@@ -19,6 +18,7 @@
         }).remove( "bla" ).done(function() {
             console.log( "bla" )
         });
+
     </script>
 
 </head>
