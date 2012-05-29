@@ -3,13 +3,11 @@
         var meta = jar.meta( name );
 
         return jar[ meta.storage ].get.apply( this, [ name, meta.type ] );
-    };
+    }
 
     this.set = function( name, data ) {
         var storage,
             storages = this.types[ jar.type( data ) ];
-
-        this.active = jar.Deferred();
 
         for ( var i = 0, l = storages.length; i < l; i++ ) {
             if ( jar[ storages[ i ] ] ) {
@@ -18,7 +16,11 @@
         }
 
         return jar[ storages[ i ] ].set.apply( this, arguments );
-    };
+    }
+
+    this.remove = function( name ) {
+        return jar[ jar.meta( name ).storage ].remove.apply( this, [ name ] );
+    }
 
     this.done = function( fn, context ) {
         this.active.add( "done", fn, context );

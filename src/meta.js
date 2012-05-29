@@ -1,10 +1,9 @@
 !function() {
-    jar.log = function( name, storage, type ) {
+    this.log = function( name, storage, type ) {
         this.prefixes.lc[ "jar-type-" + name ] = storage + ":" + type;
-
     }
 
-    jar.meta = function( name ) {
+    this.meta = function( name ) {
         var meta = this.prefixes.lc[ "jar-type-" + name ].split( ":" );
 
         return {
@@ -12,5 +11,13 @@
             type: meta[ 1 ]
         }
     }
+
+    this.removeRecord = function( name ) {
+        try {
+            lc.removeItem( "jar-type" + name );
+        } catch( e ) {}
+    }
+
+
 
 }.call( jar );

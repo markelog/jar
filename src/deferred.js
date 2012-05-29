@@ -1,5 +1,7 @@
 !function() {
-    var proto;
+    var proto,
+        slice = [].slice;
+
     function Deferred() {
         this.lists = {
             done: [],
@@ -87,5 +89,35 @@
     this.Deferred = function() {
         return new Deferred();
     }
+
+    this.resolve = function( id ) {
+        var args = slice.call( arguments ),
+            def = this.deferreds[ id ];
+
+        args.shift();
+        delete this.deferreds[ id ];
+
+        return def.resolve( args );
+    }
+
+    this.reject = function( id ) {
+        var args = slice.call( arguments ),
+            def = this.deferreds[ id ];
+
+        args.shift();
+
+        delete this.deferreds[ id ];
+        return def.reject( args );
+    }
+
+    this.fn.registr = function() {
+        var id = new Date().getTime();
+
+        this.active = jar.deferreds[ id ] = jar.Deferred();
+
+        return id;
+    }
+
+    this.deferreds = {};
 
 }.call( jar );
