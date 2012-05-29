@@ -43,8 +43,9 @@
             var id = this.registr();
 
             try {
+
                 lc.removeItem( "jar-value-" + name );
-                jar.lc.removeRecord( name )
+                jar.removeRecord( name );
                 jar.resolve( id, jar.filters[ type ]( data ) );
 
             } catch ( e ) {

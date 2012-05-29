@@ -1,4 +1,5 @@
 !function() {
+
     this.log = function( name, storage, type ) {
         this.prefixes.lc[ "jar-type-" + name ] = storage + ":" + type;
     }
@@ -13,11 +14,6 @@
     }
 
     this.removeRecord = function( name ) {
-        try {
-            lc.removeItem( "jar-type" + name );
-        } catch( e ) {}
+        this.prefixes.lc.removeItem( "jar-type-" + name );
     }
-
-
-
 }.call( jar );
