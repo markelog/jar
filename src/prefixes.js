@@ -9,9 +9,8 @@
         // IndexedDB prefixes
         indexedDB: window.indexedDB || window.webkitIndexedDB || window.mozIndexedDB || window.msIndexedDB,
         IDBTransaction: window.IDBTransaction || window.webkitIDBTransaction,
-        IDBKeyRange: window.IDBKeyRange || window.webkitIDBKeyRange,
-        IDBTransaction: window.IDBTransaction || window.webkitIDBTransaction
-    }
+        IDBKeyRange: window.IDBKeyRange || window.webkitIDBKeyRange
+    };
 
     this.prefixes.idb = this.prefixes.indexedDB;
     this.prefixes.lc = localStorage;

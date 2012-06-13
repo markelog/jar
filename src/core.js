@@ -17,7 +17,7 @@
 
     this.jar = function jar( storage, name, type ) {
         return new jar.fn.init( storage, name, type );
-    }
+    };
 
     jar.prototype = this.jar.fn = {
         constructor: jar,
@@ -32,7 +32,7 @@
                 json: [  "sql", "lc" ],
                 javascript: [ "sql", "lc" ],
                 text: [ "lc" ]
-            }
+            };
 
             if ( jar.prefixes.storageInfo ) {
                 this.types.xml = [ "idb", "fs" ].concat( this.types.xml );
@@ -40,18 +40,9 @@
                 this.types.javascript = [ "fs" ].concat( this.types.javascript );
             }
 
-            types = this.types[ type ];
-
-            for ( var i = 0, l = this.types.length; i < l; i++ ) {
-                if ( jar.prefixes[ types[ i ] ] ) {
-                    this.storage = jar[ storage ];
-                    break;
-                }
-            }
-
             return this;
         }
-    }
+    };
 
     jar.fn.init.prototype = jar.fn;
 
@@ -73,6 +64,6 @@
         }
 
         return "text";
-    }
+    };
 
 }.call( window );

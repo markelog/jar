@@ -4,9 +4,9 @@ module("lc", {
 
 test( "Simple set and get", function() {
     var values = {
-        text: "test",
-        json: { test: "test" }
-    }
+            text: "test",
+            json: { test: "test" }
+        };
 
     jar().set( "text", values.text ).done(function() {
         this.get( "text" )
@@ -16,7 +16,7 @@ test( "Simple set and get", function() {
             })
             .fail(function() {
                 ok( false, "fail should not be called for successful operation" );
-            })
+            });
     });
 
     jar().set( "json", values.json ).done(function() {
@@ -27,7 +27,7 @@ test( "Simple set and get", function() {
             })
             .always(function() {
                 ok( true, "always should be called for successful operation" );
-            })
+            });
     });
 
     jar().get( "not-existed" )
@@ -36,7 +36,7 @@ test( "Simple set and get", function() {
         })
         .always(function() {
             ok( true, "always should be called for fail operation" );
-        })
+        });
 });
 
 test( "Remove method", function() {
@@ -54,7 +54,7 @@ test( "Remove method", function() {
                         ok( false, "data was not removed" );
                     });
             });
-        })
+        });
     });
 });
 

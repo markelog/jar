@@ -7,7 +7,7 @@
             done: [],
             fail: [],
             always: []
-        }
+        };
 
         this.state = "pending";
 
@@ -60,7 +60,7 @@
                 value.fn.apply( value.context || jar, args );
 
                 if ( always = this.lists.always[ i ] ) {
-                    always.fn.apply( context || jar, args );
+                    always.fn.apply( value.context || jar, args );
                 }
             }
 
@@ -88,11 +88,11 @@
         fail: function( fn, context ) {
             return this.add( "fail", fn, context );
         }
-    }
+    };
 
     this.Deferred = function() {
         return new Deferred();
-    }
+    };
 
     this.resolve = function( id ) {
         var args = slice.call( arguments ),
@@ -102,7 +102,7 @@
         delete this.deferreds[ id ];
 
         return def.resolve( args );
-    }
+    };
 
     this.reject = function( id ) {
         var args = slice.call( arguments ),
@@ -112,7 +112,7 @@
 
         delete this.deferreds[ id ];
         return def.reject( args );
-    }
+    };
 
     this.fn.register = function() {
         var id = new Date().getTime();
@@ -120,22 +120,22 @@
         this.active = jar.deferreds[ id ] = jar.Deferred();
 
         return id;
-    }
+    };
 
     this.fn.done = function( fn, context ) {
         this.active.add( "done", fn, context || this );
         return this;
-    }
+    };
 
     this.fn.fail = function( fn, context ) {
         this.active.add( "fail", fn, context || this );
         return this;
-    }
+    };
 
     this.fn.always = function( fn, context ) {
         this.active.add( "always", fn, context || this );
         return this;
-    }
+    };
 
     this.deferreds = {};
 

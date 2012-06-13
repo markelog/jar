@@ -15,7 +15,7 @@
 
                 set: function( data ) {
                     var deferred = jar.Deferred(),
-                        store = this.db.transaction([ name ], IDBTransaction.READ_WRITE ).objectStore( name ),
+                        store = this.db.transaction([ name ], this.prefixes.IDBTransaction.READ_WRITE ).objectStore( name ),
                         transaction = store.put( data );
 
                     transaction.onsuccess = function() {
@@ -26,16 +26,8 @@
                         deferred.reject();
                     };
                 }
-            }
+            };
         }, this );
-
-        function setup() {
-            base.storage.createObjectStore( name, {
-                keyPath: "id"
-            });
-
-            ready.resolve();
-        }
 
         // Открываем соеденение с базой
         request = jar.prefixes.idb.open( name, version );
@@ -46,17 +38,25 @@
             request.onupgradeneeded = function () {
                 base.storage = this.result;
                 setup();
-            }
+            };
 
             request.onsuccess = function() {
                 base.storage = this.result;
                 ready.resolve();
-            }
+            };
 
         } else {
             request.onsuccess = function() {
                 (base.storage = this.result ).setVersion( version ).onsuccess = setup;
-            }
+            };
         }
+    }
+
+    function setup() {
+        base.storage.createObjectStore( name, {
+            keyPath: "id"
+        });
+
+        ready.resolve();
     }
 }.call( jar.fn );

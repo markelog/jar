@@ -18,7 +18,7 @@
 
                     } else { // IE
 
-                        xml = new ActiveXObject( "Microsoft.XMLDOM" );
+                        xml = new window.ActiveXObject( "Microsoft.XMLDOM" );
                         xml.async = "false";
                         xml.loadXML( data );
                     }
@@ -41,15 +41,15 @@
 
                 return function( data ) {
                     return div.innerHTML = data;
-                }
+                };
             }()
-    }
+    };
 
     this.rFilters = {
         json: JSON.stringify,
         text: function( text ) {
             return text;
         }
-    }
+    };
 
 }.call( jar );

@@ -26,16 +26,16 @@
         this.data[ base ][ name ] = {
             storage: storage,
             type: type
-        }
+        };
 
         return jar;
-    }
+    };
 
     this.meta = function( base, name ) {
         if ( this.data[ base ] ) {
             return this.data[ base ][ name ];
         }
-    }
+    };
 
     this.removeRecord = function( base, name ) {
         if ( this.data[ base ] ) {
@@ -43,5 +43,5 @@
         }
 
         return jar;
-    }
+    };
 }.call( jar );

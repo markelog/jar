@@ -28,7 +28,7 @@ module.exports = function(grunt) {
       files: ['test/**/*.html']
     },
     lint: {
-      files: ['grunt.js', 'src/**/*.js', 'test/**/*.js']
+      files: ['grunt.js', 'src/**/*.js', 'src/**/*.js' ]
     },
     watch: {
       files: '<config:lint.files>',
@@ -37,8 +37,8 @@ module.exports = function(grunt) {
     jshint: {
       options: {
         curly: true,
-        eqeqeq: true,
-        immed: true,
+        eqeqeq: false,
+        immed: false,
         latedef: true,
         newcap: true,
         noarg: true,
@@ -46,10 +46,19 @@ module.exports = function(grunt) {
         undef: true,
         boss: true,
         eqnull: true,
-        browser: true
+        browser: true,
+        evil: true,
+        expr: true
       },
       globals: {
-        jQuery: true
+        jQuery: true,
+        jar: true,
+
+        // QUnit stuff
+        test: true,
+        ok: true,
+        strictEqual: true,
+        expect: true
       }
     },
     uglify: {}
