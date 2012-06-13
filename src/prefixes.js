@@ -6,7 +6,7 @@
 
         Blob: window.BlobBuilder || window.WebKitBlobBuilder || window.Blob,
 
-        // IndexDB prefixes
+        // IndexedDB prefixes
         indexedDB: window.indexedDB || window.webkitIndexedDB || window.mozIndexedDB || window.msIndexedDB,
         IDBTransaction: window.IDBTransaction || window.webkitIDBTransaction,
         IDBKeyRange: window.IDBKeyRange || window.webkitIDBKeyRange,

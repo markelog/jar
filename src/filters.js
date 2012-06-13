@@ -46,7 +46,10 @@
     }
 
     this.rFilters = {
-        json: JSON.stringify
+        json: JSON.stringify,
+        text: function( text ) {
+            return text;
+        }
     }
 
 }.call( jar );

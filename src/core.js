@@ -8,12 +8,12 @@
 
 !function() {
     var aliases = {
-        idb: [ "indexeddb", "idb", "indb" ],
-        sql: [ "websql", "sql" ],
-        lc: [ "localStorage", "webstorage", "lc" ],
-        fsapi: [ "filesystem", "fsapi" ]
-    },
-    toString = "".toString;
+            idb: [ "indexeddb", "idb", "indb" ],
+            sql: [ "websql", "sql" ],
+            lc: [ "localStorage", "webstorage", "lc" ],
+            fsapi: [ "filesystem", "fsapi" ]
+        },
+        toString = "".toString;
 
     this.jar = function jar( storage, name, type ) {
         return new jar.fn.init( storage, name, type );
@@ -22,7 +22,7 @@
     jar.prototype = this.jar.fn = {
         constructor: jar,
 
-        init: function( storage, name, type ) {
+        init: function( name, type ) {
             var types;
             type = type || "text";
 
@@ -41,10 +41,6 @@
             }
 
             types = this.types[ type ];
-
-            if ( jar[ storage ] ) {
-                this.storage = jar[ storage ];
-            }
 
             for ( var i = 0, l = this.types.length; i < l; i++ ) {
                 if ( jar.prefixes[ types[ i ] ] ) {

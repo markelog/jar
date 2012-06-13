@@ -1,18 +1,15 @@
 !function() {
-    var lc = localStorage;
+    var lc = window.localStorage;
 
     this.lc = {
         set: function( name, data, type ) {
             type = type || jar.type( data );
 
-            var id = this.registr();
+            var id = this.register();
 
             try {
-
-                // Залогируй мета информацию
-                jar.log( name, "lc", type );
-                lc[ "jar-value-" + name ] = jar.rFilters[ type ]( data );
-
+                lc[ "jar-value-" + this.name + "-" + name ] = jar.rFilters[ type ]( data );
+                jar.log( this.name, name, "lc", type );
                 jar.resolve( id );
 
             } catch ( e ) {
@@ -23,14 +20,14 @@
         },
 
         get: function( name, type ) {
-            type = type || jar.meta( name ).type;
+            type = type || jar.meta( this.name, name ).type;
 
             var data, meta,
-                id = this.registr();
+                id = this.register();
 
             try {
-                data = lc[ "jar-value-" + name ];
-                jar.resolve( id, jar.filters[ type ]( data ) );
+                data = lc[ "jar-value-" + this.name + "-" + name ];
+                jar.resolve( id, jar.filters[ type ]( data ), type  );
 
             } catch ( e ) {
                 jar.reject( id );
@@ -40,13 +37,12 @@
         },
 
         remove: function( name ) {
-            var id = this.registr();
+            var id = this.register();
 
             try {
-
-                lc.removeItem( "jar-value-" + name );
-                jar.removeRecord( name );
-                jar.resolve( id, jar.filters[ type ]( data ) );
+                lc.removeItem( "jar-value-" + this.name + "-" + name );
+                jar.removeRecord( this.name, name );
+                jar.resolve( id );
 
             } catch ( e ) {
                 jar.reject( id );

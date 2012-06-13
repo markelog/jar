@@ -1,19 +1,47 @@
 !function() {
+    var lc = localStorage;
 
-    this.log = function( name, storage, type ) {
-        this.prefixes.lc[ "jar-type-" + name ] = storage + ":" + type;
+    this.data = lc[ "jar-meta" ] ? this.filters.json( lc[ "jar-meta" ] ) : {};
+
+    function unload() {
+         lc[ "jar-meta" ] = jar.rFilters.json( jar.data );
     }
 
-    this.meta = function( name ) {
-        var meta = this.prefixes.lc[ "jar-type-" + name ].split( ":" );
+    if ( window.onbeforeunload ) {
+        if ( window.attachEvent ) {
+            window.attachEvent( "onbeforeunload", unload );
+        } else {
+            window.addEventListener( "onbeforeunload", unload, false );
+        }
+    } else {
+        window.history.navigationMode = "compatible";
+        window.addEventListener( "unload", unload, false );
+    }
 
-        return {
-            storage: meta[ 0 ],
-            type: meta[ 1 ]
+    this.log = function( base, name, storage, type ) {
+        if ( !this.data[ base ] ) {
+            this.data[ base ] = {};
+        }
+
+        this.data[ base ][ name ] = {
+            storage: storage,
+            type: type
+        }
+
+        return jar;
+    }
+
+    this.meta = function( base, name ) {
+        if ( this.data[ base ] ) {
+            return this.data[ base ][ name ];
         }
     }
 
-    this.removeRecord = function( name ) {
-        this.prefixes.lc.removeItem( "jar-type-" + name );
+    this.removeRecord = function( base, name ) {
+        if ( this.data[ base ] ) {
+            delete this.data[ base ][ name ];
+        }
+
+        return jar;
     }
 }.call( jar );
