@@ -3,8 +3,6 @@
 
     this.lc = {
         set: function( name, data, type ) {
-            type = type || jar.type( data );
-
             var id = this.register();
 
             try {
@@ -27,7 +25,7 @@
 
             try {
                 data = lc[ "jar-value-" + this.name + "-" + name ];
-                jar.resolve( id, jar.filters[ type ]( data ), type  );
+                jar.resolve( id, jar.filters[ type ]( data ), type );
 
             } catch ( e ) {
                 jar.reject( id );
@@ -51,4 +49,4 @@
             return this;
         }
     };
-}.call( jar );
+}.call( jar.fn );

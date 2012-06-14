@@ -1,35 +1,38 @@
 !function () {
+    var push = [].push;
+
     this.get = function( name ) {
         var meta = jar.meta( this.name, name );
 
         if ( meta ) {
-            return jar[ meta.storage ].get.apply( this, [ name, meta.type ] );
+            return this[ meta.storage ].get.apply( this, [ name, meta.type ] );
         }
 
         jar.reject( this.register() );
         return this;
     };
 
-    this.set = function( name, data ) {
+    this.set = function( name, data, type ) {
         var storage,
-            type = jar.type( data ),
+            type = type || jar.type( data ),
             storages = this.types[ type ];
 
+        push.call( arguments, type )
+
         for ( var i = 0, l = storages.length; i < l; i++ ) {
-            if ( jar[ storages[ i ] ] ) {
+            if ( this[ storages[ i ] ] ) {
                 storage = storages[ i ];
                 break;
             }
         }
-
-        return jar[ storage ].set.apply( this, arguments );
+        return this[ storage ].set.apply( this, arguments );
     };
 
     this.remove = function( name ) {
         var meta = jar.meta( this.name, name );
 
         if ( meta ) {
-            return jar[ meta.storage ].remove.apply( this, [ name ] );
+            return this[ meta.storage ].remove.apply( this, [ name ] );
         }
 
         jar.reject( this.register() );

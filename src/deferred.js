@@ -1,5 +1,6 @@
 !function() {
     var proto,
+        counter = 0,
         slice = [].slice;
 
     function Deferred() {
@@ -94,6 +95,22 @@
         return new Deferred();
     };
 
+    this.when = function() {
+        var def = jar.Deferred(),
+            executed = 0,
+            length = arguments.length;
+
+        for ( var i = 0; i < length; i++ ) {
+            arguments[ i ].done(function() {
+                if ( length == ++executed ) {
+                    def.resolve();
+                }
+            });
+        }
+
+        return def;
+    };
+
     this.resolve = function( id ) {
         var args = slice.call( arguments ),
             def = this.deferreds[ id ];
@@ -115,7 +132,7 @@
     };
 
     this.fn.register = function() {
-        var id = new Date().getTime();
+        var id = new Date().getTime() + ++counter;
 
         this.active = jar.deferreds[ id ] = jar.Deferred();
 

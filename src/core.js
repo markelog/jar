@@ -31,14 +31,44 @@
                 xml: [ "sql", "lc" ],
                 json: [  "sql", "lc" ],
                 javascript: [ "sql", "lc" ],
-                text: [ "lc" ]
+                text: [ "websql", "lc" ]
             };
 
             if ( jar.prefixes.storageInfo ) {
                 this.types.xml = [ "idb", "fs" ].concat( this.types.xml );
                 this.types.json = [ "idb" ].concat( this.types.json );
-                this.types.javascript = [ "fs" ].concat( this.types.javascript );
+                this.types.javascript = ["idb"]//[ "fs" ].concat( this.types.javascript );
+                this.types.text = [ "idb", "lc" ];
             }
+
+            this.setup( name, "idb" );
+
+            return this;
+        },
+
+        // Setup for all storages
+        setup: function( name, storages ) {
+            storages = storages.split( " " );
+            defs = [];
+
+            var storage;
+
+            this.instances = {};
+            this.active = jar.Deferred();
+
+            for ( var i = 0, l = storages.length; i < storages.length; i++ ) {
+                storage = storages[ i ];
+
+                this.instances[ storage ] = {};
+
+                if ( typeof this[ storage ] == "function" ) {
+                    defs.push( this[ storage ]( name ) );
+                }
+            }
+
+            jar.when.apply( jar, defs ).done( function() {
+                this.active.resolve();
+            }, this );
 
             return this;
         }
