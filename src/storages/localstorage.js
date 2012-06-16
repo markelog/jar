@@ -2,12 +2,9 @@
     var lc = window.localStorage;
 
     this.lc = {
-        set: function( name, data, type ) {
-            var id = this.register();
-
+        set: function( name, data, type, id ) {
             try {
-                lc[ "jar-value-" + this.name + "-" + name ] = jar.rFilters[ type ]( data );
-                jar.log( this.name, name, "lc", type );
+                lc[ "jar-value-" + this.name + "-" + name ] = jar.serializations[ type ]( data );
                 jar.resolve( id );
 
             } catch ( e ) {
@@ -17,16 +14,18 @@
             return this;
         },
 
-        get: function( name, type ) {
-            type = type || jar.meta( this.name, name ).type;
+        get: function( name, type, id ) {
+            type = type || this.meta( name ).type;
 
-            var data, meta,
-                id = this.register();
+            var data, meta;
 
             try {
                 data = lc[ "jar-value-" + this.name + "-" + name ];
-                jar.resolve( id, jar.filters[ type ]( data ), type );
-
+                if ( data ) {
+                    jar.resolve( id, jar.filters[ type ]( data ), type );
+                } else {
+                    jar.reject( id );
+                }
             } catch ( e ) {
                 jar.reject( id );
             }
@@ -34,12 +33,9 @@
             return this;
         },
 
-        remove: function( name ) {
-            var id = this.register();
-
+        remove: function( name, id ) {
             try {
                 lc.removeItem( "jar-value-" + this.name + "-" + name );
-                jar.removeRecord( this.name, name );
                 jar.resolve( id );
 
             } catch ( e ) {
