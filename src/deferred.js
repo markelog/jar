@@ -25,18 +25,18 @@
             context = context || jar;
 
             if ( !fn ) {
-                return jar;
+                return this;
             }
 
             if ( this.state != "pending" ) {
                 if ( this.state == "resolved" && type == "done" ) {
                    fn.apply( context, this.args );
-                   return jar;
+                   return this;
                 }
 
                 if ( this.state == "rejected" && type == "fail" ) {
                     fn.apply( context, this.args );
-                    return jar;
+                    return this;
                 }
 
                 if ( type == "always" ) {
@@ -51,7 +51,7 @@
 
             this.length++;
 
-            return jar;
+            return this;
         },
 
         iterate: function( type, args, i /* internal */ ) {
@@ -113,6 +113,10 @@
             executed = 0,
             length = arguments.length;
 
+        if ( !length ) {
+            return def
+        }
+
         function executer() {
             if ( length == ++executed ) {
                 def.resolve();
@@ -120,7 +124,7 @@
         }
 
         for ( var i = 0; i < length; i++ ) {
-            arguments[ i ].done( executer );
+            arguments[ i ].done( executer ).fail( def.reject );
         }
 
         return def;
@@ -154,11 +158,9 @@
         var id = new Date().getTime() + (++counter);
 
         this.active = jar.deferreds[ id ] = jar.Deferred();
+        this.active.id = id;
 
-        return {
-            def: this.active,
-            id: id
-        };
+        return this.active;
     };
 
     this.fn.done = function( fn, context ) {
