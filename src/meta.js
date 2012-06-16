@@ -2,7 +2,7 @@
     var lc = localStorage,
         data = lc[ "jar-meta" ];
 
-    jar.data = !!data ? jar.filters.json( data ) : {};
+    jar.data = data ? jar.filters.json( data ) : {};
 
     function unload() {
          lc[ "jar-meta" ] = jar.rFilters.json( jar.data );
@@ -21,7 +21,7 @@
 
     this.log = function( name, storage, type ) {
         if ( !jar.data[ this.name ] ) {
-            jar.data[ this.name ] = 1;
+            jar.data[ this.name ] = {};
         }
 
         jar.data[ this.name ][ name ] = {
