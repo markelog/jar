@@ -10,6 +10,8 @@
             always: []
         };
 
+        // Total amount of callbacks
+        this.length = 0;
         this.state = "pending";
 
         return this;
@@ -47,22 +49,33 @@
                 context: context
             });
 
+            this.length++;
+
             return jar;
         },
 
-        iterate: function( type, args ) {
+        iterate: function( type, args, i /* internal */ ) {
+            var value, always,
+                isAlways = type == "always";
+
+            i = i || 0;
             type = this.lists[ type ];
 
-            var value, always;
-
-            for ( var i = 0, l = type.length; i < l; i++ ) {
+            for ( var l = type.length; i < l; i++ ) {
                 value = type[ i ];
 
                 value.fn.apply( value.context || jar, args );
 
-                if ( always = this.lists.always[ i ] ) {
+                // call "always" callback
+                if ( !isAlways && ( always = this.lists.always[ i ] ) ) {
                     always.fn.apply( value.context || jar, args );
                 }
+            }
+
+            // If successful or failed callbacks is less then "always" callbacks
+            // some of the always callbacks will not be called
+            if ( i < this.lists.always.length ) {
+                this.iterate( "always", args, i );
             }
 
             return this;
@@ -100,20 +113,24 @@
             executed = 0,
             length = arguments.length;
 
+        function executer() {
+            if ( length == ++executed ) {
+                def.resolve();
+            }
+        }
+
         for ( var i = 0; i < length; i++ ) {
-            arguments[ i ].done(function() {
-                if ( length == ++executed ) {
-                    def.resolve();
-                }
-            });
+            arguments[ i ].done( executer );
         }
 
         return def;
     };
 
-    this.resolve = function( id ) {
-        var args = slice.call( arguments ),
-            def = this.deferreds[ id ];
+    this.resolve = function( def ) {
+        var id = typeof def == "object" ? def.id : def,
+            args = slice.call( arguments );
+
+        def = this.deferreds[ id ];
 
         args.shift();
         delete this.deferreds[ id ];
@@ -121,9 +138,11 @@
         return def.resolve( args );
     };
 
-    this.reject = function( id ) {
-        var args = slice.call( arguments ),
-            def = this.deferreds[ id ];
+    this.reject = function( def ) {
+        var id = typeof def == "object" ? def.id : def,
+            args = slice.call( arguments );
+
+        def = this.deferreds[ id ];
 
         args.shift();
 
@@ -132,11 +151,14 @@
     };
 
     this.fn.register = function() {
-        var id = new Date().getTime() + ++counter;
+        var id = new Date().getTime() + (++counter);
 
         this.active = jar.deferreds[ id ] = jar.Deferred();
 
-        return id;
+        return {
+            def: this.active,
+            id: id
+        };
     };
 
     this.fn.done = function( fn, context ) {

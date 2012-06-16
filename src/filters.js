@@ -45,7 +45,7 @@
             }()
     };
 
-    this.rFilters = {
+    this.serializations = {
         json: JSON.stringify,
         text: function( text ) {
             return text;

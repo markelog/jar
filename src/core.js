@@ -7,41 +7,66 @@
 */
 
 !function() {
-    var aliases = {
+    var jar,
+        storageInfo = window.storageInfo || window.webkitStorageInfo,
+        toString = "".toString,
+        order = {
+            xml: [ "sql", "lc" ],
+            json: [  "sql", "lc" ],
+            javascript: [ "sql", "lc" ],
+            text: [ "websql", "lc" ]
+        };
+
+    if ( storageInfo ) {
+        order.xml = [ "idb", "fs" ].concat( order.xml );
+        order.json = [ "idb" ].concat( order.json );
+        order.javascript = [ "fs" ].concat( order.javascript );
+        order.text = [ "idb", "lc" ];
+    }
+
+    jar = this.jar = function jar( name, storage ) {
+        return new jar.fn.init( name, storage );
+    };
+
+    /*
+    jar.aliases = {
+        storages: {
             idb: [ "indexeddb", "idb", "indb" ],
             sql: [ "websql", "sql" ],
             lc: [ "localStorage", "webstorage", "lc" ],
-            fsapi: [ "filesystem", "fsapi" ]
+            fs: [ "filesystem", "fsapi",  ]
         },
-        toString = "".toString;
-
-    this.jar = function jar( storage, name, type ) {
-        return new jar.fn.init( storage, name, type );
+        types: {
+            js: [ "javascript" ],
+            text: [ "text" ]
+        }
     };
+    */
 
     jar.prototype = this.jar.fn = {
         constructor: jar,
 
-        init: function( name, type ) {
-            var types;
-            type = type || "text";
+        order: order,
+
+        storages: "fs idb websql lc",
+
+        types: "xml javascript text json",
+
+        init: function( name, storage ) {
+            var storages, types;
 
             this.name = name || "jar";
-            this.types = {
-                xml: [ "sql", "lc" ],
-                json: [  "sql", "lc" ],
-                javascript: [ "sql", "lc" ],
-                text: [ "websql", "lc" ]
-            };
 
-            if ( jar.prefixes.storageInfo ) {
-                this.types.xml = [ "idb", "fs" ].concat( this.types.xml );
-                this.types.json = [ "idb" ].concat( this.types.json );
-                this.types.javascript = ["idb"]//[ "fs" ].concat( this.types.javascript );
-                this.types.text = [ "idb", "lc" ];
+            if ( storage ) {
+                types = this.types.split( " " );
+
+                for ( var i = 0, l = types.length; i < l; i++ ) {
+                    this.order[ types[ i ] ] = [ storage ];
+                }
             }
 
-            this.setup( name, "idb" );
+            // TODO – add support for aliases
+            this.setup( name, storage || this.storages );
 
             return this;
         },
@@ -49,9 +74,8 @@
         // Setup for all storages
         setup: function( name, storages ) {
             storages = storages.split( " " );
-            defs = [];
-
-            var storage;
+            var storage,
+                defs = [];
 
             this.instances = {};
             this.active = jar.Deferred();

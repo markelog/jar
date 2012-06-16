@@ -1,42 +1,52 @@
 !function () {
-    var push = [].push;
-
-    this.get = function( name ) {
-        var meta = jar.meta( this.name, name );
-
-        if ( meta ) {
-            return this[ meta.storage ].get.apply( this, [ name, meta.type ] );
-        }
-
-        jar.reject( this.register() );
-        return this;
-    };
-
     this.set = function( name, data, type ) {
-        var storage,
-            type = type || jar.type( data ),
-            storages = this.types[ type ];
+        type = type || jar.type( data );
 
-        push.call( arguments, type )
+        var storage,
+            reg = this.register(),
+            storages = this.order[ type ];
 
         for ( var i = 0, l = storages.length; i < l; i++ ) {
-            if ( this[ storages[ i ] ] ) {
+            storage = storages[ i ];
+
+            if ( this.storages[ storage ] && this[ storages[ i ] ] ) {
                 storage = storages[ i ];
                 break;
             }
         }
-        return this[ storage ].set.apply( this, arguments );
+
+        reg.def.done(function() {
+            this.log( name, storage, type );
+        }, this );
+
+        return this[ storage ].set.apply( this, [ name, data, type, reg.id ] );
     };
 
-    this.remove = function( name ) {
-        var meta = jar.meta( this.name, name );
+    this.get = function( name ) {
+        var meta = this.meta( name ),
+            id = this.register().id;
 
         if ( meta ) {
-            return this[ meta.storage ].remove.apply( this, [ name ] );
+            return this[ meta.storage ].get.apply( this, [ name, meta.type, id ] );
         }
 
-        jar.reject( this.register() );
+        jar.reject( id );
         return this;
     };
 
+    this.remove = function( name ) {
+        var meta = this.meta( name ),
+            reg = this.register();
+
+        if ( meta && this[ meta.storage ] ) {
+            reg.def.done(function() {
+                this.removeRecord( name );
+            }, this );
+
+            return this[ meta.storage ].remove.apply( this, [ name, reg.id ] );
+        }
+
+        jar.reject( reg.id );
+        return this;
+    };
 }.call( jar.fn );

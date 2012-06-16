@@ -1,7 +1,8 @@
 !function() {
-    var lc = localStorage;
+    var lc = localStorage,
+        data = lc[ "jar-meta" ];
 
-    this.data = lc[ "jar-meta" ] ? this.filters.json( lc[ "jar-meta" ] ) : {};
+    jar.data = !!data ? jar.filters.json( data ) : {};
 
     function unload() {
          lc[ "jar-meta" ] = jar.rFilters.json( jar.data );
@@ -18,12 +19,12 @@
         window.addEventListener( "unload", unload, false );
     }
 
-    this.log = function( base, name, storage, type ) {
-        if ( !this.data[ base ] ) {
-            this.data[ base ] = {};
+    this.log = function( name, storage, type ) {
+        if ( !jar.data[ this.name ] ) {
+            jar.data[ this.name ] = 1;
         }
 
-        this.data[ base ][ name ] = {
+        jar.data[ this.name ][ name ] = {
             storage: storage,
             type: type
         };
@@ -31,17 +32,17 @@
         return jar;
     };
 
-    this.meta = function( base, name ) {
-        if ( this.data[ base ] ) {
-            return this.data[ base ][ name ];
+    this.meta = function( name ) {
+        if ( jar.data[ this.name ] ) {
+            return jar.data[ this.name ][ name ];
         }
     };
 
-    this.removeRecord = function( base, name ) {
-        if ( this.data[ base ] ) {
-            delete this.data[ base ][ name ];
+    this.removeRecord = function( name ) {
+        if ( jar.data[ this.name ] ) {
+            delete jar.data[ this.name ][ name ];
         }
 
         return jar;
     };
-}.call( jar );
+}.call( jar.fn );
