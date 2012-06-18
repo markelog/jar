@@ -1,4 +1,4 @@
-module("lc", {
+module( "lc", {
     teardown: moduleTeardown
 });
 
@@ -8,7 +8,7 @@ test( "Simple set and get", function() {
             json: { test: "test" }
         };
 
-    jar().set( "text", values.text ).done(function() {
+    jar( "lc", "lc" ).set( "text", values.text ).done(function() {
         this.get( "text" )
             .done(function( data, type ) {
                 strictEqual( data, values.text, "set and get ok for text type" );
@@ -19,7 +19,7 @@ test( "Simple set and get", function() {
             });
     });
 
-    jar().set( "json", values.json ).done(function() {
+    jar( "lc", "lc" ).set( "json", values.json ).done(function() {
         this.get( "json" )
             .done(function( data, type ) {
                 strictEqual( data.test, "test", "set and get ok for json type" );
@@ -30,7 +30,7 @@ test( "Simple set and get", function() {
             });
     });
 
-    jar().get( "not-existed" )
+    jar( "lc", "lc" ).get( "not-existed" )
         .fail(function( data ) {
             ok( true, "fail should be called" );
         })
@@ -42,7 +42,7 @@ test( "Simple set and get", function() {
 test( "Remove method", function() {
     expect( 1 );
 
-    jar().set( "test", "test" ).done(function() {
+    jar( "lc", "lc" ).set( "test", "test" ).done(function() {
 
         // Make sure data is writed
         this.get( "test" ).done(function( data ) {
@@ -61,9 +61,9 @@ test( "Remove method", function() {
 test( "Differentiate data in diffrent data-sets", function() {
     expect( 1 );
 
-    jar( "test-1" ).set( "test", "test1" ).done(function() {
+    jar( "lc-1", "lc" ).set( "test", "test1" ).done(function() {
         this.get( "test" ).done(function( test1 ) {
-            jar( "test-2" ).set( "test", "test2" ).done(function() {
+            jar( "lc-2", "lc" ).set( "test", "test2" ).done(function() {
                 this.get( "test" ).done(function( test2 ) {
                     ok( test1 !== test2, "In diffrent data-sets diffrent data" );
                 });

@@ -1,8 +1,13 @@
 !function() {
     var proto,
+        self = this,
         database = {},
         indexOf = [].indexOf,
-        self = this;
+
+        // Prefixes
+        indexedDB =  window.indexedDB || window.webkitIndexedDB || window.mozIndexedDB || window.msIndexedDB,
+        IDBTransaction = window.IDBTransaction || window.webkitIDBTransaction,
+        IDBKeyRange = window.IDBKeyRange || window.webkitIDBKeyRange
 
     this.idb = function( name ) {
         return new proto.init( name, this.instances );
@@ -13,40 +18,55 @@
 
         init: function( name, instances ) {
             var db,
+                self = this;
 
-                self = this,
-
-                version = 1,
-
-                // Open connection with database
-                request = jar.prefixes.indexedDB.open( "jar", version );
-
+            this.version = 1;
             this.name = name;
             this.def = jar.Deferred();
+
+            // Open connection with database
+            this.request = indexedDB.open( "jar", this.version )
 
             this.def.done(function() {
                 instances.idb = this;
             }, this );
 
+            function reject() {
+                self.def.reject();
+            }
+
             // onupgradeneeded это новый эвент он есть только в Фаервоксе.
             // Хром использует устаревший (через setVersion) способ инициализации базы
-            if ( request.onupgradeneeded === null ) {
-                request.onupgradeneeded = function () {
+            if ( this.request.onupgradeneeded === null ) {
+                this.request.onupgradeneeded = function () {
                     self.setup();
                 };
 
-                request.onsuccess = function() {
+                this.request.onsuccess = function() {
                     self.db = this.result;
                     self.def.resolve();
                 };
 
             } else {
-                request.onsuccess = function() {
-                    (self.db = this.result).setVersion( version ).onsuccess = function() {
+
+                this.request.onsuccess = function() {
+                    self.db = this.result;
+
+                    if ( this.result.version == self.version ) {
+                        return self.setup();
+                    }
+
+                    var versionSet = this.result.setVersion( self.version );
+
+                    versionSet.onsuccess = function() {
                         self.setup();
                     };
-                };
+
+                    versionSet.onfailure = reject;
+                }
             }
+
+            this.request.onerror = reject;
 
             return this.def;
         },
@@ -60,11 +80,11 @@
                 });
             }
 
-            this.store = this.db.transaction([ this.name ], 1 /* Read-write */ ).objectStore( this.name );
             this.def.resolve();
+            delete this.def;
 
             return this;
-        }
+        },
     };
 
     proto.init.prototype = proto;
@@ -76,7 +96,9 @@
         };
 
         var self = this,
-            store = this.instances.idb.store,
+            store = this.instances.idb.db.transaction([ this.name ], 1 /* Read-write */ ).objectStore( this.name ),
+
+            // put, so we can rewrite data
             request = store.put( data );
 
         request.onsuccess = function() {
@@ -92,7 +114,8 @@
 
     this.idb.get = function( name, type, id ) {
         var self = this,
-            index = this.instances.idb.store.index( "name" ),
+            store = this.instances.idb.db.transaction([ this.name ], 1 /* Read only */ ).objectStore( this.name ),
+            index = store.index( "name" ),
             meta = this.meta( name ),
             request = index.get( name );
 
@@ -121,7 +144,8 @@
 
     this.idb.remove = function( name, id ) {
         var self = this,
-            request = this.instances.idb.store.delete( name );
+            store = this.instances.idb.db.transaction([ this.name ], 1 /* Read-write */ ).objectStore( this.name ),
+            request = store.delete( name );
 
         request.onsuccess = function() {
             jar.resolve( id );
@@ -133,4 +157,41 @@
 
         return this;
     };
+
+    this.idb.clear = function( id, destroy /* internal */ ) {
+        var request, store,
+            name = this.name,
+            instance = this.instances.idb,
+            db = instance.db;
+
+        function reject() {
+            jar.reject( id );
+        }
+
+        function resolve() {
+            jar.resolve( id );
+        }
+
+        // Either clear or destroy
+        if ( destroy ) {
+
+            // Required for deleteObjectStore transaction
+            request = db.setVersion( ++instance.version );
+            request.onsuccess = function() {
+                db.deleteObjectStore( name );
+
+                resolve();
+            };
+
+        } else {
+            store = this.instances.idb.db.transaction([ this.name ], 1 /* Read-write */ ).objectStore( this.name );
+            request = store.clear();
+            request.onsuccess = resolve;
+        }
+
+        request.onerror = reject;
+
+        return this;
+    };
+
 }.call( jar.fn );

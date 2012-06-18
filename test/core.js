@@ -1,1 +1,1 @@
-module("core", { teardown: moduleTeardown });
+module( "core", { teardown: moduleTeardown } );

@@ -64,11 +64,11 @@
             for ( var l = type.length; i < l; i++ ) {
                 value = type[ i ];
 
-                value.fn.apply( value.context || jar, args );
+                value.fn.apply( value.context || this, args );
 
                 // call "always" callback
                 if ( !isAlways && ( always = this.lists.always[ i ] ) ) {
-                    always.fn.apply( value.context || jar, args );
+                    always.fn.apply( value.context || this, args );
                 }
             }
 
@@ -82,13 +82,21 @@
         },
 
         resolve: function( args ) {
-            this.state = "resolved";
-            return this.iterate( "done", this.args = args );
+            if ( this.state == "pending" ) {
+                this.iterate( "done", this.args = args );
+                this.state = "resolved";
+            }
+
+            return this;
         },
 
         reject: function( args ) {
-            this.state = "rejected";
-            return this.iterate( "fail", this.args = args );
+            if ( this.state == "pending" ) {
+                this.iterate( "fail", this.args = args );
+                this.state = "rejected";
+            }
+
+            return this;
         },
 
         done: function( fn, context ) {
@@ -114,7 +122,7 @@
             length = arguments.length;
 
         if ( !length ) {
-            return def
+            return def.resolve();
         }
 
         function executer() {

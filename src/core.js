@@ -48,51 +48,50 @@
 
         order: order,
 
-        storages: "fs idb websql lc",
+        storages: [ "fs", "idb", "websql", "lc" ],
 
-        types: "xml javascript text json",
+        types: [ "xml", "javascript", "text", "json" ],
 
         init: function( name, storage ) {
-            var storages, types;
-
             this.name = name || "jar";
 
-            if ( storage ) {
-                types = this.types.split( " " );
-
-                for ( var i = 0, l = types.length; i < l; i++ ) {
-                    this.order[ types[ i ] ] = [ storage ];
-                }
-            }
-
             // TODO – add support for aliases
-            this.setup( name, storage || this.storages );
+            this.setup( storage || this.storages );
 
             return this;
         },
 
         // Setup for all storages
-        setup: function( name, storages ) {
-            storages = storages.split( " " );
+        setup: function( storages ) {
+            this.instances = {};
+            this.storages = storages = storages.split( " " );
+
             var storage,
+                def = this.register(),
                 defs = [];
 
-            this.instances = {};
-            this.active = jar.Deferred();
-
-            for ( var i = 0, l = storages.length; i < storages.length; i++ ) {
+            for ( var i = 0, l = storages.length; i < l; i++ ) {
                 storage = storages[ i ];
 
                 this.instances[ storage ] = {};
 
+                // base for some storages does not need to be created
                 if ( typeof this[ storage ] == "function" ) {
-                    defs.push( this[ storage ]( name ) );
+                    defs.push( this[ storage ]( this.name ) );
                 }
             }
 
-            jar.when.apply( jar, defs ).done( function() {
-                this.active.resolve();
-            }, this );
+            for ( var i = 0, l = this.types.length; i < l; i++ ) {
+                this.order[ this.types[ i ] ] = storages;
+            }
+
+            jar.when.apply( jar, defs )
+                .done(function() {
+                    def.resolve();
+                })
+                .fail(function() {
+                    def.reject();
+                });
 
             return this;
         }
