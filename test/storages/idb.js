@@ -9,7 +9,6 @@ asyncTest( "Complete removal of object store", 1, function() {
                 this.get( "1" ).done(function( data ) {
                     this.remove()
                         .done(function() {
-                            console.log( this.instances.idb.db.objectStoreNames )
                             ok( !~[].indexOf.call( this.instances.idb.db.objectStoreNames, "idb-1" ), "Store was completely removed" );
                         })
                         .fail(function() {
@@ -20,8 +19,8 @@ asyncTest( "Complete removal of object store", 1, function() {
             });
         })
         .fail(function() {
-            console.log(4)
-        })
+            ok( false, "Can't create object store" );
+        });
 });
 
 asyncTest( "Clear object store", 2, function() {
