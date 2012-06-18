@@ -25,7 +25,7 @@
             this.def = jar.Deferred();
 
             // Open connection with database
-            request = indexedDB.open( "jar", this.version );
+            request = indexedDB.open( "jar-" + this.name, this.version );
 
             this.def.done(function() {
                 instances.idb = this;
@@ -149,6 +149,8 @@
             store = this.instances.idb.db.transaction([ this.name ], 1 /* Read-write */ ).objectStore( this.name ),
             request = store.delete( name );
 
+        console.log(1)
+
         request.onsuccess = function() {
             jar.resolve( id );
         };
@@ -179,11 +181,16 @@
 
             // Required for deleteObjectStore transaction
             request = db.setVersion( ++instance.version );
+
             request.onsuccess = function() {
                 db.deleteObjectStore( name );
 
                 resolve();
             };
+
+            request.onfailure = function() {
+                console.log(2)
+            }
 
         } else {
             store = this.instances.idb.db.transaction([ this.name ], 1 /* Read-write */ ).objectStore( this.name );
