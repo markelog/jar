@@ -9,7 +9,7 @@ asyncTest( "Complete removal of object store", 1, function() {
                 this.get( "1" ).done(function( data ) {
                     this.remove()
                         .done(function() {
-                            ok( !~[].indexOf.call( this.instances.idb.db.objectStoreNames, "idb-1" ), "Store was completely removed" );
+                            ok( !~[].indexOf.call( jar.idb.db.objectStoreNames, this.name ), "Store was completely removed" );
                         })
                         .fail(function() {
                             ok( false, "Store was not completely removed" );
@@ -46,22 +46,34 @@ asyncTest( "Clear object store", 1, function() {
     });
 });
 
-asyncTest( "Complete removal of object store", 1, function() {
-    var test = jar( "idb-3", "idb" ).done(function() {
+asyncTest( "Complete removal of object store after it was removed", 1, function() {
+    jar( "idb-3", "idb" ).done(function() {
         this.set( "1", "2" ).done(function() {
             this.get( "1" ).done(function( data ) {
                 this.remove().done(function() {
                     this.setup( "idb" )
                         .done(function() {
-                            ok( test.instances.idb.db.objectStoreNames.length === 1, "Store was setted, after being removed" );
-                            start();
+                            ok( jar.idb.db.objectStoreNames.contains( this.name ), "Store was setted, after being removed" );
                         })
                         .fail(function() {
                             ok( false, "Store was not setted, after being removed" );
                         })
                         .always( start );
-                });
+                }).fail(function() {
+                    ok( false, "Store was not removed" );
+                })
             });
         });
+    });
+});
+
+asyncTest( "Parallel store creation should work", 2, function() {
+    jar( "idb-1", "idb" ).done(function() {
+        ok( true, "First store created" );
+    });
+
+    jar( "idb-2", "idb" ).done(function() {
+        ok( true, "Second store created" );
+        start();
     });
 });

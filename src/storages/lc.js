@@ -47,19 +47,24 @@
         },
 
         clear: function( id, destroy /* internal */ ) {
-            var self = this,
+            var reg,
+                self = this,
                 defs = [],
                 data = jar.data[ this.name ];
 
-            for ( key in data ) {
+            function exec( key ) {
+                return function() {
+                    this.removeRecord( key );
+                };
+            }
+
+            for ( var key in data ) {
                 reg = this.register();
                 defs.push( reg );
 
                 this[ data[ key ].storage ].remove.apply( this, [ key, reg.id ] );
 
-                reg.done(function() {
-                    this.removeRecord( key );
-                }, this );
+                reg.done( exec( key ), this );
             }
 
             jar.when.apply( this, defs ).fail(function() {

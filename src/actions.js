@@ -85,6 +85,5 @@
         }
 
         return this;
-    }
-
+    };
 }.call( jar.fn );

@@ -145,7 +145,7 @@
         def = this.deferreds[ id ];
 
         args.shift();
-        delete this.deferreds[ id ];
+        //delete this.deferreds[ id ];
 
         return def.resolve( args );
     };

@@ -137,5 +137,5 @@
         }, reject );
 
         return this;
-    }
+    };
 }.call( jar.fn );

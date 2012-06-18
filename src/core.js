@@ -81,7 +81,7 @@
                 }
             }
 
-            for ( var i = 0, l = this.types.length; i < l; i++ ) {
+            for ( i = 0, l = this.types.length; i < l; i++ ) {
                 this.order[ this.types[ i ] ] = storages;
             }
 

@@ -7,32 +7,55 @@
         // Prefixes
         indexedDB =  window.indexedDB || window.webkitIndexedDB || window.mozIndexedDB || window.msIndexedDB,
         IDBTransaction = window.IDBTransaction || window.webkitIDBTransaction,
-        IDBKeyRange = window.IDBKeyRange || window.webkitIDBKeyRange
+        IDBKeyRange = window.IDBKeyRange || window.webkitIDBKeyRange;
 
     this.idb = function( name ) {
         return new proto.init( name, this.instances );
     };
 
+    jar.idb = {};
+
     proto = this.idb.prototype = {
         constructor: this.idb,
 
         init: function( name, instances ) {
-            var db, request,
+            var db, request, def,
                 self = this;
 
-            this.version = 1;
             this.name = name;
-            this.def = jar.Deferred();
 
-            // Open connection with database
-            request = indexedDB.open( "jar-" + this.name, this.version );
+            if ( jar.idb.db ) {
 
-            this.def.done(function() {
+                // If previous deferred is finished, then create new deferred
+                if ( jar.idb.def.state != "pending" ) {
+                    jar.idb.def = jar.Deferred();
+                    this.setup();
+
+                } else {
+                    // If base already opening or opened, wait when it will finish
+                    jar.idb.def.done(function() {
+                        self.setup();
+                    });
+                }
+
+                return jar.idb.def;
+            }
+
+            def = jar.idb.def = jar.Deferred();
+            jar.idb.version = 1;
+            jar.idb.setVersion = {
+                readyState: 0
+            };
+
+            // Open connection for database
+            jar.idb.db = request = indexedDB.open( "jar", jar.idb.version );
+
+            def.done(function() {
                 instances.idb = this;
             }, this );
 
             function reject() {
-                self.def.reject();
+                def.reject();
             }
 
             // onupgradeneeded это новый эвент он есть только в Фаервоксе.
@@ -44,46 +67,53 @@
 
                 request.onsuccess = function() {
                     self.db = this.result;
-                    self.def.resolve();
+                    def.resolve();
                 };
 
             } else {
                 request.onsuccess = function() {
-                    self.db = this.result;
+                    jar.idb.db = this.result;
 
                     if ( !~indexOf.call( this.result.objectStoreNames, self.name ) ) {
                         return self.setup();
                     }
 
-                    self.def.resolve();
-                }
+                    def.resolve();
+                };
             }
 
             request.onerror = function() {
-                self.def.reject();
+                def.reject();
             };
 
-            return this.def;
+            return def;
         },
 
         setup: function() {
-            var request = this.db.setVersion( this.version ),
+            if ( jar.idb.setVersion.readyState != 1 ) {
+                jar.idb.setVersion = jar.idb.db.setVersion( jar.idb.version );
+            }
+
+            var request = jar.idb.setVersion,
                 name = this.name,
-                db = this.db,
-                def = this.def;
+                db = jar.idb.db,
+                def = jar.idb.def;
 
-            request.onsuccess = function() {
-                db.createObjectStore( name, {
-                    keyPath: "name"
-                }).createIndex( "name", "name", {
-                    unique: true
-                });
-                def.resolve();
-            };
+            request.addEventListener( "success", function() {
+                if ( !db.objectStoreNames.contains( name ) ) {
+                    db.createObjectStore( name, {
+                        keyPath: "name"
+                    }).createIndex( "name", "name", {
+                        unique: true
+                    });
+                }
 
-            request.onfailure = function() {
+                jar.idb.def.resolve();
+            });
+
+            request.addEventListener( "error", function() {
                 def.reject();
-            };
+            });
 
             return this;
         },
@@ -98,7 +128,7 @@
         };
 
         var self = this,
-            store = this.instances.idb.db.transaction([ this.name ], 1 /* Read-write */ ).objectStore( this.name ),
+            store = jar.idb.db.transaction([ this.name ], 1 /* Read-write */ ).objectStore( this.name ),
 
             // put, so we can rewrite data
             request = store.put( data );
@@ -116,7 +146,7 @@
 
     this.idb.get = function( name, type, id ) {
         var self = this,
-            store = this.instances.idb.db.transaction([ this.name ], 1 /* Read only */ ).objectStore( this.name ),
+            store = jar.idb.db.transaction([ this.name ], 0 /* Read only */ ).objectStore( this.name ),
             index = store.index( "name" ),
             meta = this.meta( name ),
             request = index.get( name );
@@ -146,10 +176,8 @@
 
     this.idb.remove = function( name, id ) {
         var self = this,
-            store = this.instances.idb.db.transaction([ this.name ], 1 /* Read-write */ ).objectStore( this.name ),
+            store = jar.idb.db.transaction([ this.name ], 1 /* Read-write */ ).objectStore( this.name ),
             request = store.delete( name );
-
-        console.log(1)
 
         request.onsuccess = function() {
             jar.resolve( id );
@@ -165,8 +193,7 @@
     this.idb.clear = function( id, destroy /* internal */ ) {
         var request, store,
             name = this.name,
-            instance = this.instances.idb,
-            db = instance.db;
+            db = jar.idb.db;
 
         function reject() {
             jar.reject( id );
@@ -180,20 +207,15 @@
         if ( destroy ) {
 
             // Required for deleteObjectStore transaction
-            request = db.setVersion( ++instance.version );
+            request = jar.idb.setVersion = jar.idb.db.setVersion( ++jar.idb.version );
 
             request.onsuccess = function() {
                 db.deleteObjectStore( name );
-
                 resolve();
             };
 
-            request.onfailure = function() {
-                console.log(2)
-            }
-
         } else {
-            store = this.instances.idb.db.transaction([ this.name ], 1 /* Read-write */ ).objectStore( this.name );
+            store = jar.idb.db.transaction([ this.name ], 1 /* Read-write */ ).objectStore( this.name );
             request = store.clear();
             request.onsuccess = resolve;
         }
