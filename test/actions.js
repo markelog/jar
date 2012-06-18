@@ -2,6 +2,7 @@ module( "actions", {
     teardown: moduleTeardown
 });
 
+/*
 asyncTest( "Complete removal of object store", 3, function() {
     jar( "test-1", "idb fs" ).done(function() {
         this.clear().done(function() {
@@ -28,3 +29,4 @@ asyncTest( "Complete removal of object store", 3, function() {
         })
     })
 });
+ */

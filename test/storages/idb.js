@@ -19,23 +19,29 @@ asyncTest( "Complete removal of object store", 1, function() {
             });
         })
         .fail(function() {
+            start();
             ok( false, "Can't create object store" );
         });
 });
 
-asyncTest( "Clear object store", 2, function() {
-    var test = jar( "idb-2", "idb" ).done(function() {
+asyncTest( "Clear object store", 1, function() {
+    jar( "idb-2", "idb" ).done(function() {
         this.set( "1", "2" ).done(function() {
-            this.get( "1" ).done(function( data ) {
-                this.clear()
-                    .done(function() {
-                        ok( test.instances.idb.db.objectStoreNames.length === 1, "Store was cleared" );
-                    })
-                    .fail(function() {
-                        ok( false, "Store was not cleared" );
-                    })
-                    .always( start );
-            });
+            this.clear()
+                .done(function() {
+                    this.get( "1" )
+                        .done(function() {
+                            ok( false, "Data was not cleared" );
+                        })
+                        .fail(function() {
+                            ok( true, "Data was cleared" );
+                        })
+                        .always( start );
+                })
+                .fail(function() {
+                    start();
+                    ok( false, "Store was not cleared" );
+                });
         });
     });
 });

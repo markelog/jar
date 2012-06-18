@@ -17,7 +17,7 @@
         constructor: this.idb,
 
         init: function( name, instances ) {
-            var db,
+            var db, request,
                 self = this;
 
             this.version = 1;
@@ -25,7 +25,7 @@
             this.def = jar.Deferred();
 
             // Open connection with database
-            this.request = indexedDB.open( "jar", this.version )
+            request = indexedDB.open( "jar", this.version );
 
             this.def.done(function() {
                 instances.idb = this;
@@ -37,51 +37,53 @@
 
             // onupgradeneeded это новый эвент он есть только в Фаервоксе.
             // Хром использует устаревший (через setVersion) способ инициализации базы
-            if ( this.request.onupgradeneeded === null ) {
-                this.request.onupgradeneeded = function () {
+            if ( request.onupgradeneeded === null ) {
+                request.onupgradeneeded = function () {
                     self.setup();
                 };
 
-                this.request.onsuccess = function() {
+                request.onsuccess = function() {
                     self.db = this.result;
                     self.def.resolve();
                 };
 
             } else {
-
-                this.request.onsuccess = function() {
+                request.onsuccess = function() {
                     self.db = this.result;
 
-                    if ( this.result.version == self.version ) {
+                    if ( !~indexOf.call( this.result.objectStoreNames, self.name ) ) {
                         return self.setup();
                     }
 
-                    var versionSet = this.result.setVersion( self.version );
-
-                    versionSet.onsuccess = function() {
-                        self.setup();
-                    };
-
-                    versionSet.onfailure = reject;
+                    self.def.resolve();
                 }
             }
 
-            this.request.onerror = reject;
+            request.onerror = function() {
+                self.def.reject();
+            };
 
             return this.def;
         },
 
         setup: function() {
-            if ( !~indexOf.call( this.db.objectStoreNames, this.name ) ) {
-                this.db.createObjectStore( this.name, {
+            var request = this.db.setVersion( this.version ),
+                name = this.name,
+                db = this.db,
+                def = this.def;
+
+            request.onsuccess = function() {
+                db.createObjectStore( name, {
                     keyPath: "name"
                 }).createIndex( "name", "name", {
                     unique: true
                 });
-            }
+                def.resolve();
+            };
 
-            this.def.resolve();
-            delete this.def;
+            request.onfailure = function() {
+                def.reject();
+            };
 
             return this;
         },
