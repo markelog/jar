@@ -66,6 +66,7 @@ test( "Differentiate data in diffrent data-sets", function() {
             jar( "lc-2", "lc" ).set( "test", "test2" ).done(function() {
                 this.get( "test" ).done(function( test2 ) {
                     ok( test1 !== test2, "In diffrent data-sets diffrent data" );
+                    start();
                 });
             });
         });

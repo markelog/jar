@@ -39,8 +39,8 @@ asyncTest( "Clear object store", 1, function() {
                         .always( start );
                 })
                 .fail(function() {
-                    start();
                     ok( false, "Store was not cleared" );
+                    start();
                 });
         });
     });
@@ -61,6 +61,7 @@ asyncTest( "Complete removal of object store after it was removed", 1, function(
                         .always( start );
                 }).fail(function() {
                     ok( false, "Store was not removed" );
+                    start();
                 })
             });
         });
@@ -74,6 +75,8 @@ asyncTest( "Parallel store creation should work", 2, function() {
 
     jar( "idb-2", "idb" ).done(function() {
         ok( true, "Second store created" );
+
+        // Assuming this request will be the last one
         start();
     });
 });
