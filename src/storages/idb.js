@@ -1,5 +1,5 @@
 !function() {
-    var proto,
+    var proto, idb,
         self = this,
         database = {},
         indexOf = [].indexOf,
@@ -13,7 +13,7 @@
         return new proto.init( name, this.instances );
     };
 
-    jar.idb = {};
+    idb = jar.idb = {};
 
     proto = this.idb.prototype = {
         constructor: this.idb,
@@ -24,35 +24,31 @@
 
             this.name = name;
 
-            if ( jar.idb.db ) {
+            if ( idb.db ) {
 
                 // If previous deferred is finished, then create new deferred
-                if ( jar.idb.def.state != "pending" ) {
-                    jar.idb.def = jar.Deferred();
+                if ( idb.def.state != "pending" ) {
+                    idb.def = jar.Deferred();
                     this.setup();
 
                 } else {
                     // If base already opening or opened, wait when it will finish
-                    jar.idb.def.done(function() {
+                    idb.def.done(function() {
                         self.setup();
                     });
                 }
 
-                return jar.idb.def;
+                return idb.def;
             }
 
-            def = jar.idb.def = jar.Deferred();
-            jar.idb.version = 1;
-            jar.idb.setVersion = {
+            def = idb.def = jar.Deferred();
+            idb.version = 1;
+            idb.setVersion = {
                 readyState: 0
             };
 
             // Open connection for database
-            jar.idb.db = request = indexedDB.open( "jar", jar.idb.version );
-
-            def.done(function() {
-                instances.idb = this;
-            }, this );
+            idb.db = request = indexedDB.open( "jar", idb.version );
 
             function reject() {
                 def.reject();
@@ -72,7 +68,7 @@
 
             } else {
                 request.onsuccess = function() {
-                    jar.idb.db = this.result;
+                    idb.db = this.result;
 
                     if ( !~indexOf.call( this.result.objectStoreNames, self.name ) ) {
                         return self.setup();
@@ -90,14 +86,14 @@
         },
 
         setup: function() {
-            if ( jar.idb.setVersion.readyState != 1 ) {
-                jar.idb.setVersion = jar.idb.db.setVersion( jar.idb.version );
+            if ( idb.setVersion.readyState != 1 ) {
+                idb.setVersion = idb.db.setVersion( idb.version );
             }
 
-            var request = jar.idb.setVersion,
+            var request = idb.setVersion,
                 name = this.name,
-                db = jar.idb.db,
-                def = jar.idb.def;
+                db = idb.db,
+                def = idb.def;
 
             request.addEventListener( "success", function() {
                 if ( !db.objectStoreNames.contains( name ) ) {
@@ -108,7 +104,7 @@
                     });
                 }
 
-                jar.idb.def.resolve();
+                idb.def.resolve();
             });
 
             request.addEventListener( "error", function() {
@@ -128,7 +124,7 @@
         };
 
         var self = this,
-            store = jar.idb.db.transaction([ this.name ], 1 /* Read-write */ ).objectStore( this.name ),
+            store = idb.db.transaction([ this.name ], 1 /* Read-write */ ).objectStore( this.name ),
 
             // put, so we can rewrite data
             request = store.put( data );
@@ -146,7 +142,7 @@
 
     this.idb.get = function( name, type, id ) {
         var self = this,
-            store = jar.idb.db.transaction([ this.name ], 0 /* Read only */ ).objectStore( this.name ),
+            store = idb.db.transaction([ this.name ], 0 /* Read only */ ).objectStore( this.name ),
             index = store.index( "name" ),
             meta = this.meta( name ),
             request = index.get( name );
@@ -176,7 +172,7 @@
 
     this.idb.remove = function( name, id ) {
         var self = this,
-            store = jar.idb.db.transaction([ this.name ], 1 /* Read-write */ ).objectStore( this.name ),
+            store = idb.db.transaction([ this.name ], 1 /* Read-write */ ).objectStore( this.name ),
             request = store.delete( name );
 
         request.onsuccess = function() {
@@ -193,7 +189,7 @@
     this.idb.clear = function( id, destroy /* internal */ ) {
         var request, store,
             name = this.name,
-            db = jar.idb.db;
+            db = idb.db;
 
         function reject() {
             jar.reject( id );
@@ -207,7 +203,7 @@
         if ( destroy ) {
 
             // Required for deleteObjectStore transaction
-            request = jar.idb.setVersion = jar.idb.db.setVersion( ++jar.idb.version );
+            request = idb.setVersion = idb.db.setVersion( ++idb.version );
 
             request.onsuccess = function() {
                 db.deleteObjectStore( name );
@@ -215,7 +211,7 @@
             };
 
         } else {
-            store = jar.idb.db.transaction([ this.name ], 1 /* Read-write */ ).objectStore( this.name );
+            store = idb.db.transaction([ this.name ], 1 /* Read-write */ ).objectStore( this.name );
             request = store.clear();
             request.onsuccess = resolve;
         }

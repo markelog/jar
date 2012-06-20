@@ -1,5 +1,5 @@
 !function() {
-    var proto,
+    var proto, fs,
         requestFileSystem = window.requestFileSystem || window.webkitRequestFileSystem,
         Blob = window.BlobBuilder || window.WebKitBlobBuilder || window.Blob,
         types = {
@@ -7,20 +7,19 @@
             text: "text/plain"
         };
 
-    this.fs = function( name ) {
-        return new proto.init( name, this.instances );
+    this.fs = function( name, instance ) {
+        return new proto.init( name, instance );
     };
+
+    fs = jar.fs = {};
 
     proto = this.fs.prototype = {
         constructor: this.fs,
 
-        init: function( name, instances ) {
+        init: function( name, instance ) {
             this.name = name;
             this.def = jar.Deferred();
-
-            this.def.done(function() {
-                instances.fs = this;
-            }, this );
+            this.instance = instance;
 
             return this.setup().def;
         },
@@ -30,15 +29,19 @@
                 name = this.name,
                 def = this.def;
 
-            requestFileSystem( 0 /* Temporary */, 0, function( fs ) {
-                (self.db = fs.root).getDirectory( name, {
+            function reject() {
+                def.reject();
+            }
+
+            requestFileSystem( 0 /* Temporary */, 0, function( entry ) {
+                (fs.db = entry.root).getDirectory( name, {
                     create: true
                 }, function( dir ) {
-                    self.store = dir;
+                    self.instance.dir = dir;
                     def.resolve();
 
-                  }, def.reject );
-                }, def.reject );
+                  }, reject );
+                }, reject );
 
             return this;
         }
@@ -47,11 +50,13 @@
     proto.init.prototype = proto;
 
     this.fs.set = function( name, data, type, id ) {
+        type = type || jar.type( type );
+
         function reject() {
             jar.reject( id );
         }
 
-        this.instances.fs.store.getFile( name, {
+        this.dir.getFile( name, {
             create: true
         }, function( entry ) {
             entry.createWriter(function( writer ) {
@@ -76,7 +81,7 @@
             jar.reject( id );
         }
 
-        this.instances.fs.store.getFile( name, {}, function( entry ) {
+        this.dir.getFile( name, {}, function( entry ) {
             entry.file(function( file ) {
                 var reader = new FileReader();
 
@@ -98,7 +103,7 @@
             jar.reject( id );
         }
 
-        this.instances.fs.store.getFile( name, {
+        this.dir.getFile( name, {
             create: false
         }, function( entry ) {
             entry.remove(function() {
@@ -110,28 +115,27 @@
     };
 
     this.fs.clear = function( id, destroy ) {
-        var instance = this.instances.fs,
-            name = this.name;
+        var self = this;
 
         function reject() {
             jar.reject( id );
         }
 
-        // Сама операция удаления
-        this.instances.fs.store.removeRecursively(function() {
+        this.dir.removeRecursively(function( entry ) {
 
             if ( !destroy ) {
-
                 // If we have to re-create the same dir
-                instance.root.getDirectory( name, {
+                fs.db.getDirectory( self.name, {
                     create: true
                 }, function( dir ) {
-                    instance.store = dir;
+                    self.dir = dir;
 
                     jar.resolve( id );
                 }, reject );
 
             } else {
+                delete self.dir;
+
                 jar.resolve( id );
             }
         }, reject );
