@@ -65,22 +65,34 @@
         var data = jar.data[ this.name ],
             def = this.register();
 
-        if ( !data ) {
+        if ( !data._length && !destroy ) {
 
             // Make request async
             window.setTimeout(function() {
                 def.resolve();
             });
+
             return this;
         }
 
-        for ( var key in data ) {
-            this[ data[ key ].storage ].clear.apply( this, [ def.id, destroy ] );
+        for ( var storage in data._storages ) {
+            this[ storage ].clear.apply( this, [ def.id, destroy ] );
         }
 
         if ( destroy ) {
+
+            // Remove all meta-info
             def.done(function() {
                 delete jar.data[ this.name ];
+            }, this );
+        } else {
+
+            // Save storages meta-info
+            def.done(function() {
+                jar.data[ this.name ] = {
+                    _storages: {},
+                    _length: 0
+                }
             });
         }
 

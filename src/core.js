@@ -63,8 +63,8 @@
 
         // Setup for all storages
         setup: function( storages ) {
-            this.instances = {};
             this.storages = storages = storages.split( " " );
+            this.stores = {};
 
             var storage,
                 def = this.register(),
@@ -73,25 +73,31 @@
             for ( var i = 0, l = storages.length; i < l; i++ ) {
                 storage = storages[ i ];
 
-                this.instances[ storage ] = {};
-
                 // base for some storages does not need to be created
                 if ( typeof this[ storage ] == "function" ) {
-                    defs.push( this[ storage ]( this.name ) );
+                    defs.push( this[ storage ]( this.name, this ) );
                 }
+
+                // Initiate meta-data for this storage
+                this.log( storage );
             }
 
             for ( i = 0, l = this.types.length; i < l; i++ ) {
                 this.order[ this.types[ i ] ] = storages;
             }
 
-            jar.when.apply( jar, defs )
-                .done(function() {
-                    def.resolve();
-                })
-                .fail(function() {
-                    def.reject();
-                });
+            // Make async only if we have async interfaces
+            if ( defs.length ) {
+                jar.when.apply( jar, defs )
+                    .done(function() {
+                        def.resolve();
+                    })
+                    .fail(function() {
+                        def.reject();
+                    });
+            } else {
+                def.resolve();
+            }
 
             return this;
         }
