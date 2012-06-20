@@ -92,7 +92,7 @@
                 jar.data[ this.name ] = {
                     _storages: {},
                     _length: 0
-                }
+                };
             });
         }
 

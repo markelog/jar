@@ -74,7 +74,7 @@
         data._length--;
 
         // But we remove info about storages
-        if ( --data._storages[ storage ] == 0 ) {
+        if ( !--data._storages[ storage ] ) {
             delete data._storages[ storage ];
         }
 
