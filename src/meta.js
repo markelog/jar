@@ -37,7 +37,7 @@
 
         // Check for name if we have to only initiate storage
         if ( storage ) {
-            jar.data[ this.name ][ name ] = {
+            data[ name ] = {
                 storage: storage,
                 type: type
             };
