@@ -49,11 +49,11 @@
         order: order,
 
         storages: [ "fs", "idb", "websql", "lc" ],
-
-        types: [ "xml", "javascript", "text", "json" ],
+        types: [ "xml", "html", "javascript", "text", "json" ],
 
         init: function( name, storage ) {
             this.name = name || "jar";
+            this.deferreds = {};
 
             // TODO – add support for aliases
             this.setup( storage || this.storages );
@@ -73,10 +73,8 @@
             for ( var i = 0, l = storages.length; i < l; i++ ) {
                 storage = storages[ i ];
 
-                // base for some storages does not need to be created
-                if ( typeof this[ storage ] == "function" ) {
-                    defs.push( this[ storage ]( this.name, this ) );
-                }
+
+                defs.push( this[ storage ]( this.name, this ) );
 
                 // Initiate meta-data for this storage
                 this.log( storage );
@@ -86,18 +84,13 @@
                 this.order[ this.types[ i ] ] = storages;
             }
 
-            // Make async only if we have async interfaces
-            if ( defs.length ) {
-                jar.when.apply( jar, defs )
-                    .done(function() {
-                        def.resolve();
-                    })
-                    .fail(function() {
-                        def.reject();
-                    });
-            } else {
-                def.resolve();
-            }
+            jar.when.apply( jar, defs )
+                .done(function() {
+                    def.resolve();
+                })
+                .fail(function() {
+                    def.reject();
+                });
 
             return this;
         }
@@ -112,9 +105,11 @@
 
         var documentElement = ( data.ownerDocument || data ).documentElement;
 
-        if ( documentElement && documentElement.nodeName !== "HTML" ) {
+        if ( documentElement && documentElement.nodeName.toLowerCase() !== "html" ) {
             return "xml";
-        } else if ( data.nodeType ) {
+        }
+
+        if ( data.nodeType ) {
             return "html";
         }
 
