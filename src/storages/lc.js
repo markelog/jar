@@ -77,7 +77,7 @@
             defs = [],
             data = jar.data[ this.name ];
 
-        function exec( key ) {
+        function executer( key ) {
             return function() {
                 this.removeRecord( key );
             };
@@ -86,10 +86,9 @@
         for ( var key in data ) {
             reg = this.register();
             defs.push( reg );
+            this.lc.remove.apply( this, [ key, reg.id ] );
 
-            this[ data[ key ].storage ].remove.apply( this, [ key, reg.id ] );
-
-            reg.done( exec( key ), this );
+            reg.done( executer( key ), this );
         }
 
         jar.when.apply( this, defs ).fail(function() {
