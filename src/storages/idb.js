@@ -4,6 +4,11 @@
         database = {},
         indexOf = [].indexOf,
 
+        cantStore = {
+            xml: true,
+            html: true
+        },
+
         // Prefixes
         indexedDB =  window.indexedDB || window.webkitIndexedDB || window.mozIndexedDB || window.msIndexedDB,
         IDBTransaction = window.IDBTransaction || window.webkitIDBTransaction,
@@ -118,16 +123,22 @@
     proto.init.prototype = proto;
 
     this.idb.set = function( name, data, type, id ) {
+        var request,
+            self = this,
+            store = idb.db.transaction([ this.name ], 1 /* Read-write */ ).objectStore( this.name );
+
+        // we can't store DOM nodes inside indexedDB
+        if ( cantStore[ type ] ) {
+            data = jar.text[ type ]( data );
+        }
+
         data = {
             name: name,
             data: data
         };
 
-        var self = this,
-            store = idb.db.transaction([ this.name ], 1 /* Read-write */ ).objectStore( this.name ),
-
-            // put, so we can rewrite data
-            request = store.put( data );
+        // use "put", so we can rewrite data
+        request = store.put( data );
 
         request.onsuccess = function() {
             jar.resolve( id );
@@ -156,8 +167,17 @@
                 return jar.reject( id );
             }
 
-            if ( jar.filters[ meta.type ] ) {
-                jar.filters[ meta.type ]( data );
+            // IndexedDB can't store some types of data in it original type
+            // we need to serialize it to right type
+            if ( cantStore[ type ] ) {
+                data = jar.filters[ meta.type ]( data );
+            }
+
+            // Some types of data can't be serialize to right type
+            // like javascript code, so instead we return it like text
+            // and execute it
+            if ( jar.executable[ type ] ) {
+                jar.filters[ type ]( data );
             }
 
             jar.resolve( id, data );
