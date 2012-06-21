@@ -1,5 +1,5 @@
 this.moduleTeardown = function() {
-    localStorage.clear();
+//    localStorage.clear();
 }
 
 
