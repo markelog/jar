@@ -10,7 +10,7 @@
             always: []
         };
 
-        // Total amount of callbacks
+        // Total amount of called callbacks
         this.length = 0;
         this.state = "pending";
 
@@ -49,8 +49,6 @@
                 context: context
             });
 
-            this.length++;
-
             return this;
         },
 
@@ -83,8 +81,8 @@
 
         resolve: function( args ) {
             if ( this.state == "pending" ) {
-                this.iterate( "done", this.args = args );
                 this.state = "resolved";
+                this.iterate( "done", this.args = args );
             }
 
             return this;
@@ -92,23 +90,23 @@
 
         reject: function( args ) {
             if ( this.state == "pending" ) {
-                this.iterate( "fail", this.args = args );
                 this.state = "rejected";
+                this.iterate( "fail", this.args = args );
             }
 
             return this;
         },
 
         done: function( fn, context ) {
-            return this.add( "done", fn, context );
+            return this.add( "done", fn, context || this.context );
         },
 
         always: function( fn, context ) {
-            return this.add( "always", fn, context );
+            return this.add( "always", fn, context || this.context );
         },
 
         fail: function( fn, context ) {
-            return this.add( "fail", fn, context );
+            return this.add( "fail", fn, context || this.context );
         }
     };
 
@@ -121,18 +119,24 @@
             executed = 0,
             length = arguments.length;
 
+        def.context = this;
+
         if ( !length ) {
             return def.resolve();
         }
 
-        function executer() {
-            if ( length == ++executed ) {
+        function done() {
+            if ( def.state == "pending" && length == ++executed ) {
                 def.resolve();
             }
         }
 
+        function reject() {
+            def.reject();
+        }
+
         for ( var i = 0; i < length; i++ ) {
-            arguments[ i ].done( executer ).fail( def.reject );
+            arguments[ i ].always( done, this ).fail( reject, this );
         }
 
         return def;
@@ -145,7 +149,7 @@
         def = this.deferreds[ id ];
 
         args.shift();
-        //delete this.deferreds[ id ];
+        delete this.deferreds[ id ];
 
         return def.resolve( args );
     };
@@ -165,7 +169,9 @@
     this.fn.register = function() {
         var id = new Date().getTime() + (++counter);
 
-        this.active = jar.deferreds[ id ] = jar.Deferred();
+        // FIXME this.deferreds stored almost forever
+        this.active = this.deferreds[ id ] = jar.deferreds[ id ] = jar.Deferred();
+
         this.active.id = id;
 
         return this.active;
@@ -188,4 +194,21 @@
 
     this.deferreds = {};
 
+    this.fn.promise = function() {
+        var def = jar.Deferred(),
+            defs = [];
+
+        for ( var id in this.deferreds ) {
+            def = this.deferreds[ id ];
+
+            if ( def.state == "pending" ) {
+                defs.push( def );
+
+            } else {
+                delete this.deferreds[ id ];
+            }
+        }
+
+        return jar.when.apply( this, defs );
+    };
 }.call( jar );
