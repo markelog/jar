@@ -2,9 +2,27 @@
     var proto, fs,
         requestFileSystem = window.requestFileSystem || window.webkitRequestFileSystem,
         Blob = window.BlobBuilder || window.WebKitBlobBuilder || window.Blob,
-        types = {
-            javascript: "text/javascript",
+        mime = {
+            javascript: "application/javascript",
+            xml: "application/xml",
+            html: "text/html",
             text: "text/plain"
+        },
+
+        origin = window.location.origin,
+
+        filters = {};
+        filters.xml = function( base, name, id ) {
+            var xhr = new XMLHttpRequest();
+            xhr.open( "get", "filesystem:" + origin + "/temporary/" + base + "/" + name, false );
+            xhr.send();
+
+            if ( xhr.readyState === 4 ) {
+                jar.resolve( id, xhr.responseXML || xhr.responseText );
+
+            } else {
+                jar.reject( id );
+            }
         };
 
     this.fs = function( name, instance ) {
@@ -68,8 +86,13 @@
 
                 writer.onerror = reject;
 
+                // We can write only strings in Blob
+                if ( typeof data != "string" ) {
+                    data = jar.text[ type ]( data );
+                }
+
                 bb.append( data );
-                writer.write( bb.getBlob( types[ type ] ) );
+                writer.write( bb.getBlob( mime[ type ] ) );
             }, reject );
         }, reject );
 
@@ -81,12 +104,20 @@
             jar.reject( id );
         }
 
+        var meta = this.meta( name );
+        type = meta && meta.type;
+
+        if ( filters[ type ] ) {
+            filters[ type ]( this.name, name, id );
+            return this;
+        }
+
         this.dir.getFile( name, {}, function( entry ) {
             entry.file(function( file ) {
                 var reader = new FileReader();
 
                 reader.onload = function() {
-                    jar.resolve( id, this.result );
+                    jar.resolve( id, jar.filters[ type ]( this.result ) );
                 };
 
                 reader.onerror = reject;
@@ -124,6 +155,7 @@
         this.dir.removeRecursively(function( entry ) {
 
             if ( !destroy ) {
+
                 // If we have to re-create the same dir
                 fs.db.getDirectory( self.name, {
                     create: true
