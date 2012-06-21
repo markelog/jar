@@ -1,8 +1,13 @@
 !function() {
+    var gEval = window.execScript || eval;
+
     this.filters = {
             json: JSON.parse,
 
-            javascript: window.execScript || eval,
+            javascript: function( data ) {
+                gEval( data );
+                return data;
+            },
 
             // from jQuery
             xml: function( data ) {
@@ -36,20 +41,38 @@
             },
 
             html: function() {
-                var div;
-                document.createDocumentFragment().appendChild( div = document.createElement( "div" ) );
+                var doc = document.implementation.createHTMLDocument("").documentElement;
 
                 return function( data ) {
-                    return div.innerHTML = data;
+                    doc.innerHTML = data;
+
+                    return doc.firstElementChild;
                 };
             }()
     };
 
-    this.serializations = {
+    this.executable = {
+        javascript: true
+        //css: true - not right now
+    };
+
+    this.text = {
         json: JSON.stringify,
+
+        xml: function( node ) {
+            if ( typeof node != "string" ) {
+                return new window.XMLSerializer().serializeToString( node );
+            }
+
+            return node;
+        },
+
         text: function( text ) {
             return text;
-        }
+        },
     };
+
+    this.text.javascript = this.text.text;
+    this.text.html = this.text.xml;
 
 }.call( jar );
