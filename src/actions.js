@@ -6,7 +6,7 @@
             reg = this.register(),
             storages = this.order[ type ];
 
-        for ( var i = 0, l = storages.length; i < l; i++ ) {
+        for ( var i = 0, l = this.order[ type ].length; i < l; i++ ) {
             storage = storages[ i ];
 
             if ( this[ storages[ i ] ] ) {
@@ -38,6 +38,7 @@
 
         // If method called without arguments – destroy store
         if ( !arguments.length ) {
+            delete this.order;
             return this.clear( true );
         }
 

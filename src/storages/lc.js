@@ -28,7 +28,7 @@
     this.lc.set = function( name, data, type, id ) {
         try {
             lc[ "jar-value-" + this.name + "-" + name ] = jar.text[ type ]( data );
-            finish( "resolve", id );
+            finish( "resolve", id, type, "lc" );
 
         } catch ( e ) {
             finish( "reject", id );

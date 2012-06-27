@@ -10,12 +10,12 @@
         },
 
         // Prefixes
-        indexedDB =  window.indexedDB || window.webkitIndexedDB || window.mozIndexedDB || window.msIndexedDB,
-        IDBTransaction = window.IDBTransaction || window.webkitIDBTransaction,
-        IDBKeyRange = window.IDBKeyRange || window.webkitIDBKeyRange;
+        indexedDB = jar.prefixes.indexedDB = window.indexedDB || window.webkitIndexedDB || window.mozIndexedDB || window.msIndexedDB,
+        IDBTransaction = jar.prefixes.IDBTransaction =  window.IDBTransaction || window.webkitIDBTransaction,
+        IDBKeyRange = jar.prefixes.IDBKeyRange = window.IDBKeyRange || window.webkitIDBKeyRange;
 
     this.idb = function( name ) {
-        return new proto.init( name, this.instances );
+        return new proto.init( name, this );
     };
 
     idb = jar.idb = {};
@@ -23,7 +23,7 @@
     proto = this.idb.prototype = {
         constructor: this.idb,
 
-        init: function( name, instances ) {
+        init: function( name, instance ) {
             var db, request, def,
                 self = this;
 
@@ -43,6 +43,8 @@
                     });
                 }
 
+                instance.db = idb.db;
+
                 return idb.def;
             }
 
@@ -53,7 +55,7 @@
             };
 
             // Open connection for database
-            idb.db = request = indexedDB.open( "jar", idb.version );
+            instance.db = idb.db = request = indexedDB.open( "jar", idb.version );
 
             function reject() {
                 def.reject();
@@ -91,6 +93,7 @@
         },
 
         setup: function() {
+            // If db already initialized don't try to create another one
             if ( idb.setVersion.readyState != 1 ) {
                 idb.setVersion = idb.db.setVersion( idb.version );
             }
@@ -141,7 +144,7 @@
         request = store.put( data );
 
         request.onsuccess = function() {
-            jar.resolve( id );
+            jar.resolve( id, type, "idb" );
         };
 
         request.onerror = function() {

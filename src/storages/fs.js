@@ -1,7 +1,7 @@
 !function() {
     var proto, fs,
-        requestFileSystem = window.requestFileSystem || window.webkitRequestFileSystem,
-        Blob = window.BlobBuilder || window.WebKitBlobBuilder || window.Blob,
+        requestFileSystem = jar.prefixes.requestFileSystem = window.requestFileSystem || window.webkitRequestFileSystem,
+        Blob = jar.prefixes.Blob = window.BlobBuilder || window.WebKitBlobBuilder || window.Blob,
         mime = {
             javascript: "application/javascript",
             xml: "application/xml",
@@ -37,9 +37,10 @@
         init: function( name, instance ) {
             this.name = name;
             this.def = jar.Deferred();
-            this.instance = instance;
 
-            return this.setup().def;
+            return this.setup().def.done(function() {
+                instance.dir = this.dir;
+            }, this );
         },
 
         setup: function() {
@@ -55,7 +56,7 @@
                 (fs.db = entry.root).getDirectory( name, {
                     create: true
                 }, function( dir ) {
-                    self.instance.dir = dir;
+                    self.dir = dir;
                     def.resolve();
 
                   }, reject );
@@ -81,7 +82,7 @@
                 var bb = new Blob();
 
                 writer.onwriteend = function() {
-                    jar.resolve( id );
+                    jar.resolve( id, type, "fs" );
                 };
 
                 writer.onerror = reject;

@@ -2,7 +2,7 @@ module( "idb", {
     teardown: moduleTeardown
 });
 
-asyncTest( "Check get and set methods", 13, function() {
+asyncTest( "Check get and set methods", 35, function() {
     jar( "idb", "idb" ).done(function() {
         var html = document.implementation.createDocument( "http://www.w3.org/1999/xhtml", "html", null ),
             body = new XMLSerializer().serializeToString( document.body.firstElementChild ),
@@ -11,17 +11,50 @@ asyncTest( "Check get and set methods", 13, function() {
             json = { "test": "test" },
             js = "js = true";
 
-        this.set( "text-1", "text" )
-            .set( "text-2", "text", "text" )
-            .set( "xml-1", xml )
-            .set( "xml-2", xml, "xml" )
-            .set( "xml-3", xmlStr, "xml" )
-            .set( "html-1", html )
-            .set( "html-2", html, "html" )
-            .set( "html-3", body, "html" )
-            .set( "js", js, "javascript" )
-            .set( "json-1", json, "json" )
-            .set( "json-2", json )
+        this.set( "text-1", "text" ).done(function( type, storage ) {
+            strictEqual( type, "text", "Data type should be text" );
+            strictEqual( storage, "idb", "Storage should be idb" );
+        })
+            .set( "text-2", "text", "text" ).done(function( type, storage ) {
+                strictEqual( type, "text", "Data type should be text" );
+                strictEqual( storage, "idb", "Storage should be idb" );
+            })
+            .set( "xml-1", xml ).done(function( type, storage ) {
+                strictEqual( type, "xml", "Data type should be xml" );
+                strictEqual( storage, "idb", "Storage should be idb" );
+            })
+            .set( "xml-2", xml, "xml" ).done(function( type, storage ) {
+                strictEqual( type, "xml", "Data type should be xml" );
+                strictEqual( storage, "idb", "Storage should be idb" );
+            })
+            .set( "xml-3", xmlStr, "xml" ).done(function( type, storage ) {
+                strictEqual( type, "xml", "Data type should be xml" );
+                strictEqual( storage, "idb", "Storage should be idb" );
+            })
+            .set( "html-1", html ).done(function( type, storage ) {
+                strictEqual( type, "html", "Data type should be html" );
+                strictEqual( storage, "idb", "Storage should be idb" );
+            })
+            .set( "html-2", html, "html" ).done(function( type, storage ) {
+                strictEqual( type, "html", "Data type should be html" );
+                strictEqual( storage, "idb", "Storage should be idb" );
+            })
+            .set( "html-3", body, "html" ).done(function( type, storage ) {
+                strictEqual( type, "html", "Data type should be html" );
+                strictEqual( storage, "idb", "Storage should be idb" );
+            })
+            .set( "js", js, "javascript" ).done(function( type, storage ) {
+                strictEqual( type, "javascript", "Data type should be javascript" );
+                strictEqual( storage, "idb", "Storage should be idb" );
+            })
+            .set( "json-1", json, "json" ).done(function( type, storage ) {
+                strictEqual( type, "json", "Data type should be json" );
+                strictEqual( storage, "idb", "Storage should be idb" );
+            })
+            .set( "json-2", json ).done(function( type, storage ) {
+                strictEqual( type, "json", "Data type should be json" );
+                strictEqual( storage, "idb", "Storage should be idb" );
+            })
 
             .promise().done(function() {
                 this.get( "text-1" ).done(function( data ) {

@@ -17,8 +17,9 @@
             text: [ "websql", "lc" ]
         };
 
+    // Use idb and fs only if we have storageInfo interface
     if ( storageInfo ) {
-        order.xml = [ "idb", "fs" ].concat( order.xml );
+        order.xml = [ "fs", "idb" ].concat( order.xml );
         order.json = [ "idb" ].concat( order.json );
         order.javascript = [ "fs" ].concat( order.javascript );
         order.text = [ "idb", "lc" ];
@@ -26,6 +27,12 @@
 
     jar = this.jar = function jar( name, storage ) {
         return new jar.fn.init( name, storage );
+    };
+
+    jar.order = order;
+
+    jar.prefixes = {
+        storageInfo: storageInfo
     };
 
     /*
@@ -46,42 +53,45 @@
     jar.prototype = this.jar.fn = {
         constructor: jar,
 
-        order: order,
-
-        storages: [ "fs", "idb", "websql", "lc" ],
+        storages: [ "fs", "idb", "lc" ],
         types: [ "xml", "html", "javascript", "text", "json" ],
 
         init: function( name, storage ) {
             this.name = name || "jar";
             this.deferreds = {};
 
-            // TODO – add support for aliases
-            this.setup( storage || this.storages );
+            if ( !storage ) {
+                this.order = order;
+            }
 
-            return this;
+            // TODO – add support for aliases
+            return this.setup( storage || this.storages );
         },
 
         // Setup for all storages
         setup: function( storages ) {
-            this.storages = storages = storages.split( " " );
-            this.stores = {};
+            this.storages = storages = storages.split ? storages.split(" ") : storages;
 
             var storage,
                 def = this.register(),
                 defs = [];
 
+            // Initiate all storages that we can work with
             for ( var i = 0, l = storages.length; i < l; i++ ) {
                 storage = storages[ i ];
 
-
+                // Initiate storage
                 defs.push( this[ storage ]( this.name, this ) );
 
                 // Initiate meta-data for this storage
                 this.log( storage );
             }
+            if ( !this.order ) {
+                this.order = {};
 
-            for ( i = 0, l = this.types.length; i < l; i++ ) {
-                this.order[ this.types[ i ] ] = storages;
+                for ( i = 0, l = this.types.length; i < l; i++ ) {
+                    this.order[ this.types[ i ] ] = storages;
+                }
             }
 
             jar.when.apply( jar, defs )
