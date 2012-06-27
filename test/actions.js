@@ -4,8 +4,6 @@ module( "actions", {
 
 asyncTest( "Basic actions", 10, function() {
     jar().done(function() {
-        console.log(this.db)
-
         ok( !!this.dir, "fs storage created" );
         ok( !!this.db, "idb storage created" );
 
