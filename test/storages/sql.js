@@ -4,13 +4,12 @@ module( "sql", {
 
 asyncTest( "WebSQL references", 2, function() {
     jar( "WebSQL references" ).done(function() {
-        ok( this.stores.fs, "References for WebSQL store was created" );
+        ok( this.stores.sql, "References for WebSQL store was created" );
         ok( ~this.storages.indexOf( "sql" ), "References in array storages should be present" );
 
         start();
     });
 });
-
 
 asyncTest( "Check get and set methods", 57, function() {
     jar( "sql", "sql" ).done(function() {

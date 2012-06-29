@@ -4,7 +4,7 @@ module( "idb", {
 
 asyncTest( "indexedDB references", 2, function() {
     jar( "indexedDB references" ).done(function() {
-        ok( this.stores.fs, "References for idb store was created" );
+        ok( this.stores.idb, "References for idb store was created" );
         ok( ~this.storages.indexOf( "idb" ), "References in array storages should be present" );
 
         start();
