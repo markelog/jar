@@ -158,7 +158,6 @@
         var self = this,
             store = idb.db.transaction([ this.name ], 0 /* Read only */ ).objectStore( this.name ),
             index = store.index( "name" ),
-            meta = this.meta( name ),
             request = index.get( name );
 
         request.onsuccess = function() {
@@ -173,7 +172,7 @@
             // IndexedDB can't store some types of data in it original type
             // we need to serialize it to right type
             if ( cantStore[ type ] ) {
-                data = jar.filters[ meta.type ]( data );
+                data = jar.filters[ type ]( data );
             }
 
             // Some types of data can't be serialize to right type
