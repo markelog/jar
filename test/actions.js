@@ -2,10 +2,11 @@ module( "actions", {
     teardown: moduleTeardown
 });
 
-asyncTest( "Basic actions", 10, function() {
+asyncTest( "Basic actions", 11, function() {
     jar().done(function() {
         ok( !!this.stores.fs, "fs storage created" );
         ok( !!this.stores.fs, "idb storage created" );
+        ok( !!this.stores.sql, "sql storage created" );
 
         this.set( "text-type" ).done(function( type, storage ) {
             strictEqual( type, "text", "Data-type should be text" );
