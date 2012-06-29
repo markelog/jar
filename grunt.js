@@ -25,9 +25,9 @@ module.exports = function(grunt) {
         dest: 'dist/<%= pkg.name %>.min.js'
       }
     },
-    qunit: {
-      files: ['test/**/*.html']
-    },
+    //qunit: {
+    //  files: ['test/**/*.html']
+    //},
     lint: {
       files: ['grunt.js', 'src/**/*.js', 'src/**/*.js' ]
     },
@@ -66,7 +66,6 @@ module.exports = function(grunt) {
     uglify: {}
   });
 
-  // Default task.
-  grunt.registerTask('default', 'lint qunit concat min');
-
+  //grunt.registerTask('default', 'lint qunit concat min');
+  grunt.registerTask('default', 'lint concat min');
 };
