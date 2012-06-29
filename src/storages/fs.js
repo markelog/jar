@@ -69,8 +69,6 @@
     proto.init.prototype = proto;
 
     this.fs.set = function( name, data, type, id ) {
-        type = type || jar.type( type );
-
         function reject() {
             jar.reject( id );
         }
