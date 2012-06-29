@@ -159,13 +159,13 @@
                 fs.db.getDirectory( self.name, {
                     create: true
                 }, function( dir ) {
-                    self.dir = dir;
+                    self.stores.fs = dir;
 
                     jar.resolve( id );
                 }, reject );
 
             } else {
-                delete self.dir;
+                delete self.stores.fs;
 
                 jar.resolve( id );
             }

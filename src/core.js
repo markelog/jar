@@ -8,6 +8,7 @@
 
 !function() {
     var jar,
+        storeNames = /[^A-Za-z0-9]/g,
         storageInfo = window.storageInfo || window.webkitStorageInfo,
         toString = "".toString,
         order = {
@@ -53,11 +54,13 @@
     jar.prototype = this.jar.fn = {
         constructor: jar,
 
-        storages: [ "fs", "idb", "lc" ],
+        storages: [ "fs", "idb", "lc", "sql" ],
         types: [ "xml", "html", "javascript", "text", "json" ],
 
         init: function( name, storage ) {
-            this.name = name || "jar";
+
+            // Name of a object store must contain only alphabetical symbols
+            this.name = name ? name.replace( storeNames, "repl" ) : "jar";
             this.deferreds = {};
             this.stores = {};
 
