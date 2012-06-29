@@ -1,4 +1,11 @@
 !function() {
+
+    // Firefox has IndexedDB but it ask users permission to access it
+    // this is considered as unwanted behavior
+    if ( !jar.prefixes.storageInfo ) {
+        return;
+    }
+
     var proto, idb,
         self = this,
         database = {},
@@ -13,6 +20,8 @@
         indexedDB = jar.prefixes.indexedDB = window.indexedDB || window.webkitIndexedDB || window.mozIndexedDB || window.msIndexedDB,
         IDBTransaction = jar.prefixes.IDBTransaction =  window.IDBTransaction || window.webkitIDBTransaction,
         IDBKeyRange = jar.prefixes.IDBKeyRange = window.IDBKeyRange || window.webkitIDBKeyRange;
+
+    this.storages.push( "idb" );
 
     this.idb = function( name ) {
         return new proto.init( name, this );
@@ -209,6 +218,7 @@
 
     this.idb.clear = function( id, destroy /* internal */ ) {
         var request, store,
+            stores = this.stores,
             name = this.name,
             db = idb.db;
 
@@ -217,6 +227,7 @@
         }
 
         function resolve() {
+            delete stores.idb;
             jar.resolve( id );
         }
 

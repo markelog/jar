@@ -2,6 +2,15 @@ module( "idb", {
     teardown: moduleTeardown
 });
 
+asyncTest( "indexedDB references", 2, function() {
+    jar( "indexedDB references" ).done(function() {
+        ok( this.stores.fs, "References for idb store was created" );
+        ok( ~this.storages.indexOf( "idb" ), "References in array storages should be present" );
+
+        start();
+    });
+});
+
 asyncTest( "Check get and set methods", 57, function() {
     jar( "idb", "idb" ).done(function() {
         var html = document.implementation.createDocument( "http://www.w3.org/1999/xhtml", "html", null ),

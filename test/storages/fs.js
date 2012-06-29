@@ -2,6 +2,15 @@ module( "fs", {
     teardown: moduleTeardown
 });
 
+asyncTest( "Filesystem references", 2, function() {
+    jar( "Filesystem references" ).done(function() {
+        ok( this.stores.fs, "References for fs store was created" );
+        ok( ~this.storages.indexOf( "fs" ), "References in array storages should be present" );
+
+        start();
+    });
+});
+
 asyncTest( "Check get and set methods", 57, function() {
     jar( "fs", "fs" ).done(function() {
         var html = document.implementation.createDocument( "http://www.w3.org/1999/xhtml", "html", null ),
@@ -150,7 +159,6 @@ asyncTest( "Complete removal of object store", 3, function() {
                 }, function() {
                     ok( true, "Store was not removed" );
 
-
                     strictEqual( jar.data[ name ], undefined, "Meta data about storages was removed for this store" );
                     strictEqual( self.stores.fs, undefined, "Store was removed from jar instance" );
 
@@ -180,7 +188,7 @@ asyncTest( "Clear object store", 3, function() {
             });
         }).fail(function() {
             ok( false, "Data was not cleared" );
-        })
+        });
     });
 });
 
@@ -202,7 +210,6 @@ asyncTest( "Parallel store creation should work", 2, function() {
 
     jar.when( fs3active, fs4active ).always(function() {
         start();
-    })
-
+    });
 });
 

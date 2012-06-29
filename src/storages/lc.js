@@ -2,6 +2,12 @@
     var lc = window.localStorage,
         slice = [].slice;
 
+    if ( !lc ) {
+        return;
+    }
+
+    this.storages.push( "lc" );
+
     // Use case for async and sync interfaces should be identical
     // We have to make sync localStorage interface to an async
 

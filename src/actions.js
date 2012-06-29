@@ -63,8 +63,10 @@
     };
 
     this.clear = function( destroy ) {
-        var data = jar.data[ this.name ],
-            def = this.register();
+        var clear, when,
+            data = jar.data[ this.name ],
+            def = this.register(),
+            defs = [];
 
         if ( !data._length && !destroy ) {
 
@@ -77,25 +79,34 @@
         }
 
         for ( var storage in data._storages ) {
-            this[ storage ].clear.apply( this, [ def.id, destroy ] );
+            clear = this.register();
+            defs.push( clear );
+
+            this[ storage ].clear.apply( this, [ clear.id, destroy ] );
         }
 
         if ( destroy ) {
 
             // Remove all meta-info
-            def.done(function() {
+            when = jar.when.apply( this, defs ).done(function() {
                 delete jar.data[ this.name ];
-            }, this );
+            });
         } else {
 
             // Save storages meta-info
-            def.done(function() {
+            when = jar.when.apply( this, defs ).done(function() {
                 jar.data[ this.name ] = {
                     _storages: {},
                     _length: 0
                 };
             });
         }
+
+        when.done(function() {
+            def.resolve();
+        }).fail(function() {
+            def.reject();
+        });
 
         return this;
     };

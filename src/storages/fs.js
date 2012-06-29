@@ -1,4 +1,12 @@
 !function() {
+
+    // Currently, if browser (Chrome don't have Quota Management API) then it
+    // don't have Filesystem API, but if some browser (Firefox) will add it
+    // it might ask users permession to work with FS, which is not so cool
+    if ( !jar.prefixes.storageInfo ) {
+        return;
+    }
+
     var proto, fs,
         requestFileSystem = jar.prefixes.requestFileSystem = window.requestFileSystem || window.webkitRequestFileSystem,
         Blob = jar.prefixes.Blob = window.BlobBuilder || window.WebKitBlobBuilder || window.Blob,
@@ -24,6 +32,8 @@
                 jar.reject( id );
             }
         };
+
+    this.storages.push( "fs" );
 
     this.fs = function( name, instance ) {
         return new proto.init( name, instance );

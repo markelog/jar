@@ -53,3 +53,17 @@ asyncTest( "Create certain type of storages", 6, function() {
         });
     });
 });
+
+asyncTest( "jar#remove without arguments", 1, function() {
+    var def = jar.Deferred();
+
+    jar( "jar#remove without arguments" ).done(function() {
+        this.set( "clear it right", "test" ).done(function() {
+            this.remove().done(function() {
+                ok( !this.stores.idb && !this.stores.fs && !this.stores.sql, "All data stores references were removed" );
+
+                start();
+            });
+        });
+    });
+});

@@ -1,6 +1,12 @@
 !function() {
     var proto, sql;
 
+    if ( !window.openDatabase ) {
+        return;
+    }
+
+    this.storages.push( "sql" );
+
     this.sql = function( name, instance ) {
         return new proto.init( name, instance );
     };
@@ -23,7 +29,7 @@
 
             function resolve() {
                 def.resolve();
-            }    
+            }
 
             function reject() {
                 def.reject();
@@ -46,7 +52,7 @@
         var update = "UPDATE " + this.name + " SET data = ? WHERE name = ?",
             insert = "INSERT INTO " + this.name + "(data, name) VALUES(?, ?)";
 
-        // We can store only text    
+        // We can store only text
         data = jar.text[ type ]( data );
 
         function resolve() {

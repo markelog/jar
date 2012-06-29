@@ -54,7 +54,7 @@
     jar.prototype = this.jar.fn = {
         constructor: jar,
 
-        storages: [ "fs", "idb", "lc", "sql" ],
+        storages: [],
         types: [ "xml", "html", "javascript", "text", "json" ],
 
         init: function( name, storage ) {
@@ -80,6 +80,12 @@
                 def = this.register(),
                 defs = [];
 
+            // Jar store meta-info in lc, if we don't have it – reject call
+            if ( !window.localStorage ) {
+                def.reject();
+                return this;
+            }
+
             // Initiate all storages that we can work with
             for ( var i = 0, l = storages.length; i < l; i++ ) {
                 storage = storages[ i ];
@@ -90,6 +96,7 @@
                 // Initiate meta-data for this storage
                 this.log( storage );
             }
+
             if ( !this.order ) {
                 this.order = {};
 
