@@ -59,6 +59,7 @@
         init: function( name, storage ) {
             this.name = name || "jar";
             this.deferreds = {};
+            this.stores = {};
 
             if ( !storage ) {
                 this.order = order;

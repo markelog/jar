@@ -142,10 +142,10 @@ asyncTest( "Clear object store", 3, function() {
             var name = this.name;
                 self = this;
 
-            this.dir.getFile( "test", {}, function() {
+            this.stores.fs.getFile( "test", {}, function() {
                 ok( true, "Data was cleared" );
                 strictEqual( jar.data[ name ]._length, 0, "Length of storages was setted to 0" );
-                ok( !!self.dir, "Reference still exist" );
+                ok( !!self.stores.fs, "Reference still exist" );
 
                 start();
             }, function() {

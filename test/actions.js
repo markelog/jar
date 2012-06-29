@@ -4,8 +4,8 @@ module( "actions", {
 
 asyncTest( "Basic actions", 10, function() {
     jar().done(function() {
-        ok( !!this.dir, "fs storage created" );
-        ok( !!this.db, "idb storage created" );
+        ok( !!this.stores.fs, "fs storage created" );
+        ok( !!this.stores.fs, "idb storage created" );
 
         this.set( "text-type" ).done(function( type, storage ) {
             strictEqual( type, "text", "Data-type should be text" );

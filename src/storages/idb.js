@@ -43,7 +43,7 @@
                     });
                 }
 
-                instance.db = idb.db;
+                instance.stores.idb = idb.db;
 
                 return idb.def;
             }
@@ -55,7 +55,7 @@
             };
 
             // Open connection for database
-            instance.db = idb.db = request = indexedDB.open( "jar", idb.version );
+            instance.stores.idb = idb.db = request = indexedDB.open( "jar", idb.version );
 
             function reject() {
                 def.reject();

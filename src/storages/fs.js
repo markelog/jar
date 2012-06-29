@@ -39,7 +39,7 @@
             this.def = jar.Deferred();
 
             return this.setup().def.done(function() {
-                instance.dir = this.dir;
+                instance.stores.fs = this.dir;
             }, this );
         },
 
@@ -75,7 +75,7 @@
             jar.reject( id );
         }
 
-        this.dir.getFile( name, {
+        this.stores.fs.getFile( name, {
             create: true
         }, function( entry ) {
             entry.createWriter(function( writer ) {
@@ -113,7 +113,7 @@
             return this;
         }
 
-        this.dir.getFile( name, {}, function( entry ) {
+        this.stores.fs.getFile( name, {}, function( entry ) {
             entry.file(function( file ) {
                 var reader = new FileReader();
 
@@ -135,7 +135,7 @@
             jar.reject( id );
         }
 
-        this.dir.getFile( name, {
+        this.stores.fs.getFile( name, {
             create: false
         }, function( entry ) {
             entry.remove(function() {
@@ -153,7 +153,7 @@
             jar.reject( id );
         }
 
-        this.dir.removeRecursively(function( entry ) {
+        this.stores.fs.removeRecursively(function( entry ) {
 
             if ( !destroy ) {
 
