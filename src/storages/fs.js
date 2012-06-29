@@ -1,8 +1,9 @@
 !function() {
 
     // Currently, if browser (Chrome don't have Quota Management API) then it
-    // don't have Filesystem API, but if some browser (Firefox) will add it
-    // it might ask users permession to work with FS, which is not so cool
+    // don't have Filesystem API, but if some browser (Firefox) will add it,
+    // it might ask users permission to work with FS, which is not so cool,
+    // but if storageInfo will be implemented it would not have to ask anything
     if ( !jar.prefixes.storageInfo ) {
         return;
     }
