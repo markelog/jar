@@ -182,7 +182,7 @@
                 jar.filters[ type ]( data );
             }
 
-            jar.resolve( id, data );
+            jar.resolve( id, data, type, "idb" );
         };
 
         request.onerror = function() {

@@ -18,7 +18,7 @@
             xhr.send();
 
             if ( xhr.readyState === 4 ) {
-                jar.resolve( id, xhr.responseXML || xhr.responseText );
+                jar.resolve( id, xhr.responseXML || xhr.responseText, "xml", "fs" );
 
             } else {
                 jar.reject( id );
@@ -118,7 +118,7 @@
                 var reader = new FileReader();
 
                 reader.onload = function() {
-                    jar.resolve( id, jar.filters[ type ]( this.result ) );
+                    jar.resolve( id, jar.filters[ type ]( this.result ), type, "fs" );
                 };
 
                 reader.onerror = reject;

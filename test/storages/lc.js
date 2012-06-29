@@ -2,7 +2,7 @@ module( "lc", {
     teardown: moduleTeardown
 });
 
-asyncTest( "Check get and set methods", 35, function() {
+asyncTest( "Check get and set methods", 57, function() {
     var lc = jar( "lc", "lc" ).done(function() {
         var html = document.implementation.createDocument( "http://www.w3.org/1999/xhtml", "html", null ),
             body = new XMLSerializer().serializeToString( document.body.firstElementChild ),
@@ -57,53 +57,76 @@ asyncTest( "Check get and set methods", 35, function() {
             })
 
             .promise().done(function() {
-                this.get( "text-1" ).done(function( data ) {
+                this.get( "text-1" ).done(function( data, type, storage ) {
                         strictEqual( typeof data, "string", "Data type of text should be text" );
+                        strictEqual( type, "text", "Data type should be text" );
+                        strictEqual( storage, "lc", "Storage should be lc" );
                     })
 
-                    .get( "text-2" ).done(function( data ) {
+                    .get( "text-2" ).done(function( data, type, storage ) {
                         strictEqual( typeof data, "string", "Data of specified type of text should be text" );
+                        strictEqual( type, "text", "Data type should be text" );
+                        strictEqual( storage, "lc", "Storage should be lc" );
                     })
 
-                    .get( "xml-1" ).done(function( data ) {
+                    .get( "xml-1" ).done(function( data, type, storage ) {
                         strictEqual( jar.type( data ), "xml", "Data type should be xml" );
+                        strictEqual( type, "xml", "Data type should be xml" );
+                        strictEqual( storage, "lc", "Storage should be lc" );
                     })
 
-                    .get( "xml-2" ).done(function( data ) {
+                    .get( "xml-2" ).done(function( data, type, storage ) {
                         strictEqual( jar.type( data ), "xml", "Data of specified type of xml should be xml" );
+                        strictEqual( type, "xml", "Data type should be xml" );
+                        strictEqual( storage, "lc", "Storage should be lc" );
                     })
 
-                    .get( "xml-3" ).done(function( data ) {
+                    .get( "xml-3" ).done(function( data, type, storage ) {
                         strictEqual( jar.type( data ), "xml", "Data of specified type of xml string should be xml" );
+                        strictEqual( type, "xml", "Data type should be xml" );
+                        strictEqual( storage, "lc", "Storage should be lc" );
                     })
 
-                    .get( "html-1" ).done(function( data ) {
+                    .get( "html-1" ).done(function( data, type, storage ) {
                         strictEqual( jar.type( data ), "html", "Data type should be html" );
+                        strictEqual( type, "html", "Data type should be html" );
+                        strictEqual( storage, "lc", "Storage should be lc" );
                     })
 
-                    .get( "html-2" ).done(function( data ) {
+                    .get( "html-2" ).done(function( data, type, storage ) {
                         strictEqual( jar.type( data ), "html", "Data of specified type of html should be html" );
+                        strictEqual( type, "html", "Data type should be html" );
+                        strictEqual( storage, "lc", "Storage should be lc" );
                     })
 
-                    .get( "html-3" ).done(function( data ) {
+                    .get( "html-3" ).done(function( data, type, storage ) {
                         strictEqual( jar.type( data ), "html", "Data of specified type of html should be html" );
+                        strictEqual( type, "html", "Data type should be html" );
+                        strictEqual( storage, "lc", "Storage should be lc" );
                     })
 
-                    .get( "js" ).done(function( data ) {
+                    .get( "js" ).done(function( data, type, storage ) {
                         strictEqual( jar.type( data ), "text", "Data of specified type of javascript should be text" );
                         ok ( window.js, "js global variable should be defined" );
                         strictEqual( data, js, "Data should look like simple text" );
 
                         // cleanup
                         window.js = undefined;
+
+                        strictEqual( type, "javascript", "Data type should be javascript" );
+                        strictEqual( storage, "lc", "Storage should be lc" );
                     })
 
-                    .get( "json-1" ).done(function( data ) {
+                    .get( "json-1" ).done(function( data, type, storage ) {
                         strictEqual( jar.type( data ), "json", "Data of specified type of json should be json" );
+                        strictEqual( type, "json", "Data type should be json" );
+                        strictEqual( storage, "lc", "Storage should be lc" );
                     })
 
-                    .get( "json-2" ).done(function( data ) {
+                    .get( "json-2" ).done(function( data, type, storage ) {
                         strictEqual( jar.type( data ), "json", "Data type of json should be json" );
+                        strictEqual( type, "json", "Data type should be json" );
+                        strictEqual( storage, "lc", "Storage should be lc" );
                     })
 
                     .promise().done( start );
