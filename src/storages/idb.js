@@ -163,8 +163,7 @@
         request.onsuccess = function() {
             var data = this.result && this.result.data;
 
-            // when data is not found its a still succesfull operation
-            // but not for us
+            // when data isn't there its still succesfull operation, but not for us
             if ( !data ) {
                 return jar.reject( id );
             }
@@ -175,7 +174,7 @@
                 data = jar.filters[ type ]( data );
             }
 
-            // Some types of data can't be serialize to right type
+            // some types of data can't be serialize to right type
             // like javascript code, so instead we return it like text
             // and execute it
             if ( jar.executable[ type ] ) {
