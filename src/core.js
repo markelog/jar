@@ -68,7 +68,7 @@
             this.stores = {};
 
             if ( !storage ) {
-                this.order = order;
+                this.order = jar.order;
             }
 
             // TODO – add support for aliases
