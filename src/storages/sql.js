@@ -38,7 +38,7 @@
             this.db = window.openDatabase( "jar", "1", "jar Database", 0 );
             this.db.transaction(function( trans ) {
 
-                // have to use variable, can't use an expression
+                // have to use variable for command, can't use an expression
                 trans.executeSql( command, [], resolve, reject );
             });
 
