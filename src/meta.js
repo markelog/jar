@@ -5,7 +5,7 @@
     jar.data = data ? jar.filters.json( data ) : {};
 
     function unload() {
-         lc[ "jar-meta" ] = jar.rFilters.json( jar.data );
+         lc[ "jar-meta" ] = jar.text.json( jar.data );
     }
 
     if ( window.onbeforeunload ) {
