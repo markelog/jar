@@ -11,11 +11,13 @@
         storeNames = /[^A-Za-z0-9]/g,
         storageInfo = window.storageInfo || window.webkitStorageInfo,
         toString = "".toString,
+        sqlLc = [ "sql", "lc" ],
         order = {
-            xml: [ "sql", "lc" ],
-            json: [  "sql", "lc" ],
-            javascript: [ "sql", "lc" ],
-            text: [ "websql", "lc" ]
+            xml: sqlLc,
+            html: sqlLc,
+            json: sqlLc,
+            javascript: sqlLc,
+            text: sqlLc
         };
 
     // Use idb and fs only if we have storageInfo interface
