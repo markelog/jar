@@ -41,7 +41,7 @@
             },
 
             html: function() {
-                var doc = document.implementation.createHTMLDocument("").documentElement;
+                var doc = document.implementation.createHTMLDocument( "" ).documentElement;
 
                 return function( data ) {
                     doc.innerHTML = data;
@@ -51,8 +51,11 @@
             }()
     };
 
+    this.filters.js = this.filters.javascript;
+
     this.executable = {
-        javascript: true
+        javascript: true,
+        js: true
         //css: true - not right now
     };
 
@@ -72,7 +75,7 @@
         },
     };
 
-    this.text.javascript = this.text.text;
+    this.text.js = this.text.javascript = this.text.text;
     this.text.html = this.text.xml;
 
 }.call( jar );

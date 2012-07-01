@@ -26,6 +26,7 @@
         order.text = [ "idb", "lc" ];
     }
 
+    order.js = order.javascript;
     jar = this.jar = function jar( name, storage ) {
         return new jar.fn.init( name, storage );
     };
@@ -55,7 +56,7 @@
         constructor: jar,
 
         storages: [],
-        types: [ "xml", "html", "javascript", "text", "json" ],
+        types: [ "xml", "html", "javascript", "js", "text", "json" ],
 
         init: function( name, storage ) {
 
