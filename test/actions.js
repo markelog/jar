@@ -2,6 +2,12 @@ module( "actions", {
     teardown: moduleTeardown
 });
 
+asyncTest( "Check get and set methods", 57, function() {
+    jar().done(function() {
+        checkGetSet.call( this );
+    });
+});
+
 asyncTest( "Basic actions", 11, function() {
     jar().done(function() {
         ok( !!this.stores.fs, "fs storage created" );
