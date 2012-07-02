@@ -12,11 +12,11 @@ if ( jar.prefixes.indexedDB) {
     });
 
     asyncTest( "Parallel store creation should work", 2, function() {
-        tt = jar( "idb-1", "idb" ).done(function() {
+        jar( "idb-1", "idb" ).done(function() {
             ok( true, "First store created" );
         });
 
-        t = jar( "idb-2", "idb" ).done(function() {
+        jar( "idb-2", "idb" ).done(function() {
             ok( true, "Second store created" );
 
             // Assuming this request will be the last one
