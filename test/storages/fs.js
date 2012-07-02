@@ -3,16 +3,21 @@ if ( jar.prefixes.storageInfo ) {
         teardown: moduleTeardown
     });
 
+    asyncTest( "Basic ref", 1, function() {
+        jar().done(function() {
+            ok( this.stores.fs, "fs storage created" );
+            start();
+        });
+    });
+
     asyncTest( "Filesystem references", 2, function() {
-        jar( "Filesystem references" ).done(function() {
-            ok( this.stores.fs, "References for fs store was created" );
+        jar( "Filesystem references", "fs" ).done(function() {
+            ok( this.stores.fs.sub, "References for fs store was created" );
             ok( ~this.storages.indexOf( "fs" ), "References in array storages should be present" );
 
             start();
         });
     });
-
-
 
     asyncTest( "Check get and set methods", 57, function() {
         jar( "fs", "fs" ).done(function() {
@@ -20,9 +25,9 @@ if ( jar.prefixes.storageInfo ) {
         });
     });
 
-    asyncTest( "Complete removal of object store", 3, function() {
+    asyncTest( "Complete removal of object store", 4, function() {
         jar( "fs-1", "fs" ).done(function() {
-            var store = this.stores.fs;
+            var store = this.stores.fs.sub;
 
             this.remove()
                 .done(function() {
@@ -36,8 +41,9 @@ if ( jar.prefixes.storageInfo ) {
                     }, function() {
                         ok( true, "Store was not removed" );
 
-                        strictEqual( jar.data[ name ], undefined, "Meta data about storages was removed for this store" );
-                        strictEqual( self.stores.fs, undefined, "Store was removed from jar instance" );
+                        strictEqual( jar.data._meta[ name ], undefined, "Meta data about storages was removed for this store" );
+                        ok( self.stores.fs, "Store was not removed from jar instance" );
+                        ok( self.stores.fs.sub, "Sub-dir was removed" );
 
                         start();
                     });
@@ -53,9 +59,9 @@ if ( jar.prefixes.storageInfo ) {
                 var name = this.name;
                     self = this;
 
-                this.stores.fs.getFile( "test", {}, function() {
+                this.stores.fs.sub.getFile( "test", {}, function() {
                     ok( true, "Data was cleared" );
-                    strictEqual( jar.data[ name ]._length, 0, "Length of storages was setted to 0" );
+                    strictEqual( jar.data._meta[ name ].length, 0, "Length of storages was setted to 0" );
                     ok( !!self.stores.fs, "Reference still exist" );
 
                     start();

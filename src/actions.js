@@ -2,9 +2,19 @@
     this.set = function( name, data, type ) {
         type = type || jar.type( data );
 
-        var storage,
-            reg = this.register(),
-            storages = this.order[ type ];
+        var storage, storages,
+            reg = this.register();
+
+        // Reject request if storage is not exist
+        if ( !this.order ) {
+            setTimeout(function() {
+                reg.reject();
+            });
+
+            return this;
+        }
+
+        storages = this.order[ type ];
 
         for ( var i = 0, l = this.order[ type ].length; i < l; i++ ) {
             storage = storages[ i ];
@@ -52,6 +62,14 @@
             }, this );
 
             return this[ meta.storage ].remove.apply( this, [ name, id ] );
+        } else {
+
+            // Make request async
+            window.setTimeout(function() {
+                jar.reject( id );
+            });
+
+            return this;
         }
 
         // Make request async
@@ -65,10 +83,11 @@
     this.clear = function( destroy ) {
         var clear, when,
             data = jar.data[ this.name ],
+            meta = jar.data._meta[ this.name ],
             def = this.register(),
             defs = [];
 
-        if ( !data._length && !destroy ) {
+        if ( !meta.length && !destroy ) {
 
             // Make request async
             window.setTimeout(function() {
@@ -78,7 +97,7 @@
             return this;
         }
 
-        for ( var storage in data._storages ) {
+        for ( var storage in meta.storages ) {
             clear = this.register();
             defs.push( clear );
 
@@ -89,21 +108,23 @@
 
             // Remove all meta-info
             when = jar.when.apply( this, defs ).done(function() {
-                delete jar.data[ this.name ];
+                delete jar.data._meta[ this.name ];
             });
+
         } else {
 
             // Save storages meta-info
             when = jar.when.apply( this, defs ).done(function() {
-                jar.data[ this.name ] = {
-                    _storages: {},
-                    _length: 0
+                jar.data._meta[ this.name ] = {
+                    storages: {},
+                    length: 0
                 };
             });
         }
 
         when.done(function() {
             def.resolve();
+
         }).fail(function() {
             def.reject();
         });

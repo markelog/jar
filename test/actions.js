@@ -8,12 +8,8 @@ asyncTest( "Check get and set methods", 57, function() {
     });
 });
 
-asyncTest( "Basic actions", 11, function() {
+asyncTest( "Basic actions", 8, function() {
     jar().done(function() {
-        ok( !!this.stores.fs, "fs storage created" );
-        ok( !!this.stores.fs, "idb storage created" );
-        ok( !!this.stores.sql, "sql storage created" );
-
         this.set( "text-type" ).done(function( type, storage ) {
             strictEqual( type, "text", "Data-type should be text" );
             strictEqual( jar.data.jar[ "text-type" ].type, "text", "In meta data-type should be text " );
@@ -61,15 +57,23 @@ asyncTest( "Create certain type of storages", 6, function() {
     });
 });
 
-asyncTest( "jar#remove without arguments", 1, function() {
+asyncTest( "jar#remove without arguments", 4, function() {
     var def = jar.Deferred();
 
     jar( "jar#remove without arguments" ).done(function() {
         this.set( "clear it right", "test" ).done(function() {
             this.remove().done(function() {
-                ok( !this.stores.idb && !this.stores.fs && !this.stores.sql, "All data stores references were removed" );
+                var stores = this.stores,
+                    okey = false;
 
-                start();
+                this.storages.forEach(function( name ) {
+                    if ( name != "lc" && !okey ) {
+                        okey = stores[ name ];
+                    }
+                });
+
+                ok( okey, "All data stores references is still there" );
+                checkRemoved.call( this ).promise().always( start );
             });
         });
     });

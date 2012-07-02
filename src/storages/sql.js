@@ -103,7 +103,7 @@
     this.sql.remove = function( name, id ) {
         var command = "DELETE FROM " + this.name + "WHERE name = ?";
 
-        function resolve( trans, result ) {
+        function resolve() {
             jar.resolve( id );
         }
 
@@ -123,10 +123,6 @@
             command = destroy ? "DROP TABLE " + this.name : "DELETE FROM " + this.name;
 
         function resolve() {
-            if ( destroy ) {
-                delete self.stores.sql;
-            }
-
             jar.resolve( id );
         }
 

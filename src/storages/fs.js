@@ -48,11 +48,10 @@
 
         init: function( name, instance ) {
             this.name = name;
+            this.instance = instance;
             this.def = jar.Deferred();
 
-            return this.setup().def.done(function() {
-                instance.stores.fs = this.dir;
-            }, this );
+            return this.setup().def;
         },
 
         setup: function() {
@@ -64,12 +63,21 @@
                 def.reject();
             }
 
+            // Create root directory
             requestFileSystem( 0 /* Temporary */, 0, function( entry ) {
-                (fs.db = entry.root).getDirectory( name, {
+                (fs.db = entry.root).getDirectory( "jar", {
                     create: true
                 }, function( dir ) {
-                    self.dir = dir;
-                    def.resolve();
+                    self.instance.stores.fs = dir;
+
+                    // Create sub dir, in it will be written all users files
+                    dir.getDirectory( name, {
+                        create: true
+                    }, function( sub ) {
+                        dir.sub = sub;
+
+                        def.resolve();
+                    });
 
                   }, reject );
                 }, reject );
@@ -85,7 +93,7 @@
             jar.reject( id );
         }
 
-        this.stores.fs.getFile( name, {
+        this.stores.fs.sub.getFile( name, {
             create: true
         }, function( entry ) {
             entry.createWriter(function( writer ) {
@@ -123,7 +131,7 @@
             return this;
         }
 
-        this.stores.fs.getFile( name, {}, function( entry ) {
+        this.stores.fs.sub.getFile( name, {}, function( entry ) {
             entry.file(function( file ) {
                 var reader = new FileReader();
 
@@ -145,11 +153,12 @@
             jar.reject( id );
         }
 
-        this.stores.fs.getFile( name, {
+        this.stores.fs.sub.getFile( name, {
             create: false
         }, function( entry ) {
             entry.remove(function() {
               jar.resolve( id );
+
             }, reject);
         }, reject );
 
@@ -163,7 +172,7 @@
             jar.reject( id );
         }
 
-        this.stores.fs.removeRecursively(function( entry ) {
+        this.stores.fs.sub.removeRecursively(function( entry ) {
 
             if ( !destroy ) {
 
@@ -171,16 +180,15 @@
                 fs.db.getDirectory( self.name, {
                     create: true
                 }, function( dir ) {
-                    self.stores.fs = dir;
+                    self.stores.fs.sub = dir;
 
                     jar.resolve( id );
                 }, reject );
 
             } else {
-                delete self.stores.fs;
-
                 jar.resolve( id );
             }
+
         }, reject );
 
         return this;

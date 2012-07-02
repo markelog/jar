@@ -1,4 +1,4 @@
-module( "deferreds", {
+module( "deferred", {
     teardown: moduleTeardown
 });
 
@@ -56,11 +56,11 @@ asyncTest( "jar#done", 4, function() {
 asyncTest( "Storage related deferreds", 2, function() {
     var defs = [];
 
-    defs[ 0 ] = jar( "fs", "fs" ).always(function() {
+    defs[ 0 ] = jar( "lc", "lc" ).always(function() {
         ok ( this.active.state !== "pending", "State of a resolved deferred should not be pending" );
     }).active;
 
-    defs[ 1 ] = jar( "fs", "fs" ).always(function() {
+    defs[ 1 ] = jar( "lc", "lc" ).always(function() {
         this.promise().done(function() {
             ok ( true, "Done callback for promise method should be executed" );
         });

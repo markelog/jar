@@ -23,7 +23,7 @@
     this.lc = function() {
         var def = jar.Deferred();
 
-        // Make sync interface async
+        // Make sync interface is async
         window.setTimeout(function() {
             def.resolve();
         });
@@ -77,7 +77,7 @@
         return this;
     };
 
-    this.lc.clear = function( id, destroy /* internal */ ) {
+    this.lc.clear = function( id ) {
         var reg,
             self = this,
             defs = [],
@@ -92,13 +92,20 @@
         for ( var key in data ) {
             reg = this.register();
             defs.push( reg );
+
             this.lc.remove.apply( this, [ key, reg.id ] );
 
             reg.done( executer( key ), this );
         }
 
-        jar.when.apply( this, defs ).fail(function() {
-            jar.reject( id );
+        setTimeout(function() {
+            jar.when.apply( self, defs )
+                .done(function() {
+                    jar.resolve( id );
+                })
+                .fail(function() {
+                    jar.reject( id );
+                });
         });
 
         return this;

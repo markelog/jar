@@ -1,8 +1,5 @@
 !function() {
-
-    // Firefox has IndexedDB but it ask users permission to access it
-    // this is considered as unwanted behavior
-    if ( !jar.prefixes.storageInfo ) {
+    if ( !jar.prefixes.indexedDB ) {
         return;
     }
 
@@ -18,7 +15,7 @@
 
         // Prefixes
         indexedDB = jar.prefixes.indexedDB = window.indexedDB || window.webkitIndexedDB || window.mozIndexedDB || window.msIndexedDB,
-        IDBTransaction = jar.prefixes.IDBTransaction =  window.IDBTransaction || window.webkitIDBTransaction,
+        IDBTransaction = jar.prefixes.IDBTransaction = window.IDBTransaction || window.webkitIDBTransaction,
         IDBKeyRange = jar.prefixes.IDBKeyRange = window.IDBKeyRange || window.webkitIDBKeyRange;
 
     this.storages.push( "idb" );
@@ -36,97 +33,66 @@
             var db, request, def,
                 self = this;
 
+            this.instance = instance;
+            this.def = jar.Deferred();
             this.name = name;
 
-            if ( idb.db ) {
-
-                // If previous deferred is finished, then create new deferred
-                if ( idb.def.state != "pending" ) {
-                    idb.def = jar.Deferred();
-                    this.setup();
-
-                } else {
-                    // If base already opening or opened, wait when it will finish
-                    idb.def.done(function() {
-                        self.setup();
-                    });
-                }
-
-                instance.stores.idb = idb.db;
-
-                return idb.def;
-            }
-
-            def = idb.def = jar.Deferred();
-            idb.version = 1;
-            idb.setVersion = {
-                readyState: 0
-            };
-
-            // Open connection for database
-            instance.stores.idb = idb.db = request = indexedDB.open( "jar", idb.version );
-
-            function reject() {
-                def.reject();
-            }
-
-            // onupgradeneeded это новый эвент он есть только в Фаервоксе.
-            // Хром использует устаревший (через setVersion) способ инициализации базы
-            if ( request.onupgradeneeded === null ) {
-                request.onupgradeneeded = function () {
-                    self.setup();
-                };
-
-                request.onsuccess = function() {
-                    self.db = this.result;
-                    def.resolve();
-                };
-
-            } else {
-                request.onsuccess = function() {
-                    idb.db = this.result;
-
-                    if ( !~indexOf.call( this.result.objectStoreNames, self.name ) ) {
-                        return self.setup();
-                    }
-
-                    def.resolve();
-                };
-            }
-
-            request.onerror = function() {
-                def.reject();
-            };
-
-            return def;
+            return this.setup().def;
         },
 
         setup: function() {
-            // If db already initialized don't try to create another one
-            if ( idb.setVersion.readyState != 1 ) {
-                idb.setVersion = idb.db.setVersion( idb.version );
+            var request,
+                self = this,
+                name = this.name;
+
+            function reject() {
+                self.def.reject();
             }
 
-            var request = idb.setVersion,
-                name = this.name,
-                db = idb.db,
-                def = idb.def;
+            // If db already initialized don't try to create another one
+            if ( !idb.open ) {
 
-            request.addEventListener( "success", function() {
-                if ( !db.objectStoreNames.contains( name ) ) {
-                    db.createObjectStore( name, {
-                        keyPath: "name"
-                    }).createIndex( "name", "name", {
-                        unique: true
-                    });
+                // Open connection for database
+                idb.open = indexedDB.open( "jar", new Date().getTime() );
+            }
+
+            // In case we create instance without reopening connection to database
+            if ( idb.db ) {
+                self.instance.stores.idb = idb.db;
+            }
+
+            // New way to do it
+            if ( idb.open.onupgradeneeded === null ) {
+
+                request = setVersion(function() {
+                    self.instance.stores.idb = idb.db = this.result;
+                    createObjectStore( name );
+                }, this.instance );
+
+                request.addEventListener( "success", function() {
+                    self.def.resolve();
+                });
+
+                request.addEventListener( "error", reject );
+
+            // Old way
+            } else {
+
+                // If db exist than just update it
+                if ( idb.db ) {
+                    update( this );
                 }
 
-                idb.def.resolve();
-            });
+                // This will not be executed if db already exist
+                idb.open.addEventListener( "success", function() {
 
-            request.addEventListener( "error", function() {
-                def.reject();
-            });
+                    // Create link in jar for new db
+                    self.instance.stores.idb = idb.db = this.result;
+                    update( self );
+                });
+            }
+
+            idb.open.addEventListener( "error", reject );
 
             return this;
         },
@@ -135,11 +101,18 @@
     proto.init.prototype = proto;
 
     this.idb.set = function( name, data, type, id ) {
+
+        // Reject request if store is not exist
+        if ( !contains( this.name ) ) {
+            jar.reject( id );
+            return this;
+        }
+
         var request,
             self = this,
-            store = idb.db.transaction([ this.name ], 1 /* Read-write */ ).objectStore( this.name );
+            store = idb.db.transaction([ this.name ], IDBTransaction.READ_WRITE ).objectStore( this.name );
 
-        // we can't store DOM nodes inside indexedDB
+        // We can't store DOM nodes
         if ( cantStore[ type ] ) {
             data = jar.text[ type ]( data );
         }
@@ -149,7 +122,7 @@
             data: data
         };
 
-        // use "put", so we can rewrite data
+        // Use "put", so we can rewrite data
         request = store.put( data );
 
         request.onsuccess = function() {
@@ -164,15 +137,22 @@
     };
 
     this.idb.get = function( name, type, id ) {
+
+        // Reject request if store is not exist
+        if ( !contains( this.name ) ) {
+            jar.reject( id );
+            return this;
+        }
+
         var self = this,
-            store = idb.db.transaction([ this.name ], 0 /* Read only */ ).objectStore( this.name ),
+            store = idb.db.transaction([ this.name ], IDBTransaction.READ_ONLY ).objectStore( this.name ),
             index = store.index( "name" ),
             request = index.get( name );
 
         request.onsuccess = function() {
             var data = this.result && this.result.data;
 
-            // when data isn't there its still succesfull operation, but not for us
+            // When data isn't there its still succesfull operation for this api, but not for jar
             if ( !data ) {
                 return jar.reject( id );
             }
@@ -183,7 +163,7 @@
                 data = jar.filters[ type ]( data );
             }
 
-            // some types of data can't be serialize to right type
+            // Some types of data can't be serialize to right type
             // like javascript code, so instead we return it like text
             // and execute it
             if ( jar.executable[ type ] ) {
@@ -201,8 +181,15 @@
     };
 
     this.idb.remove = function( name, id ) {
+
+        // Reject request if store is not exist
+        if ( !contains( this.name ) ) {
+            jar.reject( id );
+            return this;
+        }
+
         var self = this,
-            store = idb.db.transaction([ this.name ], 1 /* Read-write */ ).objectStore( this.name ),
+            store = idb.db.transaction([ this.name ], IDBTransaction.READ_WRITE ).objectStore( this.name ),
             request = store.delete( name );
 
         request.onsuccess = function() {
@@ -219,38 +206,89 @@
     this.idb.clear = function( id, destroy /* internal */ ) {
         var request, store,
             stores = this.stores,
-            name = this.name,
-            db = idb.db;
+            name = this.name;
+
+        function resolve() {
+            jar.resolve( id );
+        }
 
         function reject() {
             jar.reject( id );
         }
 
-        function resolve() {
-            delete stores.idb;
-            jar.resolve( id );
-        }
-
         // Either clear or destroy
         if ( destroy ) {
-
-            // Required for deleteObjectStore transaction
-            request = idb.setVersion = idb.db.setVersion( ++idb.version );
-
-            request.onsuccess = function() {
-                db.deleteObjectStore( name );
-                resolve();
-            };
+            request = setVersion(function() {
+                idb.db.deleteObjectStore( name );
+            }, this );
 
         } else {
-            store = idb.db.transaction([ this.name ], 1 /* Read-write */ ).objectStore( this.name );
+            store = idb.db.transaction([ name ], IDBTransaction.READ_WRITE ).objectStore( name );
             request = store.clear();
-            request.onsuccess = resolve;
         }
 
+        request.onsuccess = resolve;
         request.onerror = reject;
 
         return this;
     };
+
+    function setVersion( fn, instance ) {
+
+        // Old way to set database version
+        if ( idb.db && idb.db.setVersion ) {
+
+            // If we have active request attach to it, if not create new one
+            if ( !idb.setVersion || idb.setVersion.readyState == 2 /* done */ ) {
+                idb.setVersion = idb.db.setVersion( new Date().getTime() );
+            }
+
+            idb.setVersion.addEventListener( "success", fn );
+
+        } else {
+            if ( idb.open.readyState == "pending" ) {
+                idb.setVersion = idb.open;
+
+            } else {
+                idb.db.close();
+                idb.setVersion = indexedDB.open( "jar", new Date().getTime() );
+            }
+
+            idb.setVersion.addEventListener( "upgradeneeded", function() {
+                instance.stores.idb = idb.db = this.result;
+                fn.apply( this, arguments );
+            });
+        }
+
+        return idb.setVersion;
+    }
+
+    function update( instance ) {
+        var request = setVersion(function() {
+            createObjectStore( instance.name );
+        });
+
+        request.addEventListener( "success", function() {
+            instance.def.resolve();
+        });
+
+        request.addEventListener( "error", function() {
+            instance.def.reject();
+        });
+    }
+
+    function contains( name ) {
+        return idb.db.objectStoreNames.contains( name );
+    }
+
+    function createObjectStore( name ) {
+        if ( !idb.db.objectStoreNames.contains( name ) ) {
+            idb.db.createObjectStore( name, {
+                keyPath: "name"
+            }).createIndex( "name", "name", {
+                unique: true
+            });
+        }
+    }
 
 }.call( jar.fn );

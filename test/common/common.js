@@ -1,13 +1,13 @@
 this.moduleTeardown = function() {
-    var idb = window.indexedDB || window.webkitIndexedDB || window.mozIndexedDB || window.msIndexedDB,
-        request = idb.deleteDatabase( "jar" );
-    stop();
+    var idb = window.indexedDB || window.webkitIndexedDB || window.mozIndexedDB || window.msIndexedDB;
+        //request = idb.deleteDatabase( "jar" );
+    //stop();
 
 
-    request.onsuccess = start();
-    request.onerror = function() {
-        ok( false, "Can't remove idb database" );
-    };
+    //request.onsuccess = start();
+    //request.onerror = function() {
+        //ok( false, "Can't remove idb database" );
+    //};
 
 //    localStorage.clear();
 }
@@ -142,4 +142,15 @@ function checkGetSet( st ) {
         });
 }
 
+
+function checkRemoved() {
+   return this.get( "1" ).fail(function() {
+        ok( true, "This key is not exist anymore" );
+    }).set( "1", "2" ).fail(function() {
+        ok( true, "You can't set values if store is not exist" )
+
+    }).remove( "1" ).fail(function() {
+        ok( true, "You can't remove values if store is not exist" );
+    });
+}
 

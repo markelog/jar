@@ -2,17 +2,21 @@
     var lc = localStorage,
         data = lc[ "jar-meta" ];
 
-    jar.data = data ? jar.filters.json( data ) : {};
+    jar.data = data = data ? jar.filters.json( data ) : {};
 
-    function unload() {
-         lc[ "jar-meta" ] = jar.text.json( jar.data );
+    if ( !data._meta ) {
+        data._meta = {};
     }
 
-    if ( window.onbeforeunload ) {
-        if ( window.attachEvent ) {
-            window.attachEvent( "onbeforeunload", unload );
+    function unload() {
+        //lc[ "jar-meta" ] = jar.text.json( jar.data );
+    }
+
+    if ( window.onbeforeunload == null ) {
+        if ( window.addEventListener ) {
+            window.addEventListener( "beforeunload", unload, false );
         } else {
-            window.addEventListener( "onbeforeunload", unload, false );
+            window.attachEvent( "beforeunload", unload );
         }
     } else {
         window.history.navigationMode = "compatible";
@@ -21,18 +25,18 @@
 
     // Log meta-data
     this.log = function( name, storage, type ) {
-        var data;
+        var data, meta;
 
-        if ( !jar.data[ this.name ] ) {
-            jar.data[ this.name ] = {
+       if ( !jar.data._meta[ this.name ] ) {
+            jar.data[ this.name ] = {};
 
-                // Possible vulnerable
-                _storages: {},
-
-                _length: 0
+            jar.data._meta[ this.name ] = {
+                storages: {},
+                length: 0
             };
         }
 
+        meta = jar.data._meta[ this.name ];
         data = jar.data[ this.name ];
 
         // Check for name if we have to only initiate storage
@@ -42,17 +46,18 @@
                 type: type
             };
 
-            data._length++;
+            meta.length++;
+
         } else {
             storage = name;
         }
 
         // Remember total amounts of keys that uses this type of storages
-        if ( !data._storages[ storage ] ) {
-            data._storages[ storage ] = 0;
+        if ( !meta.storages[ storage ] ) {
+            meta.storages[ storage ] = 0;
         }
 
-        data._storages[ storage ]++;
+        meta.storages[ storage ]++;
 
         return this;
     };
@@ -60,22 +65,23 @@
     // Remove meta-data
     this.removeRecord = function( name ) {
         var storage,
-            meta = jar.data[ this.name ];
+            data = jar.data[ this.name ],
+            meta = jar.data._meta[ this.name ];
 
         if ( !data ) {
             return this;
         }
 
-        storage = data._storages;
+        storage = meta.storages;
 
         delete data[ name ];
 
         // If data is equal to zero we still no removing data-store
-        data._length--;
+        meta.length--;
 
         // But we remove info about storages
-        if ( !--data._storages[ storage ] ) {
-            delete data._storages[ storage ];
+        if ( !--meta.storages[ storage ] ) {
+            delete meta.storages[ storage ];
         }
 
         return this;

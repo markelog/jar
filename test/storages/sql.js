@@ -3,8 +3,15 @@ if ( window.openDatabase ) {
         teardown: moduleTeardown
     });
 
+    asyncTest( "Basic ref", 1, function() {
+        jar().done(function() {
+            ok( this.stores.sql, "sql storage created" );
+            start();
+        });
+    });
+
     asyncTest( "WebSQL references", 2, function() {
-        jar( "WebSQL references" ).done(function() {
+        jar( "WebSQL references", "sql" ).done(function() {
             ok( this.stores.sql, "References for WebSQL store was created" );
             ok( ~this.storages.indexOf( "sql" ), "References in array storages should be present" );
 
@@ -46,9 +53,7 @@ if ( window.openDatabase ) {
                     this.get( "1" ).done(function( data ) {
                         this.remove()
                             .done(function() {
-
-                                // sql prop will be deleted only if "remove" was successful
-                                ok( !this.stores.sql, "Store was completely removed" );
+                                ok( this.stores.sql, "References to database is still there" );
                             })
                             .fail(function() {
                                 ok( false, "Store was not completely removed" );

@@ -57,6 +57,8 @@
     jar.prototype = this.jar.fn = {
         constructor: jar,
 
+        version: 0,
+
         storages: [],
         types: [ "xml", "html", "javascript", "js", "text", "json" ],
 
