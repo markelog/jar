@@ -53,7 +53,7 @@
             if ( !idb.open ) {
 
                 // Open connection for database
-                idb.open = indexedDB.open( "jar", jar.version = new Date().getTime() );
+                idb.open = indexedDB.open( "jar", new Date().getTime() );
             }
 
             // In case we create instance without reopening connection to database
@@ -250,7 +250,7 @@
                 idb.setVersion = idb.open;
 
             } else {
-                idb.setVersion = indexedDB.open( "jar", jar.version = new Date().getTime() );
+                idb.setVersion = indexedDB.open( "jar", new Date().getTime() );
             }
 
             idb.setVersion.addEventListener( "upgradeneeded", function() {
