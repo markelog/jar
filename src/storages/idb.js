@@ -233,8 +233,6 @@
         return this;
     };
 
-    var test = [];
-
     function setVersion( fn, instance ) {
 
         // Old way to set database version
