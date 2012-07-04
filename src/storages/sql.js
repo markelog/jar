@@ -68,11 +68,10 @@
 
             // Try to add data, if transaction will fall then try to update it
             trans.executeSql( insert, [ data, name ], resolve, function() {
-                trans.executeSql( update, [ data, name ], resolve, reject );
 
                 // Can't re-use transaction in Opera
                 store.transaction(function( trans ) {
-                    //trans.executeSql( update, [ data, name ], resolve, reject );
+                    trans.executeSql( update, [ data, name ], resolve, reject );
                 });
             });
         });
