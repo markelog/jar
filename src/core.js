@@ -95,11 +95,16 @@
             for ( var i = 0, l = storages.length; i < l; i++ ) {
                 storage = storages[ i ];
 
-                // Initiate storage
-                defs.push( this[ storage ]( this.name, this ) );
+                // This check needed if user explicitly specified storage that
+                // he wants to work with, whereas browser don't implement it
+                if ( this[ storage ] ) {
 
-                // Initiate meta-data for this storage
-                this.log( storage );
+                    // Initiate storage
+                    defs.push( this[ storage ]( this.name, this ) );
+
+                    // Initiate meta-data for this storage
+                    this.log( storage );
+                }
             }
 
             if ( !this.order ) {
