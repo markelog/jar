@@ -53,7 +53,7 @@
             if ( !idb.open ) {
 
                 // Open connection for database
-                idb.open = indexedDB.open( "jar", new Date().getTime() );
+                idb.open = indexedDB.open( "jar", jar.version = new Date().getTime() );
             }
 
             // In case we create instance without reopening connection to database
@@ -73,8 +73,6 @@
                     self.def.resolve();
                 });
 
-                request.addEventListener( "error", reject );
-
             // Old way
             } else {
 
@@ -84,15 +82,17 @@
                 }
 
                 // This will not be executed if db already exist
-                idb.open.addEventListener( "success", function() {
+                (request = idb.open).addEventListener( "success", function() {
 
                     // Create link in jar for new db
                     self.instance.stores.idb = idb.db = this.result;
+
                     update( self );
                 });
             }
 
-            idb.open.addEventListener( "error", reject );
+            request.addEventListener( "error", reject );
+            request.addEventListener( "blocked", reject );
 
             return this;
         },
@@ -233,6 +233,8 @@
         return this;
     };
 
+    var test = [];
+
     function setVersion( fn, instance ) {
 
         // Old way to set database version
@@ -251,7 +253,7 @@
 
             } else {
                 idb.db.close();
-                idb.setVersion = indexedDB.open( "jar", new Date().getTime() );
+                idb.setVersion = indexedDB.open( "jar", jar.version = new Date().getTime() );
             }
 
             idb.setVersion.addEventListener( "upgradeneeded", function() {
@@ -259,6 +261,12 @@
                 fn.apply( this, arguments );
             });
         }
+
+        idb.setVersion.addEventListener( "success", function() {
+            this.result.onversionchange = function() {
+                this.close();
+            };
+        });
 
         return idb.setVersion;
     }
