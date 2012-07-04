@@ -14,7 +14,7 @@ asyncTest( "Basic actions", 8, function() {
             strictEqual( type, "text", "Data-type should be text" );
             strictEqual( jar.data.jar[ "text-type" ].type, "text", "In meta data-type should be text " );
 
-            strictEqual( jar.order.text[ 0 ], storage, "Storage should be " + storage );
+            ok( ~jQuery.inArray( storage, jar.order.text ), "Storage should be " + storage );
             strictEqual( jar.data.jar[ "text-type" ].storage, storage, "In meta storage should be " + storage );
         });
 
@@ -22,7 +22,7 @@ asyncTest( "Basic actions", 8, function() {
             strictEqual( type, "json", "Data-type should be json" );
             strictEqual( jar.data.jar[ "json-type" ].type, "json", "In meta data-type should be json" );
 
-            strictEqual( jar.order.text[ 0 ], storage, "Storage should be " + storage );
+            ok( ~jQuery.inArray( storage, jar.order.text ), "Storage should be " + storage );
             strictEqual( jar.data.jar[ "json-type" ].storage, storage, "In meta storage should be " + storage );
         });
 
