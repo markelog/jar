@@ -50,7 +50,8 @@
 
     this.sql.set = function( name, data, type, id ) {
         var update = "UPDATE " + this.name + " SET data = ? WHERE name = ?",
-            insert = "INSERT INTO " + this.name + "(data, name) VALUES(?, ?)";
+            insert = "INSERT INTO " + this.name + "(data, name) VALUES(?, ?)",
+            store = this.stores.sql;
 
         // We can store only text
         data = jar.text[ type ]( data );
@@ -63,11 +64,16 @@
             jar.reject( id );
         }
 
-        this.stores.sql.transaction(function( trans ) {
+        store.transaction(function( trans ) {
 
             // Try to add data, if transaction will fall then try to update it
             trans.executeSql( insert, [ data, name ], resolve, function() {
                 trans.executeSql( update, [ data, name ], resolve, reject );
+
+                // Can't re-use transaction in Opera
+                store.transaction(function( trans ) {
+                    //trans.executeSql( update, [ data, name ], resolve, reject );
+                });
             });
         });
 
