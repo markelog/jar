@@ -107,6 +107,18 @@
 
         fail: function( fn, context ) {
             return this.add( "fail", fn, context || this.context );
+        },
+
+        then: function( success, error, context ) {
+            if ( typeof error == "function" ) {
+                this.add( "done", success, context || this.context )
+                    .add( "fail", error, context || this.context );
+
+            } else {
+                this.add( "done", success, error || this.context );
+            }
+
+            return this;
         }
     };
 
@@ -189,6 +201,11 @@
 
     this.fn.always = function( fn, context ) {
         this.active.add( "always", fn, context || this );
+        return this;
+    };
+
+    this.fn.then = function() {
+        this.active.then.apply( this.active, arguments );
         return this;
     };
 

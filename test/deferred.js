@@ -2,13 +2,13 @@ module( "deferred", {
     teardown: moduleTeardown
 });
 
-asyncTest( "jar.when", 3, function() {
-    var def1, def2;
+asyncTest( "jar.when", 4, function() {
+    var def1 = jar.Deferred(),
+        def2 = jar.Deferred(),
+        def3 = jar.Deferred(),
+        def4 = jar.Deferred();
 
-    def1 = jar.Deferred();
     def1.resolve();
-
-    def2 = jar.Deferred();
     def2.resolve();
 
     jar.when( def1, def2 ).done(function() {
@@ -23,7 +23,56 @@ asyncTest( "jar.when", 3, function() {
         ok( true, "jar.when called without arguments should be resolved")
     });
 
+    jar.when( def3, def4 ).always(function() {
+        strictEqual( def4.state, "pending", "If one of the deferreds was rejected, call fail-callbacks without waiting for others deferreds" );
+    });
+
+    def3.reject();
+
     start();
+});
+
+asyncTest( "jar.Deferred#then", 4, function() {
+    var def1 = jar.Deferred(),
+        def2 = jar.Deferred(),
+        exist = jar.Deferred(),
+        notExist = jar.Deferred();
+
+    def1.then(function() {
+        ok( true, "Successful callback is executed" );
+    });
+
+    def2.then(function() {
+        ok( false, "Successful callback should not be executed" );
+
+    }, function() {
+        ok( true, "Unsuccessful callback is executed" );
+    });
+
+    def1.resolve();
+    def2.reject();
+
+    jar( "not-existed" ).get( "not-existed" ).then(function() {
+        ok( false, "Then successful callback should not be executed" );
+
+    }, function() {
+        ok( true, "Unsuccessful callback should be executed" );
+
+        notExist.resolve();
+    });
+
+    jar( "exist" ).done(function() {
+        this.set( "exist", "test" ).done(function() {
+            this.get( "exist" ).then(function() {
+                ok( true, "Successful callback is executed" );
+
+            }).always(function() {
+                exist.resolve();
+            });
+        });
+    });
+
+    jar.when( exist, notExist ).done( start );
 });
 
 asyncTest( "jar#done", 4, function() {
