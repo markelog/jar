@@ -9,7 +9,7 @@
     }
 
     function unload() {
-        //lc[ "jar-meta" ] = jar.text.json( jar.data );
+        lc[ "jar-meta" ] = jar.text.json( jar.data );
     }
 
     if ( window.onbeforeunload == null ) {
