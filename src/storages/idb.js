@@ -283,7 +283,7 @@
     }
 
     function contains( name ) {
-        return idb.db.objectStoreNames.contains( name );
+        return idb.db && idb.db.objectStoreNames.contains( name );
     }
 
     function createObjectStore( name ) {
