@@ -252,7 +252,6 @@
                 idb.setVersion = idb.open;
 
             } else {
-                idb.db.close();
                 idb.setVersion = indexedDB.open( "jar", jar.version = new Date().getTime() );
             }
 
