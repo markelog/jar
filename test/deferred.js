@@ -22,7 +22,7 @@ asyncTest( "jar.when", 6, function() {
     });
 
     jar.when().done(function() {
-        ok( true, "jar.when called without arguments should be resolved")
+        ok( true, "jar.when called without arguments should be resolved" );
     });
 
     jar.when( def3, def4 ).always(function() {
