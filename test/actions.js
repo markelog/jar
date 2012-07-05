@@ -9,6 +9,9 @@ asyncTest( "Check get and set methods", 57, function() {
 });
 
 asyncTest( "Basic actions", 14, function() {
+    var first = jar.Deferred(),
+        second = jar.Deferred();
+
     jar( "Basic actions-1" ).done(function() {
         this.set( "text-type" ).done(function( type, storage ) {
             strictEqual( type, "text", "Data-type should be text" );
@@ -26,7 +29,9 @@ asyncTest( "Basic actions", 14, function() {
             strictEqual( jar.data.jar[ "json-type" ].storage, storage, "In meta storage should be " + storage );
         });
 
-        this.promise().done( start );
+        this.promise().done( function() {
+            first.resolve();
+        });
     });
 
     jar( "Basic actions-2" ).done(function() {
@@ -34,21 +39,23 @@ asyncTest( "Basic actions", 14, function() {
         ok( jar.data._meta[ this.name ], "_meta is initialized" );
 
         this.clear().done(function() {
+
             ok( jar.data[ this.name ], "Meta is not removed" );
             ok( jar.data._meta[ this.name ], "_meta is not removed" );
 
             this.remove().done(function() {
-                console.log(jar.data._meta[this.name])
                 ok( !jar.data[ this.name ], "Meta is removed" );
                 ok( !jar.data._meta[ this.name ], "_meta is removed" );
+
+                second.resolve();
             });
         });
     });
+
+    jar.when( first, second ).done( start );
 });
 
 asyncTest( "Create certain type of storages", 6, function() {
-    var def = jar.Deferred();
-
     jar( "test", "idb" ).done(function() {
         strictEqual( this.storages[ 0 ], "idb", "Create only idb type of storage" );
 
@@ -64,8 +71,6 @@ asyncTest( "Create certain type of storages", 6, function() {
                     strictEqual( this.storages[ 1 ], "fs", "Create fs type of storage" );
                     strictEqual( this.storages[ 2 ], "lc", "Create lc type of storage" );
 
-                    def.resolve();
-
                     start();
                 });
             });
@@ -73,7 +78,7 @@ asyncTest( "Create certain type of storages", 6, function() {
     });
 });
 
-asyncTest( "jar#remove without arguments", 4, function() {
+asyncTest( "jar#remove without arguments", function() {
     var def = jar.Deferred();
 
     jar( "jar#remove without arguments" ).done(function() {

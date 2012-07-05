@@ -81,17 +81,22 @@
     };
 
     this.clear = function( destroy ) {
-        var clear, when,
+        var clear, when, def,
+            self = this,
             data = jar.data[ this.name ],
             meta = jar.data._meta[ this.name ],
-            def = this.register(),
             defs = [];
 
-        if ( !meta.length && !destroy ) {
+        if ( !meta.length ) {
+            def = this.register();
 
             // Make request async
             window.setTimeout(function() {
-                def.resolve();
+                if ( destroy ) {
+                    kill( self.name );
+                }
+
+                jar.resolve( def );
             });
 
             return this;
@@ -108,7 +113,7 @@
 
             // Remove all meta-info
             when = jar.when.apply( this, defs ).done(function() {
-                delete jar.data._meta[ this.name ];
+                kill( this.name );
             });
 
         } else {
@@ -122,6 +127,8 @@
             });
         }
 
+        def = this.register();
+
         when.done(function() {
             def.resolve();
 
@@ -131,4 +138,10 @@
 
         return this;
     };
+
+    function kill( name ) {
+        delete jar.data[ name ];
+        delete jar.data._meta[ name ];
+    }
+
 }.call( jar.fn );
