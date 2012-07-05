@@ -129,6 +129,7 @@
     this.when = function() {
         var def = jar.Deferred(),
             executed = 0,
+            args = [],
             length = arguments.length;
 
         def.context = this;
@@ -138,8 +139,10 @@
         }
 
         function done() {
+            args.push( arguments );
+
             if ( def.state == "pending" && length == ++executed ) {
-                def.resolve();
+                def.resolve( args );
             }
         }
 
@@ -181,7 +184,7 @@
     this.fn.register = function() {
         var id = new Date().getTime() + (++counter);
 
-        // FIXME this.deferreds stored almost forever
+        // FIXME Deferreds in this.deferreds stored almost forever
         this.active = this.deferreds[ id ] = jar.deferreds[ id ] = jar.Deferred();
 
         this.active.id = id;

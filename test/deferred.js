@@ -2,17 +2,19 @@ module( "deferred", {
     teardown: moduleTeardown
 });
 
-asyncTest( "jar.when", 4, function() {
+asyncTest( "jar.when", 6, function() {
     var def1 = jar.Deferred(),
         def2 = jar.Deferred(),
         def3 = jar.Deferred(),
         def4 = jar.Deferred();
 
-    def1.resolve();
-    def2.resolve();
+    def1.resolve( [ "def1" ] );
+    def2.resolve( [ "def2" ] );
 
-    jar.when( def1, def2 ).done(function() {
+    jar.when( def1, def2 ).done(function( def1, def2 ) {
          ok( true, "When worked for resolved Deferred" );
+         strictEqual( def1[ 0 ], "def1", "First deferreds arguments is correctly received" );
+         strictEqual( def2[ 0 ], "def2", "Second deferreds arguments is correctly received" );
     });
 
     jar.when.apply( "test", [ def1 ] ).done(function () {
