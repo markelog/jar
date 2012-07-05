@@ -8,8 +8,8 @@ asyncTest( "Check get and set methods", 57, function() {
     });
 });
 
-asyncTest( "Basic actions", 8, function() {
-    jar().done(function() {
+asyncTest( "Basic actions", 14, function() {
+    jar( "Basic actions-1" ).done(function() {
         this.set( "text-type" ).done(function( type, storage ) {
             strictEqual( type, "text", "Data-type should be text" );
             strictEqual( jar.data.jar[ "text-type" ].type, "text", "In meta data-type should be text " );
@@ -27,6 +27,22 @@ asyncTest( "Basic actions", 8, function() {
         });
 
         this.promise().done( start );
+    });
+
+    jar( "Basic actions-2" ).done(function() {
+        ok( jar.data[ this.name ], "Meta is initialized" );
+        ok( jar.data._meta[ this.name ], "_meta is initialized" );
+
+        this.clear().done(function() {
+            ok( jar.data[ this.name ], "Meta is not removed" );
+            ok( jar.data._meta[ this.name ], "_meta is not removed" );
+
+            this.remove().done(function() {
+                console.log(jar.data._meta[this.name])
+                ok( !jar.data[ this.name ], "Meta is removed" );
+                ok( !jar.data._meta[ this.name ], "_meta is removed" );
+            });
+        });
     });
 });
 
