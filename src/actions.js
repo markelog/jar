@@ -83,8 +83,9 @@
     this.clear = function( destroy ) {
         var clear, when, def,
             self = this,
-            data = jar.data[ this.name ],
-            meta = jar.data._meta[ this.name ],
+            name = this.name
+            data = jar.data[ name ],
+            meta = jar.data._meta[ name ],
             defs = [];
 
         if ( !meta.length ) {
@@ -93,7 +94,7 @@
             // Make request async
             window.setTimeout(function() {
                 if ( destroy ) {
-                    kill( self.name );
+                    kill( name );
                 }
 
                 jar.resolve( def );
@@ -113,14 +114,14 @@
 
             // Remove all meta-info
             when = jar.when.apply( this, defs ).done(function() {
-                kill( this.name );
+                kill( name );
             });
 
         } else {
 
             // Save storages meta-info
             when = jar.when.apply( this, defs ).done(function() {
-                jar.data._meta[ this.name ] = {
+                jar.data._meta[ name ] = {
                     storages: {},
                     length: 0
                 };
