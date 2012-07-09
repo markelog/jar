@@ -50,7 +50,8 @@ module.exports = function(grunt) {
         browser: true,
         evil: true,
         expr: true,
-        es5: true
+        es5: true,
+        trailing: true
       },
       globals: {
         jQuery: true,
