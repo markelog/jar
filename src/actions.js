@@ -45,7 +45,6 @@
     };
 
     this.remove = function( name ) {
-
         // If method called without arguments – destroy store
         if ( !arguments.length ) {
             delete this.order;
@@ -83,7 +82,7 @@
     this.clear = function( destroy ) {
         var clear, when, def,
             self = this,
-            name = this.name
+            name = this.name,
             data = jar.data[ name ],
             meta = jar.data._meta[ name ],
             defs = [];
