@@ -2,6 +2,20 @@ module( "deferred", {
     teardown: moduleTeardown
 });
 
+asyncTest( "Basics", 1, function() {
+    var def = jar.Deferred();
+
+    def.fail(function() {
+        ok( true, "Fail-callback is called" );
+    })
+    .done(function() {
+        ok( false, "Done-callback should not be called" );
+    })
+    .always( start );
+
+    def.reject();
+})
+
 asyncTest( "jar.when", 6, function() {
     var def1 = jar.Deferred(),
         def2 = jar.Deferred(),
