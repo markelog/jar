@@ -11,11 +11,11 @@
 
             // from jQuery
             xml: function( data ) {
+                var xml;
+
                 if ( typeof data !== "string" || !data ) {
                     return null;
                 }
-
-                var xml;
 
                 try {
                     if ( window.DOMParser ) {
@@ -41,7 +41,7 @@
             },
 
             html: function() {
-                var doc = document.implementation.createHTMLDocument( "" ).documentElement;
+                var doc = document.createElement( "div" );
 
                 return function( data ) {
                     doc.innerHTML = data;

@@ -81,18 +81,12 @@ asyncTest( "jar#remove without arguments", function() {
     var def = jar.Deferred();
 
     jar( "jar#remove without arguments" ).done(function() {
-        this.set( "clear it right", "test" ).done(function() {
+        var original = this.storages.slice().length;
+
+        this.set( "remove it right", "test" ).done(function() {
             this.remove().done(function() {
-                var stores = this.stores,
-                    okey = false;
 
-                this.storages.forEach(function( name ) {
-                    if ( name != "lc" && !okey ) {
-                        okey = stores[ name ];
-                    }
-                });
-
-                ok( okey, "All data stores references is still there" );
+                equal( original, this.storages.length, "All data stores references is still there" );
                 checkRemoved.call( this ).promise().always( start );
             });
         });

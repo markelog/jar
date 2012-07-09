@@ -200,7 +200,10 @@
 
         try {
             store = idb.db.transaction([ this.name ], readwrite ).objectStore( this.name );
-            request = store.delete( name );
+
+            // Even though IE < 10 don't used this storage, it still raises exception
+            // if we use delete method through dot notaion while parsing this code
+            request = store[ "delete" ]( name );
 
         } catch ( _ ) {
             jar.reject( id );
@@ -347,5 +350,4 @@
 
         return jar.iversion;
     }
-
 }.call( jar.fn );

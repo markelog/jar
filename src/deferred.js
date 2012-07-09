@@ -28,6 +28,10 @@
                 return this;
             }
 
+            if ( !this.args ) {
+                this.args = [];
+            }
+
             if ( this.state != "pending" ) {
                 if ( this.state == "resolved" && type == "done" ) {
                    fn.apply( context, this.args );
@@ -57,6 +61,7 @@
                 isAlways = type == "always";
 
             i = i || 0;
+            args = args || [];
             type = this.lists[ type ];
 
             for ( var l = type.length; i < l; i++ ) {

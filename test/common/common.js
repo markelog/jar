@@ -13,7 +13,7 @@ this.moduleTeardown = function() {
 }
 
 function checkGetSet( st ) {
-    var html = document.implementation.createDocument( "http://www.w3.org/1999/xhtml", "html", null ),
+    var html = document.createElement( "div" ),
         body = new XMLSerializer().serializeToString( document.body.firstElementChild ),
         xmlStr = "<xml>test</xml>",
         xml = new window.DOMParser().parseFromString( xmlStr, "text/xml"),
@@ -65,7 +65,7 @@ function checkGetSet( st ) {
             ok( ~jQuery.inArray( storage, st ? [ st ] : this.order[ type ] ), "Storage type should be correct" );
         })
 
-        .promise().done(function() {
+        .promise().always(function() {
             this.get( "text-1" ).done(function( data, type, storage ) {
                     strictEqual( typeof data, "string", "Data type of text should be text" );
                     strictEqual( type, "text", "Data type should be text" );
@@ -138,7 +138,7 @@ function checkGetSet( st ) {
                     ok( ~jQuery.inArray( storage, st ? [ st ] : this.order[ type ] ), "Storage type should be correct" );
                 })
 
-                .promise().done( start );
+                .promise().always( start );
         });
 }
 
