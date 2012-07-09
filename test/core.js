@@ -3,7 +3,7 @@ module( "core", { teardown: moduleTeardown } );
 
 asyncTest( "Global stuff", 1, function() {
     jar( "@_#-!$%^&*()_+=фt" ).done(function() {
-        strictEqual( this.name, "replreplreplreplreplreplreplreplreplreplreplreplreplreplreplreplt",
+        strictEqual( this.name, "repl_replreplreplreplreplreplreplreplreplrepl_replreplreplt",
          "Name was successfully changed" );
 
         start();

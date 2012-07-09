@@ -6,6 +6,7 @@
     var proto, idb,
         self = this,
         database = {},
+        counter = 0,
         indexOf = [].indexOf,
 
         cantStore = {
@@ -16,7 +17,10 @@
         // Prefixes
         indexedDB = jar.prefixes.indexedDB = window.indexedDB || window.webkitIndexedDB || window.mozIndexedDB || window.msIndexedDB,
         IDBTransaction = jar.prefixes.IDBTransaction = window.IDBTransaction || window.webkitIDBTransaction,
-        IDBKeyRange = jar.prefixes.IDBKeyRange = window.IDBKeyRange || window.webkitIDBKeyRange;
+        IDBKeyRange = jar.prefixes.IDBKeyRange = window.IDBKeyRange || window.webkitIDBKeyRange,
+
+        readwrite = IDBTransaction.READ_WRITE || "readwrite",
+        readonly = IDBTransaction.READ_ONLY !== 0 ? "readonly" : 0;
 
     this.storages.push( "idb" );
 
@@ -51,9 +55,7 @@
 
             // If db already initialized don't try to create another one
             if ( !idb.open ) {
-
-                // Open connection for database
-                idb.open = indexedDB.open( "jar", new Date().getTime() );
+                idb.open = indexedDB.open( "jar", version() );
             }
 
             // In case we create instance without reopening connection to database
@@ -63,10 +65,10 @@
 
             // New way to do it
             if ( idb.open.onupgradeneeded === null ) {
-
                 request = setVersion(function() {
                     self.instance.stores.idb = idb.db = this.result;
                     createObjectStore( name );
+
                 }, this.instance );
 
                 request.addEventListener( "success", function() {
@@ -92,10 +94,8 @@
             }
 
             request.addEventListener( "error", reject );
-            request.addEventListener( "blocked", reject );
-
             return this;
-        },
+        }
     };
 
     proto.init.prototype = proto;
@@ -108,9 +108,8 @@
             return this;
         }
 
-        var request,
-            self = this,
-            store = idb.db.transaction([ this.name ], IDBTransaction.READ_WRITE ).objectStore( this.name );
+        var request, store,
+            self = this;
 
         // We can't store DOM nodes
         if ( cantStore[ type ] ) {
@@ -122,8 +121,16 @@
             data: data
         };
 
-        // Use "put", so we can rewrite data
-        request = store.put( data );
+        try {
+            store = idb.db.transaction([ this.name ], readwrite ).objectStore( this.name );
+
+            // Use "put", so we can rewrite data
+            request = store.put( data );
+
+        } catch ( _ ) {
+            jar.reject( id );
+            return this;
+        }
 
         request.onsuccess = function() {
             jar.resolve( id, type, "idb" );
@@ -145,7 +152,7 @@
         }
 
         var self = this,
-            store = idb.db.transaction([ this.name ], IDBTransaction.READ_ONLY ).objectStore( this.name ),
+            store = idb.db.transaction([ this.name ], readonly ).objectStore( this.name ),
             index = store.index( "name" ),
             request = index.get( name );
 
@@ -188,9 +195,17 @@
             return this;
         }
 
-        var self = this,
-            store = idb.db.transaction([ this.name ], IDBTransaction.READ_WRITE ).objectStore( this.name ),
+        var request, store,
+            self = this;
+
+        try {
+            store = idb.db.transaction([ this.name ], readwrite ).objectStore( this.name );
             request = store.delete( name );
+
+        } catch ( _ ) {
+            jar.reject( id );
+            return this;
+        }
 
         request.onsuccess = function() {
             jar.resolve( id );
@@ -216,19 +231,25 @@
             jar.reject( id );
         }
 
-        // Either clear or destroy
-        if ( destroy ) {
-            request = setVersion(function() {
-                idb.db.deleteObjectStore( name );
-            }, this );
+        try {
 
-        } else {
-            store = idb.db.transaction([ name ], IDBTransaction.READ_WRITE ).objectStore( name );
-            request = store.clear();
+            // Either clear or destroy
+            if ( destroy ) {
+                request = setVersion(function() {
+                    idb.db.deleteObjectStore( name );
+                }, this );
+
+            } else {
+                store = idb.db.transaction([ name ], readwrite ).objectStore( name );
+                request = store.clear();
+            }
+
+            request.onsuccess = resolve;
+            request.onerror = reject;
+
+        } catch ( _ ) {
+            reject();
         }
-
-        request.onsuccess = resolve;
-        request.onerror = reject;
 
         return this;
     };
@@ -240,7 +261,7 @@
 
             // If we have active request attach to it, if not create new one
             if ( !idb.setVersion || idb.setVersion.readyState == 2 /* done */ ) {
-                idb.setVersion = idb.db.setVersion( new Date().getTime() );
+                idb.setVersion = idb.db.setVersion( version() );
             }
 
             idb.setVersion.addEventListener( "success", fn );
@@ -250,7 +271,7 @@
                 idb.setVersion = idb.open;
 
             } else {
-                idb.setVersion = indexedDB.open( "jar", new Date().getTime() );
+                idb.setVersion = indexedDB.open( "jar", version() );
             }
 
             idb.setVersion.addEventListener( "upgradeneeded", function() {
@@ -265,6 +286,12 @@
             };
         });
 
+        idb.setVersion.addEventListener( "blocked", function() {
+            if ( idb.db ) {
+                idb.db.close();
+            }
+        });
+
         return idb.setVersion;
     }
 
@@ -277,6 +304,10 @@
             instance.def.resolve();
         });
 
+        request.addEventListener( "blocked", function() {
+            instance.def.reject();
+        });
+
         request.addEventListener( "error", function() {
             instance.def.reject();
         });
@@ -287,13 +318,34 @@
     }
 
     function createObjectStore( name ) {
-        if ( !idb.db.objectStoreNames.contains( name ) ) {
+        if ( !contains( name ) ) {
             idb.db.createObjectStore( name, {
                 keyPath: "name"
             }).createIndex( "name", "name", {
                 unique: true
             });
         }
+    }
+
+    function version() {
+
+        // IE6 is dead right?
+        // In IE 10 we can't use new Date().getTime() or Date.now() for two reasons
+        // 1) msindexedDB can't work with version highter than 9 sybmols number
+        // 2) We can't use something that was not a number before, for example if
+        // a = 2;
+        // we can do – msIndexedDB.open( "test", a );
+        // but we can't do msIndexedDB.open( "test", ++a );
+        // or if a = "2"
+        // we can't do msIndexedDB.open( "test", +a );
+        if ( window.msIndexedDB ) {
+            jar.iversion = window.eval( ( +jar.iversion + 1 ).toString() );
+
+        } else {
+            jar.iversion = Date.now() + ( ++counter );
+        }
+
+        return jar.iversion;
     }
 
 }.call( jar.fn );

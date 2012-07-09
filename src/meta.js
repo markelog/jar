@@ -3,6 +3,7 @@
         data = lc[ "jar-meta" ];
 
     jar.data = data = data ? jar.filters.json( data ) : {};
+    jar.iversion = lc[ "jar-iversion" ] || 1;
 
     if ( !data._meta ) {
         data._meta = {};
@@ -10,6 +11,7 @@
 
     function unload() {
         lc[ "jar-meta" ] = jar.text.json( jar.data );
+        lc[ "jar-iversion" ] = jar.iversion;
     }
 
     if ( window.onbeforeunload == null ) {

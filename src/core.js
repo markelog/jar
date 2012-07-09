@@ -8,7 +8,7 @@
 
 !function() {
     var jar,
-        storeNames = /[^A-Za-z0-9]/g,
+        rstoreNames = /[^\w]/g,
         storageInfo = window.storageInfo || window.webkitStorageInfo,
         toString = "".toString,
         sqlLc = [ "sql", "lc" ],
@@ -20,11 +20,17 @@
             text: sqlLc
         };
 
-    // Use idb and fs only if we have storageInfo interface
+    // Firefox ask user permission to use indexedDb, because of this we don't use it in FF
     if ( storageInfo ) {
         order.xml = [ "fs", "idb" ].concat( order.xml );
         order.json = [ "idb" ].concat( order.json );
         order.javascript = [ "fs" ].concat( order.javascript );
+        order.text = [ "idb", "lc" ];
+
+    } else if ( window.msIndexedDB ) {
+        order.xml = [ "idb" ].concat( order.xml );
+        order.json = [ "idb" ].concat( order.json );
+        order.javascript = [ "idb" ].concat( order.javascript );
         order.text = [ "idb", "lc" ];
     }
 
@@ -39,21 +45,6 @@
         storageInfo: storageInfo
     };
 
-    /*
-    jar.aliases = {
-        storages: {
-            idb: [ "indexeddb", "idb", "indb" ],
-            sql: [ "websql", "sql" ],
-            lc: [ "localStorage", "webstorage", "lc" ],
-            fs: [ "filesystem", "fsapi",  ]
-        },
-        types: {
-            js: [ "javascript" ],
-            text: [ "text" ]
-        }
-    };
-    */
-
     jar.prototype = this.jar.fn = {
         constructor: jar,
 
@@ -65,7 +56,7 @@
         init: function( name, storage ) {
 
             // Name of a object store must contain only alphabetical symbols
-            this.name = name ? name.replace( storeNames, "repl" ) : "jar";
+            this.name = name ? name.replace( rstoreNames, "repl" ) : "jar";
             this.deferreds = {};
             this.stores = {};
 
