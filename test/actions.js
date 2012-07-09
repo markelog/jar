@@ -8,25 +8,25 @@ asyncTest( "Check get and set methods", 57, function() {
     });
 });
 
-asyncTest( "Basic actions", 14, function() {
+asyncTest( "Basic actions", function() {
     var first = jar.Deferred(),
         second = jar.Deferred();
 
     jar( "Basic actions-1" ).done(function() {
         this.set( "text-type" ).done(function( type, storage ) {
             strictEqual( type, "text", "Data-type should be text" );
-            strictEqual( jar.data.jar[ "text-type" ].type, "text", "In meta data-type should be text " );
+            strictEqual( jar.data[ this.name ][ "text-type" ].type, "text", "In meta data-type should be text " );
 
             ok( ~jQuery.inArray( storage, jar.order.text ), "Storage should be " + storage );
-            strictEqual( jar.data.jar[ "text-type" ].storage, storage, "In meta storage should be " + storage );
+            strictEqual( jar.data[ this.name ][ "text-type" ].storage, storage, "In meta storage should be " + storage );
         });
 
         this.set( "json-type", {} ).done(function( type, storage ) {
             strictEqual( type, "json", "Data-type should be json" );
-            strictEqual( jar.data.jar[ "json-type" ].type, "json", "In meta data-type should be json" );
+            strictEqual( jar.data[ this.name ][ "json-type" ].type, "json", "In meta data-type should be json" );
 
             ok( ~jQuery.inArray( storage, jar.order.text ), "Storage should be " + storage );
-            strictEqual( jar.data.jar[ "json-type" ].storage, storage, "In meta storage should be " + storage );
+            strictEqual( jar.data[ this.name ][ "json-type" ].storage, storage, "In meta storage should be " + storage );
         });
 
         this.promise().done( function() {
@@ -66,7 +66,6 @@ asyncTest( "Create certain type of storages", 6, function() {
                 strictEqual( this.storages[ 0 ], "lc", "Create only lc type of storage" );
 
                 jar( "test", "idb fs lc" ).done(function() {
-
                     strictEqual( this.storages[ 0 ], "idb", "Create idb type of storage" );
                     strictEqual( this.storages[ 1 ], "fs", "Create fs type of storage" );
                     strictEqual( this.storages[ 2 ], "lc", "Create lc type of storage" );
