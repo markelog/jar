@@ -135,12 +135,12 @@
         var meta = this.meta( name );
         type = meta && meta.type;
 
+        name = name.replace( /\//g, "|" );
+
         if ( filters[ type ] ) {
             filters[ type ]( this.name, name, id );
             return this;
         }
-
-        name = name.replace( /\//g, "|" );
 
         this.stores.fs.sub.getFile( name, {}, function( entry ) {
             entry.file(function( file ) {
