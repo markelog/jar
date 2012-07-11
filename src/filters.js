@@ -5,10 +5,10 @@
     if ( window.XMLSerializer ) {
         xml = function( node ) {
             if ( typeof node != "string" ) {
-                    return new window.XMLSerializer().serializeToString( node );
-                }
+                return new window.XMLSerializer().serializeToString( node );
+            }
 
-                return node;
+            return node;
         };
 
     // Old IE
