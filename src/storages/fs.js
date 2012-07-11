@@ -22,12 +22,12 @@
 
         filters = {};
         filters.xml = function( base, name, id ) {
-            var xhr = new XMLHttpRequest();
-            xhr.open( "get", "filesystem:" + origin + "/temporary/" + base + "/" + name, false );
+            var xhr = new window.XMLHttpRequest();
+            xhr.open( "get", "filesystem:" + origin + "/temporary/jar/" + base + "/" + name, false );
             xhr.send();
 
             if ( xhr.readyState === 4 ) {
-                jar.resolve( id, xhr.responseXML || xhr.responseText, "xml", "fs" );
+                jar.resolve( id, xhr.responseXML, "xml", "fs" );
 
             } else {
                 jar.reject( id );
