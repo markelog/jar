@@ -10,7 +10,7 @@ asyncTest( "jar.load - js", function() {
             jar.load( path, "js", "jar.load - js" ).done(function( data, base ) {
                 ok( data.length, "Data is returned" );
                 ok( js, "Variable is assigned" );
-                ok( base instanceof jar, "Second argument is instace of jar" );
+                ok( base instanceof jar, "Second argument is instance of jar" );
 
                 // cleanup
                 window.js = undefined;
@@ -23,7 +23,7 @@ asyncTest( "jar.load - js", function() {
                     jar.load( path, "js", "jar.load - js" ).done(function( data, base ) {
                         ok( data.length, "Data is returned" );
                         ok( js, "Variable is assigned" );
-                        ok( base instanceof jar, "Second argument is instace of jar" );
+                        ok( base instanceof jar, "Second argument is instance of jar" );
 
                         // cleanup
                         window.js = undefined;
@@ -45,7 +45,7 @@ asyncTest( "jar.load - xml", function() {
             // through xhr-request
             jar.load( path, "xml", "jar.load - xml" ).done(function( data, base ) {
                 strictEqual( jar.type( data ), "xml", "Data is returned" );
-                ok( base instanceof jar, "Second argument is instace of jar" );
+                ok( base instanceof jar, "Second argument is instance of jar" );
 
                 // wait a bit, so data can be writed
                 window.setTimeout(function() {
@@ -54,7 +54,7 @@ asyncTest( "jar.load - xml", function() {
                     // through jar-store
                     jar.load( path, "xml", "jar.load - xml" ).done(function( data, base ) {
                         strictEqual( jar.type( data ), "xml", "Data is returned" );
-                        ok( base instanceof jar, "Second argument is instace of jar" );
+                        ok( base instanceof jar, "Second argument is instance of jar" );
 
                         start();
                     });
@@ -75,7 +75,7 @@ asyncTest( "jar.load - css", function() {
                 var element = jQuery( '<div class="load-test"></div>' ).appendTo( "#qunit-fixture" );
                 strictEqual( element.css( "font-size" ), "99px", "css style should be applied" );
 
-                ok( base instanceof jar, "Second argument is instace of jar" );
+                ok( base instanceof jar, "Second argument is instance of jar" );
 
                 // wait a bit, so data can be writed
                 window.setTimeout(function() {
@@ -83,7 +83,7 @@ asyncTest( "jar.load - css", function() {
 
                     // through jar-store
                     jar.load( path, "css", "jar.load - css" ).done(function( data, base ) {
-                        ok( base instanceof jar, "Second argument is instace of jar" );
+                        ok( base instanceof jar, "Second argument is instance of jar" );
 
                         start();
                     });
