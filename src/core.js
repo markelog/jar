@@ -119,34 +119,4 @@
     };
 
     jar.fn.init.prototype = jar.fn;
-
-    jar.type = function( data ) {
-        var documentElement, nodeName;
-
-        if ( !data ) {
-            return;
-        }
-
-        if ( typeof data == "string" ) {
-            return "text";
-        }
-
-        documentElement = ( data.ownerDocument || data ).documentElement;
-        nodeName = documentElement && documentElement.nodeName.toLowerCase();
-
-        if ( nodeName ) {
-            if ( nodeName !== "html" ) {
-                return "xml"
-            }
-
-            return "html";
-        }
-
-        if ( typeof data == "object" ) {
-            return "json";
-        }
-
-        return "text";
-    };
-
 }.call( window );

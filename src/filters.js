@@ -87,4 +87,33 @@
     this.text.js = this.text.javascript = this.text.text;
     this.text.html = this.text.xml;
 
+    jar.type = function( data ) {
+        var documentElement, nodeName;
+
+        if ( typeof data == "string" ) {
+            return "text";
+        }
+
+        if ( !data ) {
+            return;
+        }
+
+        documentElement = ( data.ownerDocument || data ).documentElement;
+        nodeName = documentElement && documentElement.nodeName.toLowerCase();
+
+        if ( nodeName ) {
+            if ( nodeName !== "html" ) {
+                return "xml"
+            }
+
+            return "html";
+        }
+
+        if ( typeof data == "object" ) {
+            return "json";
+        }
+
+        return "text";
+    };
+
 }.call( jar );
