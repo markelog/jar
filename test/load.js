@@ -17,7 +17,6 @@ asyncTest( "jar.load - js", function() {
 
                 // wait a bit, so data can be writed
                 window.setTimeout(function() {
-
                     ok( jar.has( "jar.load - js", path ), "Meta-data should be intializated" );
 
                     // through jar-store
@@ -50,7 +49,6 @@ asyncTest( "jar.load - xml", function() {
 
                 // wait a bit, so data can be writed
                 window.setTimeout(function() {
-
                     ok( jar.has( "jar.load - xml", path ), "Meta-data should be intializated" );
 
                     // through jar-store
@@ -81,7 +79,6 @@ asyncTest( "jar.load - css", function() {
 
                 // wait a bit, so data can be writed
                 window.setTimeout(function() {
-
                     ok( jar.has( "jar.load - css", path ), "Meta-data should be intializated" );
 
                     // through jar-store
