@@ -121,17 +121,24 @@
     jar.fn.init.prototype = jar.fn;
 
     jar.type = function( data ) {
-        if ( !data || toString === data.toString ) {
+        var documentElement, nodeName;
+
+        if ( !data ) {
+            return;
+        }
+
+        if ( typeof data == "string" ) {
             return "text";
         }
 
-        var documentElement = ( data.ownerDocument || data ).documentElement;
+        documentElement = ( data.ownerDocument || data ).documentElement;
+        nodeName = documentElement && documentElement.nodeName.toLowerCase();
 
-        if ( documentElement && documentElement.nodeName.toLowerCase() !== "html" ) {
-            return "xml";
-        }
+        if ( nodeName ) {
+            if ( nodeName !== "html" ) {
+                return "xml"
+            }
 
-        if ( data.nodeType ) {
             return "html";
         }
 

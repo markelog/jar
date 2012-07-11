@@ -10,6 +10,8 @@
 
                 return node;
         };
+
+    // Old IE
     } else {
         xml = function( node ) {
 

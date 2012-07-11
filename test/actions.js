@@ -13,7 +13,7 @@ asyncTest( "Basic actions", function() {
         second = jar.Deferred();
 
     jar( "Basic actions-1" ).done(function() {
-        this.set( "text-type" ).done(function( type, storage ) {
+        this.set( "text-type", "text" ).done(function( type, storage ) {
             strictEqual( type, "text", "Data-type should be text" );
             strictEqual( jar.data[ this.name ][ "text-type" ].type, "text", "In meta data-type should be text " );
 

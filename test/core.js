@@ -22,12 +22,13 @@ test( "Check jar.type", function() {
     strictEqual( jar.type( xmlStr ), "text", "This type of data should be text" );
     strictEqual( jar.type( { "test": "test" } ), "json", "This type of data should be json" );
     strictEqual( jar.type( { test: "test" } ), "json", "Even though it is not correct, json-like data type should be json" );
+    strictEqual( jar.type(), undefined, "jar.type called without arguments should return undefined" )
+    strictEqual( jar.type( "" ), "text", 'jar.type called with empty string should return "text"' )
+    strictEqual( jar.type( null ), undefined, 'jar.type called with null argument should return undefined' )
 });
 
 test( "Check jar.text", function() {
     var xmlStr = "<xml>test</xml>";
 
     strictEqual( "string", typeof jar.text.html( document.body ), "jar.text.html call on body should return string" )
-
-
 });
