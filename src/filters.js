@@ -103,7 +103,7 @@
 
         if ( nodeName ) {
             if ( nodeName !== "html" ) {
-                return "xml"
+                return "xml";
             }
 
             return "html";
