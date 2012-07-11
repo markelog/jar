@@ -1,7 +1,6 @@
 !function() {
     var xml,
         head = document.head || document.getElementsByTagName( "head" )[ 0 ],
-        isStyleSheet = document.createElement( "style" ).styleSheet === null,
         gEval = window.execScript || eval;
 
     if ( window.XMLSerializer ) {
@@ -33,12 +32,12 @@
         css: function( data ) {
             var style = document.createElement( "style" );
 
-            if ( !isStyleSheet ) {
+            if ( style.styleSheet === undefined ) {
                 style.innerHTML = data;
 
             // for IE
             } else {
-                style.type = 'text/css';
+                style.type = "text/css";
                 style.styleSheet.cssText = data;
             }
 
