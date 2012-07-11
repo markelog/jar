@@ -37,7 +37,7 @@
                 } else {
                     jar.reject( id );
                 }
-            }
+            };
         };
 
     mime.js = mime.javascript;
@@ -99,9 +99,12 @@
             jar.reject( id );
         }
 
+        name = name.replace( /\//g, "|" );
+
         this.stores.fs.sub.getFile( name, {
             create: true
         }, function( entry ) {
+
             entry.createWriter(function( writer ) {
                 var bb = new Blob();
 
@@ -136,6 +139,8 @@
             filters[ type ]( this.name, name, id );
             return this;
         }
+
+        name = name.replace( /\//g, "|" );
 
         this.stores.fs.sub.getFile( name, {}, function( entry ) {
             entry.file(function( file ) {

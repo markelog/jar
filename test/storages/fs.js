@@ -6,6 +6,13 @@ if ( jar.prefixes.storageInfo ) {
     asyncTest( "Basic ref", 1, function() {
         jar().done(function() {
             ok( this.stores.fs, "fs storage created" );
+
+            this.set( "a/a/", "test" ).done(function() {
+                this.get( "a/a/" ).done(function( data ) {
+                    strictEqual( data, "test", 'We can store file with "/" symbol in name' );
+                });
+            });
+
             start();
         });
     });
