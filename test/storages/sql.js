@@ -19,11 +19,7 @@ if ( window.openDatabase ) {
         });
     });
 
-    asyncTest( "Check get and set methods", 57, function() {
-        jar( "sql", "sql" ).done(function() {
-            checkGetSet.call( this, "sql" );
-        });
-    });
+    checkGetSet( "sql" );
 
     asyncTest( "Check specific to sql storage actions", 2, function() {
         jar( "sql-rewrite@_#t", "sql" ).done(function() {

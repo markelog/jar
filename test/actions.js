@@ -2,11 +2,7 @@ module( "actions", {
     teardown: moduleTeardown
 });
 
-asyncTest( "Check get and set methods", 57, function() {
-    jar().done(function() {
-        checkGetSet.call( this );
-    });
-});
+checkGetSet();
 
 asyncTest( "Basic actions", function() {
     var first = jar.Deferred(),

@@ -14,6 +14,12 @@
             html: true
         },
 
+        executable = {
+            javascript: true,
+            js: true,
+            css: true
+        },
+
         // Prefixes
         indexedDB = jar.prefixes.indexedDB = window.indexedDB || window.webkitIndexedDB || window.mozIndexedDB || window.msIndexedDB,
         IDBTransaction = jar.prefixes.IDBTransaction = window.IDBTransaction || window.webkitIDBTransaction,
@@ -181,7 +187,7 @@
             // Some types of data can't be serialize to right type
             // like javascript code, so instead we return it like text
             // and execute it
-            if ( jar.executable[ type ] ) {
+            if ( executable[ type ] ) {
                 jar.filters[ type ]( data );
             }
 
@@ -350,7 +356,7 @@
         // or if a = "2"
         // we can't do msIndexedDB.open( "test", +a );
         if ( window.msIndexedDB ) {
-            jar.iversion = window.eval( ( +jar.iversion + 1 ).toString() );
+            jar.iversion = window[ "eval" ]( ( +jar.iversion + 1 ).toString() );
 
         } else {
             jar.iversion = Date.now() + ( ++counter );

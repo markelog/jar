@@ -3,7 +3,7 @@ if ( jar.prefixes.storageInfo ) {
         teardown: moduleTeardown
     });
 
-    asyncTest( "Basic ref", 1, function() {
+    asyncTest( "Basic ref", 2, function() {
         jar().done(function() {
             ok( this.stores.fs, "fs storage created" );
 
@@ -26,11 +26,7 @@ if ( jar.prefixes.storageInfo ) {
         });
     });
 
-    asyncTest( "Check get and set methods", 57, function() {
-        jar( "fs", "fs" ).done(function() {
-            checkGetSet.call( this, "fs" );
-        });
-    });
+    checkGetSet( "fs" );
 
     asyncTest( "Complete removal of object store", 4, function() {
         jar( "fs-1", "fs" ).done(function() {

@@ -1,6 +1,6 @@
 if ( jar.prefixes.indexedDB) {
     module( "idb", {
-        teardown: moduleTeardown
+        teardown: moduleTeardown,
     });
 
     asyncTest( "Basic ref", 1, function() {
@@ -33,11 +33,7 @@ if ( jar.prefixes.indexedDB) {
         });
     });
 
-    asyncTest( "Check get and set methods", 57, function() {
-        jar( "idb", "idb" ).done(function() {
-           checkGetSet.call( this, "idb" );
-        });
-    });
+    checkGetSet( "idb" );
 
     asyncTest( "Complete removal of object store", 4, function() {
         jar( "idb-1", "idb" )

@@ -1,5 +1,6 @@
 !function() {
     var xml,
+        head = document.head || document.getElementsByTagName( "head" )[ 0 ],
         gEval = window.execScript || eval;
 
     if ( window.XMLSerializer ) {
@@ -25,6 +26,14 @@
 
         javascript: function( data ) {
             gEval( data );
+            return data;
+        },
+
+        css: function( data ) {
+            var style = document.createElement( "style" );
+            style.innerHTML = data;
+
+            head.appendChild( style );
             return data;
         },
 
@@ -72,19 +81,13 @@
 
     this.filters.js = this.filters.javascript;
 
-    this.executable = {
-        javascript: true,
-        js: true
-        //css: true - not right now
-    };
-
     this.text = {
         json: JSON.stringify,
         xml: xml,
-        text: window.String,
+        text: window.String
     };
 
-    this.text.js = this.text.javascript = this.text.text;
+    this.text.js = this.text.javascript = this.text.css = this.text.text;
     this.text.html = this.text.xml;
 
     jar.type = function( data ) {

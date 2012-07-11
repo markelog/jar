@@ -2,11 +2,7 @@ module( "lc", {
     teardown: moduleTeardown
 });
 
-asyncTest( "Check get and set methods", 57, function() {
-    jar( "lc", "lc" ).done(function() {
-        checkGetSet.call( this, "lc" );
-    });
-});
+checkGetSet( "lc" );
 
 asyncTest( "Simple set and get", 7, function() {
     var values = {

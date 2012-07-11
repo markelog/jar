@@ -17,6 +17,7 @@
             html: sqlLc,
             json: sqlLc,
             javascript: sqlLc,
+            css: sqlLc,
             text: sqlLc
         };
 
@@ -25,12 +26,14 @@
         order.xml = [ "fs", "idb" ].concat( order.xml );
         order.json = [ "idb" ].concat( order.json );
         order.javascript = [ "fs" ].concat( order.javascript );
+        order.javascript = [ "css" ].concat( order.javascript );
         order.text = [ "idb", "lc" ];
 
     } else if ( window.msIndexedDB ) {
         order.xml = [ "idb" ].concat( order.xml );
         order.json = [ "idb" ].concat( order.json );
         order.javascript = [ "idb" ].concat( order.javascript );
+        order.css = [ "css" ].concat( order.css );
         order.text = [ "idb", "lc" ];
     }
 
@@ -51,7 +54,7 @@
         version: 0,
 
         storages: [],
-        types: [ "xml", "html", "javascript", "js", "text", "json" ],
+        types: [ "xml", "html", "javascript", "js", "css", "text", "json" ],
 
         init: function( name, storage ) {
 
