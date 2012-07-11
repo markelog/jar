@@ -1,7 +1,7 @@
 module( "load", { teardown: moduleTeardown } );
 
 asyncTest( "jar.load - js", function() {
-    var path = "//" + window.location.host + window.location.pathname + "data/variable.js";
+    var path = "//" + window.location.host + window.location.pathname + "data/data.js";
 
     jar( "jar.load - js" ).done(function() {
         this.clear().done(function() {
