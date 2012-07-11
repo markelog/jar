@@ -90,10 +90,9 @@
     };
 
     // Get meta-data
-    this.meta = function( name ) {
+    this.meta = function( name, base /* internal */ ) {
         var data;
-
-        if ( data = jar.data[ this.name ] ) {
+        if ( data = jar.data[ base || this.name ] ) {
             return data[ name ];
         }
     };

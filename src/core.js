@@ -119,4 +119,8 @@
     };
 
     jar.fn.init.prototype = jar.fn;
+
+    jar.has = function( base, name ) {
+        return !!jar.fn.meta( name, base.replace( rstoreNames, "repl" ) );
+    };
 }.call( window );

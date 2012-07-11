@@ -32,3 +32,18 @@ test( "Check jar.text", function() {
 
     strictEqual( "string", typeof jar.text.html( document.body ), "jar.text.html call on body should return string" )
 });
+
+asyncTest( "jar.has", 3, function() {
+    jar( "jar.has" ).done(function() {
+        this.set( "name", document.body ).done(function() {
+            ok( jar.has( "jar.has", "name" ), "jar.has should work in most common case" );
+
+            this.set( "empty", "" ).done(function() {
+                ok( jar.has( "jar.has", "empty" ), "jar.has should work on empty string" );
+                ok( !jar.has( "jar.has", "not-exist" ), "jar.has should return false for not-existed key" );
+
+                start();
+            });
+        });
+    });
+});
