@@ -1,22 +1,10 @@
-this.moduleTeardown = function() {
-    var idb = window.indexedDB || window.webkitIndexedDB || window.mozIndexedDB || window.msIndexedDB;
-        //request = idb.deleteDatabase( "jar" );
-    //stop();
-
-
-    //request.onsuccess = start();
-    //request.onerror = function() {
-        //ok( false, "Can't remove idb database" );
-    //};
-
-//    localStorage.clear();
-}
+this.moduleTeardown = function() {}
 
 function checkGetSet( st ) {
     var html = document.createElement( "div" ),
-        body = new XMLSerializer().serializeToString( document.body.firstElementChild ),
+        body = jar.text.html( document.body ),
         xmlStr = "<xml>test</xml>",
-        xml = new window.DOMParser().parseFromString( xmlStr, "text/xml"),
+        xml = jar.filters.xml( xmlStr ),
         json = { "test": "test" },
         js = "js = true";
 
