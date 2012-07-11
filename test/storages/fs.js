@@ -9,7 +9,7 @@ if ( jar.prefixes.storageInfo ) {
 
             this.set( "a/a/", "test" ).done(function() {
                 this.get( "a/a/" ).done(function( data ) {
-                    strictEqual( data, "test", 'We can store file with "/" symbol in name' );
+                    strictEqual( data, "test", 'We can store files with symbol "/" in their names' );
                 });
             });
 
