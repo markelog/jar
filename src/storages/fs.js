@@ -23,14 +23,20 @@
         filters = {};
         filters.xml = function( base, name, id ) {
             var xhr = new window.XMLHttpRequest();
-            xhr.open( "get", "filesystem:" + origin + "/temporary/jar/" + base + "/" + name, false );
+            xhr.open( "get", "filesystem:" + origin + "/temporary/jar/" + base + "/" + name, true );
             xhr.send();
 
-            if ( xhr.readyState === 4 ) {
-                jar.resolve( id, xhr.responseXML, "xml", "fs" );
+            xhr.onreadystatechange = function() {
+                if ( xhr.readyState != 4 ) {
+                    return;
+                }
 
-            } else {
-                jar.reject( id );
+                if ( xhr.status >= 200 && xhr.status < 300 || xhr.status === 304 ) {
+                    jar.resolve( id, xhr.responseXML, "xml", "fs" );
+
+                } else {
+                    jar.reject( id );
+                }
             }
         };
 
