@@ -14,7 +14,7 @@
 
                 if ( request.status >= 200 && request.status < 300 || request.status === 304 ) {
                     jar( base ).done(function() {
-                        var data = request.responseXML || request.responseText;
+                        var data = type == "xml" ? request.responseXML : request.responseText;
 
                         jar.filters[ type ]( data );
                         def.resolve([ data, this ]);

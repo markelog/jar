@@ -1,12 +1,13 @@
 !function() {
     var xml,
         head = document.head || document.getElementsByTagName( "head" )[ 0 ],
+        isStyleSheet = document.createElement( "style" ).styleSheet === null,
         gEval = window.execScript || eval;
 
     if ( window.XMLSerializer ) {
         xml = function( node ) {
             if ( typeof node != "string" ) {
-                return new window.XMLSerializer().serializeToString( node );
+                return node.xml || new window.XMLSerializer().serializeToString( node );
             }
 
             return node;
@@ -31,7 +32,15 @@
 
         css: function( data ) {
             var style = document.createElement( "style" );
-            style.innerHTML = data;
+
+            if ( !isStyleSheet ) {
+                style.innerHTML = data;
+
+            // for IE
+            } else {
+                style.type = 'text/css';
+                style.styleSheet.cssText = data;
+            }
 
             head.appendChild( style );
             return data;
