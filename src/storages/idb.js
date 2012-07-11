@@ -151,10 +151,18 @@
             return this;
         }
 
-        var self = this,
-            store = idb.db.transaction([ this.name ], readonly ).objectStore( this.name ),
-            index = store.index( "name" ),
+        var store, index, request,
+            self = this;
+
+        try {
+            store = idb.db.transaction([ this.name ], readonly ).objectStore( this.name );
+            index = store.index( "name" );
             request = index.get( name );
+
+        } catch ( _ ) {
+            jar.reject( id );
+            return this;
+        }
 
         request.onsuccess = function() {
             var data = this.result && this.result.data;
