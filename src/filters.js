@@ -13,9 +13,9 @@
 
     // Old IE
     } else {
-        xml = function( node ) {
 
-            // We can receive string as an argument, if we do, just return the same argument
+        // We can receive string as an argument, if we do, just return the same argument
+        xml = function( node ) {
             return node.xml ? node.xml : node.outerHTML || node;
         };
     }
