@@ -93,7 +93,7 @@ asyncTest( "jar.load - css", function() {
     });
 });
 asyncTest( "jar.load, explicitly set data-type",  function() {
-    var css, js, xml, wrongType;
+    var css, jsType, xml, wrongType;
 
     css = jar.load( "//" + window.location.host + window.location.pathname + "data/data.css",
                                 "jar.load, explicetlly set data-type", "css" ).done(function() {
@@ -102,7 +102,7 @@ asyncTest( "jar.load, explicitly set data-type",  function() {
 
     });
 
-    js = jar.load( "//" + window.location.host + window.location.pathname + "data/data.js",
+    jsType = jar.load( "//" + window.location.host + window.location.pathname + "data/data.js",
                         "jar.load, explicetlly set data-type", "js" ).done(function() {
                 ok( js, "Variable is assigned" );
 
@@ -117,10 +117,11 @@ asyncTest( "jar.load, explicitly set data-type",  function() {
     });
 
     wrongType = jar.load(  "//" + window.location.host + window.location.pathname + "data/wrong-type.js",
-                        "jar.load, explicetlly set data-type", "js" ).done(function() {
-        ok( js, "Variable is assigned" );
+                        "jar.load, explicetlly set data-type css", "css" ).done(function() {
+                            console.log(js)
+        strictEqual( js, undefined, "Variable is not assigned" );
 
     });
 
-    jar.when.apply( this, [ css, js, xml, wrongType ] ).always( start );
+    jar.when.apply( this, [ css, jsType, xml, wrongType ] ).always( start );
 });
