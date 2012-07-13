@@ -13,8 +13,8 @@ module.exports = function(grunt) {
     },
     concat: {
       dist: {
-          src: [ 'src/core.js', 'src/meta.js', 'src/filters.js', 'src/prefixes.js',
-                    'src/deferred.js', 'src/actions.js',
+          src: [ 'src/core.js', 'src/filters.js', 'src/prefixes.js', 'src/deferred.js',
+                    'src/load.js', 'src/meta.js', 'src/actions.js',
                     'src/storages/indexeddb.js', 'src/storages/fs.js', 'src/storages/localstorage.js' ],
         dest: 'dist/jar.js'
       }
