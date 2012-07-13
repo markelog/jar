@@ -30,9 +30,14 @@
         return def;
     }
 
-    jar.load = function( path, type, base ) {
+    jar.load = function( path, base, type ) {
+            var def, dots;
+
+            if ( arguments.length != 3 ) {
+                type = path.split( "." ).pop();
+            }
+
             base = base || "jar";
-            var def;
 
             if ( jar.has( base, path ) ) {
                 def = jar.Deferred();
