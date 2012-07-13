@@ -22,11 +22,8 @@ window.moduleTeardown = function() {
 }
 
 function checkGetSet( st ) {
-    var xsl,
-        xslPath = "//" + window.location.host + window.location.pathname + "data/data.xsl";
-
     jQuery.ajax({
-        url: xslPath,
+        url: "//" + window.location.host + window.location.pathname + "data/data.xsl",
         dataType: "xml"
     }).done(function ( xsl ) {
         asyncTest( "Check get and set methods", 71, function() {
