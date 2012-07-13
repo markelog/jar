@@ -39,8 +39,8 @@
                 }
             };
         };
-
     mime.js = mime.javascript;
+
     this.storages.push( "fs" );
 
     this.fs = function( name, instance ) {
