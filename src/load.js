@@ -37,6 +37,11 @@
                 type = path.split( "." ).pop();
             }
 
+            // Quick hack, should be changed
+            if ( type == "xsl" ) {
+                type = "xml";
+            }
+
             base = base || "jar";
 
             if ( jar.has( base, path ) ) {

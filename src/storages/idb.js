@@ -11,6 +11,7 @@
 
         cantStore = {
             xml: true,
+            xsl: true, // Temp hack
             html: true
         },
 

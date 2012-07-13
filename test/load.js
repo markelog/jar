@@ -64,25 +64,24 @@ asyncTest( "jar.load - xml", function() {
     });
 });
 
-asyncTest( "jar.load - css", function() {
-    var path = "//" + window.location.host + window.location.pathname + "data/data.css";
+asyncTest( "jar.load - xsl", function() {
+    var path = "//" + window.location.host + window.location.pathname + "data/data.xsl";
 
-    jar( "jar.load - css" ).done(function() {
+    jar( "jar.load - xsl" ).done(function() {
         this.clear().done(function() {
 
             // through xhr-request
-            jar.load( path, "jar.load - css" ).done(function( data, base ) {
-                var element = jQuery( '<div class="load-test"></div>' ).appendTo( "#qunit-fixture" );
-                strictEqual( element.css( "font-size" ), "99px", "css style should be applied" );
-
+            jar.load( path, "jar.load - xsl" ).done(function( data, base ) {
+                strictEqual( jar.type( data ), "xml", "Data is returned" );
                 ok( base instanceof jar, "Second argument is instance of jar" );
 
                 // wait a bit, so data can be writed
                 window.setTimeout(function() {
-                    ok( jar.has( "jar.load - css", path ), "Meta-data should be intializated" );
+                    ok( jar.has( "jar.load - xsl", path ), "Meta-data should be intializated" );
 
                     // through jar-store
-                    jar.load( path, "jar.load - css" ).done(function( data, base ) {
+                    jar.load( path, "jar.load - xsl" ).done(function( data, base ) {
+                        strictEqual( jar.type( data ), "xml", "Data is returned" );
                         ok( base instanceof jar, "Second argument is instance of jar" );
 
                         start();
@@ -92,6 +91,7 @@ asyncTest( "jar.load - css", function() {
         });
     });
 });
+
 asyncTest( "jar.load, explicitly set data-type",  function() {
     var css, jsType, xml, wrongType;
 

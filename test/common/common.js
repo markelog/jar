@@ -22,7 +22,19 @@ window.moduleTeardown = function() {
 }
 
 function checkGetSet( st ) {
-    asyncTest( "Check get and set methods", 61, function() {
+    var xsl,
+        xslPath = "//" + window.location.host + window.location.pathname + "data/data.xsl";
+
+    stop();
+
+    jQuery.ajax({
+        url: xslPath,
+        dataType: "xml"
+    }).done(function ( data ) {
+        xsl = data;
+    });
+
+    asyncTest( "Check get and set methods", 71, function() {
         jar( st, st ).done(function() {
             var html = document.createElement( "div" ),
                 body = jar.text.html( document.body ),
@@ -52,6 +64,17 @@ function checkGetSet( st ) {
                     strictEqual( type, "xml", "Data type should be xml" );
                     ok( ~jQuery.inArray( storage, st ? [ st ] : this.order[ type ] ), "Storage type should be correct" );
                 })
+
+                .set( "xsl-1", xsl ).done(function( type, storage ) {
+                    strictEqual( type, "xml", "Data type should be xml" );
+                    ok( ~jQuery.inArray( storage, st ? [ st ] : this.order[ type ] ), "Storage type should be correct" );
+                })
+
+                .set( "xsl-2", xsl, "xml" ).done(function( type, storage ) {
+                    strictEqual( type, "xml", "Data type should be xml" );
+                    ok( ~jQuery.inArray( storage, st ? [ st ] : this.order[ type ] ), "Storage type should be correct" );
+                })
+
                 .set( "html-1", html ).done(function( type, storage ) {
                     strictEqual( type, "html", "Data type should be html" );
                     ok( ~jQuery.inArray( storage, st ? [ st ] : this.order[ type ] ), "Storage type should be correct" );
@@ -108,6 +131,18 @@ function checkGetSet( st ) {
                         })
 
                         .get( "xml-3" ).done(function( data, type, storage ) {
+                            strictEqual( jar.type( data ), "xml", "Data of specified type of xml string should be xml" );
+                            strictEqual( type, "xml", "Data type should be xml" );
+                            ok( ~jQuery.inArray( storage, st ? [ st ] : this.order[ type ] ), "Storage type should be correct" );
+                        })
+
+                        .get( "xsl-1" ).done(function( data, type, storage ) {
+                            strictEqual( jar.type( data ), "xml", "Data of specified type of xml string should be xml" );
+                            strictEqual( type, "xml", "Data type should be xml" );
+                            ok( ~jQuery.inArray( storage, st ? [ st ] : this.order[ type ] ), "Storage type should be correct" );
+                        })
+
+                        .get( "xsl-2" ).done(function( data, type, storage ) {
                             strictEqual( jar.type( data ), "xml", "Data of specified type of xml string should be xml" );
                             strictEqual( type, "xml", "Data type should be xml" );
                             ok( ~jQuery.inArray( storage, st ? [ st ] : this.order[ type ] ), "Storage type should be correct" );
