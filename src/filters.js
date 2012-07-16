@@ -72,9 +72,7 @@
             return xml;
         },
 
-        text: function( data ) {
-            return data;
-        },
+        text: window.String,
 
         html: function() {
             var doc = document.createElement( "div" );
