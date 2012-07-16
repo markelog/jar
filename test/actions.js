@@ -34,16 +34,22 @@ asyncTest( "Basic actions", function() {
         ok( jar.data[ this.name ], "Meta is initialized" );
         ok( jar.data._meta[ this.name ], "_meta is initialized" );
 
-        this.clear().done(function() {
+        this.remove( "not-existed" ).done(function() {
+            ok( true, "Prop is not exist but its still is done-callback" );
 
-            ok( jar.data[ this.name ], "Meta is not removed" );
-            ok( jar.data._meta[ this.name ], "_meta is not removed" );
+            this.clear().done(function() {
 
-            this.remove().done(function() {
-                ok( !jar.data[ this.name ], "Meta is removed" );
-                ok( !jar.data._meta[ this.name ], "_meta is removed" );
+                ok( jar.data[ this.name ], "Meta is not removed" );
+                ok( jar.data._meta[ this.name ], "_meta is not removed" );
 
-                second.resolve();
+                this.remove().done(function() {
+                    ok( !jar.data[ this.name ], "Meta is removed" );
+                    ok( !jar.data._meta[ this.name ], "_meta is removed" );
+
+                    this.clear().done(function() {
+                        second.resolve();
+                    });
+                });
             });
         });
     });

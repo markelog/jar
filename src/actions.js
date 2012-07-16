@@ -45,7 +45,9 @@
     };
 
     this.remove = function( name ) {
-        // If method called without arguments – destroy store
+
+        // If method called without arguments – destroy store,
+        // if it exist
         if ( !arguments.length ) {
             delete this.order;
             return this.clear( true );
@@ -65,7 +67,7 @@
 
             // Make request async
             window.setTimeout(function() {
-                jar.reject( id );
+                jar.resolve( id );
             });
 
             return this;
@@ -87,7 +89,7 @@
             meta = jar.data._meta[ name ],
             defs = [];
 
-        if ( !meta.length ) {
+        if ( !meta || meta && !meta.length ) {
             def = this.register();
 
             // Make request async
@@ -143,5 +145,4 @@
         delete jar.data[ name ];
         delete jar.data._meta[ name ];
     }
-
 }.call( jar.fn );
