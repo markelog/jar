@@ -133,9 +133,10 @@
 
     this.when = function() {
         var def = jar.Deferred(),
+            defs = arguments,
             executed = 0,
             args = [],
-            length = arguments.length;
+            length = defs.length;
 
         def.context = this;
 
@@ -143,8 +144,8 @@
             return def.resolve();
         }
 
-        function done() {
-            args.push( arguments );
+        function done( index, doneArgs ) {
+            args[ index ] = slice.call( doneArgs );
 
             if ( def.state == "pending" && length == ++executed ) {
                 def.resolve( args );
@@ -152,11 +153,17 @@
         }
 
         function reject() {
-            def.reject();
+            def.reject( slice.call( arguments ) );
+        }
+
+        function loop( i ) {
+            return function() {
+                done( i, arguments );
+            };
         }
 
         for ( var i = 0; i < length; i++ ) {
-            arguments[ i ].always( done, this ).fail( reject, this );
+            defs[ i ].always( loop( i ), this ).fail( reject, this );
         }
 
         return def;

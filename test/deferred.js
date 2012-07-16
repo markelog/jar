@@ -16,11 +16,15 @@ asyncTest( "Basics", 1, function() {
     def.reject();
 })
 
-asyncTest( "jar.when", 6, function() {
+asyncTest( "jar.when", 12, function() {
     var def1 = jar.Deferred(),
         def2 = jar.Deferred(),
         def3 = jar.Deferred(),
-        def4 = jar.Deferred();
+        def4 = jar.Deferred(),
+        def5 = jar.Deferred(),
+        def6 = jar.Deferred(),
+        def7 = jar.Deferred(),
+        def8 = jar.Deferred();
 
     def1.resolve( [ "def1" ] );
     def2.resolve( [ "def2" ] );
@@ -44,6 +48,27 @@ asyncTest( "jar.when", 6, function() {
     });
 
     def3.reject();
+
+    jar.when( def5, def6 ).done(function( first, second ) {
+
+        strictEqual( first[ 0 ], "def5", "Callbacks should be execute in sequence they was added" );
+        strictEqual( second[ 0 ], "def6", "Callbacks should be execute in sequence they was added" );
+    });
+
+    def6.resolve([ "def6" ]);
+    def5.resolve([ "def5" ]);
+
+    jar.when( def7, def8 ).always(function() {
+        strictEqual( arguments[ 0 ], "def8", "In always callback, for failed deferred, args should be transferrd only for failed callback" );
+        strictEqual( arguments.length, 1, "In always callback, for failed deferred, args should be transferrd only for failed callback" );
+
+    }).fail(function() {
+        strictEqual( arguments[ 0 ], "def8", "In fail callback, for failed deferred, args should be transferrd only for failed callback" );
+        strictEqual( arguments.length, 1, "In fail callback, for failed deferred, args should be transferrd only for failed callback" );
+    });
+
+    def7.resolve([ "def7" ]);
+    def8.reject([ "def8" ]);
 
     start();
 });
@@ -88,11 +113,14 @@ asyncTest( "jar.Deferred#then", 4, function() {
         });
     });
 
-    jar.when( exist, notExist ).done( start );
+    jar.when( exist, notExist ).done(function() {
+        start();
+    });
 });
 
-asyncTest( "jar#done", 4, function() {
-    var def = jar.Deferred();
+asyncTest( "jar#done", 7, function() {
+    var def = jar.Deferred(),
+        test = 0;
 
     def.done(function() {
         ok( true, "Simple done-callback" );
@@ -113,6 +141,14 @@ asyncTest( "jar#done", 4, function() {
 
     def.done(function() {
         ok( true , "Resolved deferred was executed" );
+        strictEqual( test, 0, "Callbacks should be execute in sequence they was added" );
+        test = 1;
+    }).done(function() {
+        strictEqual( test, 1, "Callbacks should be execute in sequence they was added" );
+        test = 2;
+
+    }).done(function() {
+        strictEqual( test, 2, "Callbacks should be execute in sequence they was added" );
     });
 
     start();
