@@ -184,7 +184,6 @@
         }
 
         this.stores.fs.sub.removeRecursively(function( entry ) {
-
             if ( !destroy ) {
 
                 // If we have to re-create the same dir

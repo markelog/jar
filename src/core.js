@@ -126,4 +126,8 @@
     jar.has = function( base, name ) {
         return !!jar.fn.meta( name, base.replace( rstoreNames, "repl" ) );
     };
+
+    jar.fn.hasStore = function() {
+        return !!jar.data[ this.name ];
+    }
 }.call( window );

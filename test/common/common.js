@@ -22,11 +22,11 @@ window.moduleTeardown = function() {
 }
 
 function checkGetSet( st ) {
-    jQuery.ajax({
-        url: "//" + window.location.host + window.location.pathname + "data/data.xsl",
-        dataType: "xml"
-    }).done(function ( xsl ) {
-        asyncTest( "Check get and set methods", 71, function() {
+    asyncTest( "Check get and set methods", 71, function() {
+        jQuery.ajax({
+            url: "//" + window.location.host + window.location.pathname + "data/data.xsl",
+            dataType: "xml"
+        }).done(function ( xsl ) {
             jar( st, st ).done(function() {
                 var html = document.createElement( "div" ),
                     body = jar.text.html( document.body ),
@@ -192,7 +192,7 @@ function checkGetSet( st ) {
                             .promise().always( start );
                     });
                 });
-            });
+        });
     });
 }
 
@@ -200,11 +200,13 @@ function checkGetSet( st ) {
 function checkRemoved() {
    return this.get( "1" ).fail(function() {
         ok( true, "This key is not exist anymore" );
+
     }).set( "1", "2" ).fail(function() {
         ok( true, "You can't set values if store is not exist" )
 
     }).remove( "1" ).fail(function() {
         ok( true, "You can't remove values if store is not exist" );
-    });
+
+    }).promise();
 }
 

@@ -10,7 +10,7 @@ asyncTest( "Simple set and get", 7, function() {
             json: { test: "test" }
         };
 
-        jar( "lc", "lc" ).done(function() {
+        jar( "Simple set and get", "lc" ).done(function() {
             this.set( "text", values.text ).done(function() {
                 this.get( "text" )
                     .done(function( data, type ) {
@@ -42,7 +42,7 @@ asyncTest( "Simple set and get", 7, function() {
                 ok( true, "always should be called for fail operation" );
             });
 
-        this.promise().done(function() {
+        this.promise().always(function() {
             start();
         });
 
@@ -50,7 +50,7 @@ asyncTest( "Simple set and get", 7, function() {
 });
 
 asyncTest( "Remove method", 1, function() {
-    jar( "lc", "lc" ).done(function() {
+    jar( "Remove method", "lc" ).done(function() {
             this.set( "test", "test" ).done(function() {
 
                 // Make sure data is writed
@@ -69,7 +69,7 @@ asyncTest( "Remove method", 1, function() {
 });
 
 asyncTest( "Differentiate data in diffrent data-sets", 1, function() {
-    jar( "lc-1", "lc" ).done(function() {
+    jar( "Differentiate data in diffrent data-sets", "lc" ).done(function() {
         this.set( "test", "test1" ).done(function() {
             this.get( "test" ).done(function( test1 ) {
                 jar( "lc-2", "lc" ).done(function() {
@@ -110,3 +110,4 @@ asyncTest( "Test asynchronous of lc methods", 5, function() {
         });
     });
 });
+

@@ -124,9 +124,10 @@ asyncTest( "Explicitly set data-type",  function() {
 
     });
 
-    jar.when.apply( this, [ css, jsType, xml, wrongType ] ).always( start );
+    jar.when( css, jsType, xml, wrongType ).always(function() {
+        start();
+    });
 });
-
 
 asyncTest( "Load js as text and executed after", 2, function() {
     function testit() {
@@ -168,7 +169,5 @@ asyncTest( "Load js as text and executed after", 2, function() {
             });
     });
 });
-
-
 
 

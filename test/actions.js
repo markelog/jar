@@ -12,7 +12,6 @@ asyncTest( "Basic actions", function() {
         this.set( "text-type", "text" ).done(function( type, storage ) {
             strictEqual( type, "text", "Data-type should be text" );
             strictEqual( jar.data[ this.name ][ "text-type" ].type, "text", "In meta data-type should be text " );
-
             ok( ~jQuery.inArray( storage, jar.order.text ), "Storage should be " + storage );
             strictEqual( jar.data[ this.name ][ "text-type" ].storage, storage, "In meta storage should be " + storage );
         });
@@ -26,7 +25,7 @@ asyncTest( "Basic actions", function() {
         });
 
         this.promise().done( function() {
-            first.resolve();
+            start();
         });
     });
 
@@ -89,7 +88,7 @@ asyncTest( "jar#remove without arguments", function() {
             this.remove().done(function() {
 
                 equal( original, this.storages.length, "All data stores references is still there" );
-                checkRemoved.call( this ).promise().always( start );
+                checkRemoved.call( this ).always( start );
             });
         });
     });

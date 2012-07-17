@@ -108,13 +108,6 @@
     proto.init.prototype = proto;
 
     this.idb.set = function( name, data, type, id ) {
-
-        // Reject request if store is not exist
-        if ( !contains( this.name ) ) {
-            jar.reject( id );
-            return this;
-        }
-
         var request, store,
             self = this;
 
@@ -151,13 +144,6 @@
     };
 
     this.idb.get = function( name, type, id ) {
-
-        // Reject request if store is not exist
-        if ( !contains( this.name ) ) {
-            jar.reject( id );
-            return this;
-        }
-
         var store, index, request,
             self = this;
 
@@ -203,13 +189,6 @@
     };
 
     this.idb.remove = function( name, id ) {
-
-        // Reject request if store is not exist
-        if ( !contains( this.name ) ) {
-            jar.reject( id );
-            return this;
-        }
-
         var request, store,
             self = this;
 

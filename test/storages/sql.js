@@ -42,19 +42,22 @@ if ( window.openDatabase ) {
     });
 
 
-    asyncTest( "Complete removal of object store", 1, function() {
+    asyncTest( "Complete removal of object store", 4, function() {
         jar( "sql-1", "sql" )
             .done(function() {
                 this.set( "1", "2" ).done(function() {
                     this.get( "1" ).done(function( data ) {
                         this.remove()
                             .done(function() {
-                                ok( this.stores.sql, "References to database is still there" );
+                                checkRemoved.call( this ).always(function() {
+                                    ok( this.stores.sql, "References to database is still there" );
+                                    start()
+                                })
                             })
                             .fail(function() {
                                 ok( false, "Store was not completely removed" );
-                            })
-                            .always( start );
+                                start();
+                            });
                     });
                 });
             })

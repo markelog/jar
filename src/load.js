@@ -8,19 +8,19 @@
         request.send();
 
         request.onreadystatechange = function() {
-             if ( request.readyState != 4 ) {
-                    return;
-                }
+            if ( request.readyState != 4 ) {
+                return;
+            }
 
-                if ( request.status >= 200 && request.status < 300 || request.status === 304 ) {
-                    jar( base ).done(function() {
-                        var data = type == "xml" ? request.responseXML : request.responseText;
+            if ( request.status >= 200 && request.status < 300 || request.status === 304 ) {
+                jar( base ).done(function() {
+                    var data = type == "xml" ? request.responseXML : request.responseText;
 
-                        jar.filters[ type ]( data );
-                        def.resolve([ data, this ]);
+                    jar.filters[ type ]( data );
+                    def.resolve([ data, this ]);
 
-                        this.set( path, data, type );
-                    });
+                    this.set( path, data, type )
+                });
 
                 } else {
                     def.reject();

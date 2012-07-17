@@ -36,25 +36,38 @@ if ( jar.prefixes.indexedDB) {
     checkGetSet( "idb" );
 
     asyncTest( "Complete removal of object store", 4, function() {
+        var remove = jar.Deferred(),
+            checkRemove = jar.Deferred();
+
         jar( "idb-1", "idb" )
             .done(function() {
                 this.set( "1", "2" ).done(function() {
                     this.get( "1" ).done(function( data ) {
                         this.remove()
                             .done(function() {
-                                checkRemoved.call( this );
+                                checkRemoved.call( this ).always(function() {
+                                    checkRemove.resolve();
+                                })
 
-                                ok( !~[].indexOf.call( jar.idb.db.objectStoreNames, this.name ), "Store was completely removed" );
+                                .always(function() {
+                                    ok( !jar.idb.db.objectStoreNames.contains( this.name ), "Store was completely removed" );
+                                });
                             })
                             .fail(function() {
                                 ok( false, "Store was not completely removed" );
                             })
-                            .always( start );
+                            .always(function() {
+                                remove.resolve();
+                            });
                     });
                 });
             })
             .fail(function() {
                 ok( false, "Can't create object store" );
+                start();
+            });
+
+            jar.when( remove, checkRemove ).always( function() {
                 start();
             });
     });
@@ -81,13 +94,22 @@ if ( jar.prefixes.indexedDB) {
         });
     });
 
-    asyncTest( "Complete removal of object store after it was removed", 1, function() {
+    asyncTest( "Complete removal of object store after it was removed", 4, function() {
+        var setup = jar.Deferred(),
+            checkRemove = jar.Deferred();
+
         jar( "idb-3", "idb" ).done(function() {
             this.set( "1", "2" ).done(function() {
                 this.get( "1" ).done(function( data ) {
                     this.remove().done(function() {
+                        checkRemoved.call( this ).always(function() {
+                            checkRemove.resolve();
+                        });
+
                         this.setup( "idb" )
                             .done(function() {
+                                setup.resolve();
+
                                 ok( jar.idb.db.objectStoreNames.contains( this.name ), "Store was setted, after being removed" );
                             })
                             .fail(function() {
@@ -100,6 +122,10 @@ if ( jar.prefixes.indexedDB) {
                     })
                 });
             });
+        });
+
+        jar.when( setup, checkRemove ).always( function() {
+            start();
         });
     });
 }

@@ -6,8 +6,8 @@
             reg = this.register();
 
         // Reject request if storage is not exist
-        if ( !this.order ) {
-            setTimeout(function() {
+        if ( !jar.data[ this.name ] ) {
+            window.setTimeout(function() {
                 reg.reject();
             });
 
@@ -40,7 +40,10 @@
             return this[ meta.storage ].get.apply( this, [ name, meta.type, id ] );
         }
 
-        jar.reject( id );
+        window.setTimeout(function() {
+            jar.reject( id );
+        });
+
         return this;
     };
 
@@ -67,7 +70,7 @@
 
             // Make request async
             window.setTimeout(function() {
-                jar.resolve( id );
+                jar.reject( id );
             });
 
             return this;

@@ -29,7 +29,7 @@
     this.log = function( name, storage, type ) {
         var data, meta;
 
-       if ( !jar.data._meta[ this.name ] ) {
+        if ( !jar.data._meta[ this.name ] ) {
             jar.data[ this.name ] = {};
 
             jar.data._meta[ this.name ] = {
