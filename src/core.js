@@ -10,40 +10,13 @@
     var jar,
         rstoreNames = /[^\w]/g,
         storageInfo = window.storageInfo || window.webkitStorageInfo,
-        toString = "".toString,
-        sqlLc = [ "sql", "lc" ],
-        order = {
-            xml: sqlLc,
-            html: sqlLc,
-            json: sqlLc,
-            javascript: sqlLc,
-            css: sqlLc,
-            text: sqlLc
-        };
+        toString = "".toString;
 
-    // Firefox ask user permission to use indexedDb, because of this we don't use it in FF
-    if ( storageInfo ) {
-        order.xml = [ "fs", "idb" ].concat( order.xml );
-        order.json = [ "idb" ].concat( order.json );
-        order.javascript = [ "fs" ].concat( order.javascript );
-        order.javascript = [ "css" ].concat( order.javascript );
-        order.text = [ "idb", "lc" ];
-
-    } else if ( window.msIndexedDB ) {
-        order.xml = [ "idb" ].concat( order.xml );
-        order.json = [ "idb" ].concat( order.json );
-        order.javascript = [ "idb" ].concat( order.javascript );
-        order.css = [ "css" ].concat( order.css );
-        order.text = [ "idb", "lc" ];
-    }
-
-    order.js = order.javascript;
-    jar = this.jar = function jar( name, storage ) {
+    jar = this.jar = function( name, storage ) {
         return new jar.fn.init( name, storage );
     };
 
-    jar.order = order;
-
+    jar.storages = [];
     jar.prefixes = {
         storageInfo: storageInfo
     };
@@ -126,8 +99,4 @@
     jar.has = function( base, name ) {
         return !!jar.fn.meta( name, base.replace( rstoreNames, "repl" ) );
     };
-
-    jar.fn.hasStore = function() {
-        return !!jar.data[ this.name ];
-    }
 }.call( window );

@@ -4,7 +4,7 @@ if ( window.openDatabase ) {
     });
 
     asyncTest( "Basic ref", 1, function() {
-        jar().done(function() {
+        jar( "Basic ref", "sql" ).done(function() {
             ok( this.stores.sql, "sql storage created" );
             start();
         });

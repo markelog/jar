@@ -19,7 +19,7 @@
                     jar.filters[ type ]( data );
                     def.resolve([ data, this ]);
 
-                    this.set( path, data, type )
+                    this.set( path, data, type );
                 });
 
                 } else {

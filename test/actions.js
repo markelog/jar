@@ -11,7 +11,7 @@ asyncTest( "Basic actions", function() {
     jar( "Basic actions-1" ).done(function() {
         this.set( "text-type", "text" ).done(function( type, storage ) {
             strictEqual( type, "text", "Data-type should be text" );
-            strictEqual( jar.data[ this.name ][ "text-type" ].type, "text", "In meta data-type should be text " );
+            strictEqual( jar.data[ this.name ][ "text-type" ].type, "text", "In meta, data-type should be text" );
             ok( ~jQuery.inArray( storage, jar.order.text ), "Storage should be " + storage );
             strictEqual( jar.data[ this.name ][ "text-type" ].storage, storage, "In meta storage should be " + storage );
         });
@@ -20,7 +20,7 @@ asyncTest( "Basic actions", function() {
             strictEqual( type, "json", "Data-type should be json" );
             strictEqual( jar.data[ this.name ][ "json-type" ].type, "json", "In meta data-type should be json" );
 
-            ok( ~jQuery.inArray( storage, jar.order.text ), "Storage should be " + storage );
+            ok( ~jQuery.inArray( storage, jar.order.json ), "Storage should be " + storage );
             strictEqual( jar.data[ this.name ][ "json-type" ].storage, storage, "In meta storage should be " + storage );
         });
 
