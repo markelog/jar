@@ -12,7 +12,6 @@ asyncTest( "jar.load - js", function() {
             jar.load( path, "jar.load - js" ).done(function( data, base ) {
                 ok( data.length, "Data is returned" );
                 ok( js, "Variable is assigned" );
-                ok( base instanceof jar, "Second argument is instance of jar" );
 
                 // cleanup
                 window.js = undefined;
@@ -25,7 +24,6 @@ asyncTest( "jar.load - js", function() {
                     jar.load( path, "jar.load - js" ).done(function( data, base ) {
                         ok( data.length, "Data is returned" );
                         ok( js, "Variable is assigned" );
-                        ok( base instanceof jar, "Second argument is instance of jar" );
 
                         // cleanup
                         window.js = undefined;
@@ -47,7 +45,6 @@ asyncTest( "jar.load - xml", function() {
             // through xhr-request
             jar.load( path, "jar.load - xml" ).done(function( data, base ) {
                 strictEqual( jar.type( data ), "xml", "Data is returned" );
-                ok( base instanceof jar, "Second argument is instance of jar" );
 
                 // wait a bit, so data can be writed
                 window.setTimeout(function() {
@@ -56,7 +53,6 @@ asyncTest( "jar.load - xml", function() {
                     // through jar-store
                     jar.load( path, "jar.load - xml" ).done(function( data, base ) {
                         strictEqual( jar.type( data ), "xml", "Data is returned" );
-                        ok( base instanceof jar, "Second argument is instance of jar" );
 
                         start();
                     });
@@ -75,7 +71,6 @@ asyncTest( "jar.load - xsl", function() {
             // through xhr-request
             jar.load( path, "jar.load - xsl" ).done(function( data, base ) {
                 strictEqual( jar.type( data ), "xml", "Data is returned" );
-                ok( base instanceof jar, "Second argument is instance of jar" );
 
                 // wait a bit, so data can be writed
                 window.setTimeout(function() {
@@ -84,7 +79,6 @@ asyncTest( "jar.load - xsl", function() {
                     // through jar-store
                     jar.load( path, "jar.load - xsl" ).done(function( data, base ) {
                         strictEqual( jar.type( data ), "xml", "Data is returned" );
-                        ok( base instanceof jar, "Second argument is instance of jar" );
 
                         start();
                     });
@@ -170,4 +164,40 @@ asyncTest( "Load js as text and executed after", 2, function() {
     });
 });
 
+
+asyncTest( "jar.load - if we can't load data that we definetly have make xhr", function() {
+    var path = origin + "data/data.js",
+        data = {},
+        name = "jar.load - if we can't load data that we definetly have make xhr";
+
+    data[ path ] = { "storage": jar.order.text[ 0 ], "type": "text" };
+
+    jar( name ).done(function() {
+        var name = this.name;
+
+        // let's pretend we have data
+        jar.data[ name ] = data;
+        jar.data._meta[ name ] = { "storages": { "idb":1,"fs":1,"lc":1,"sql":2 }, "length":1 };
+
+        // when actually we don't
+        jar.load( path, name ).done(function( info ) {
+            ok( window.js, "We get our data even when don't have it in the first place" );
+
+            // cleanup
+            window.js = undefined;
+
+            // now lets pretend we have data and url is valid
+
+            path = "test.js";
+            jar.data[ name ][ path ] = { "storage": jar.order.text[ 0 ], "type": "text" };
+            jar.data._meta[ name ] = { "storages": { "idb":1,"fs":1,"lc":1,"sql":2 }, "length":1 };
+
+            jar.load( path, name ).fail(function() {
+                ok( true, "This request should fail" );
+                start();
+            });
+        });
+
+    });
+});
 
