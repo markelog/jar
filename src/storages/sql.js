@@ -64,17 +64,21 @@
             jar.reject( id );
         }
 
-        store.transaction(function( trans ) {
+        try {
+            store.transaction(function( trans ) {
 
-            // Try to add data, if transaction will fall then try to update it
-            trans.executeSql( insert, [ data, name ], resolve, function() {
+                // Try to add data, if transaction will fall then try to update it
+                trans.executeSql( insert, [ data, name ], resolve, function() {
 
-                // Can't re-use transaction in Opera
-                store.transaction(function( trans ) {
-                    trans.executeSql( update, [ data, name ], resolve, reject );
+                    // Can't re-use transaction in Opera
+                    store.transaction(function( trans ) {
+                        trans.executeSql( update, [ data, name ], resolve, reject );
+                    });
                 });
             });
-        });
+        } catch ( _ ) {
+            reject();
+        }
 
         return this;
     };
@@ -98,9 +102,13 @@
             jar.reject( id );
         }
 
-        this.stores.sql.transaction(function( trans ) {
-            trans.executeSql( command, [], resolve, reject );
-        });
+        try {
+            this.stores.sql.transaction(function( trans ) {
+                trans.executeSql( command, [], resolve, reject );
+            });
+        } catch ( _ ) {
+            jar.reject( id );
+        }
 
         return this;
     };
@@ -116,9 +124,13 @@
             jar.reject( id );
         }
 
-        this.stores.sql.transaction(function( trans ) {
-            trans.executeSql( command, [ name ], resolve, reject );
-        });
+        try {
+            this.stores.sql.transaction(function( trans ) {
+                trans.executeSql( command, [ name ], resolve, reject );
+            });
+        } catch ( _ ) {
+            reject();
+        }
 
         return this;
     };
@@ -135,9 +147,13 @@
             jar.reject( id );
         }
 
-        this.stores.sql.transaction(function( trans ) {
-            trans.executeSql( command, [], resolve, reject );
-        });
+        try {
+            this.stores.sql.transaction(function( trans ) {
+                trans.executeSql( command, [], resolve, reject );
+            });
+        } catch ( _ ) {
+            reject();
+        }
 
         return this;
     };
