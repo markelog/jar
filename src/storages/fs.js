@@ -20,46 +20,52 @@
 
         origin = window.location.origin,
 
-        filters = {};
-        filters.xml = function( base, name, id ) {
-            var xhr = new window.XMLHttpRequest();
-            xhr.open( "get", "filesystem:" + origin + "/temporary/jar/" + base + "/" + name, true );
-            xhr.send();
+        filters = {
+            xml: function( base, name, id ) {
+                var xhr = new window.XMLHttpRequest();
 
-            xhr.onreadystatechange = function() {
-                if ( xhr.readyState != 4 ) {
-                    return;
+                xhr.open( "get", "filesystem:" + origin + "/temporary/jar/" + base + "/" + name, true );
+                xhr.send();
+
+                xhr.onreadystatechange = function() {
+                    if ( xhr.readyState != 4 ) {
+                        return;
+                    }
+
+                    if ( xhr.status >= 200 && xhr.status < 300 || xhr.status === 304 ) {
+                        jar.resolve( id, xhr.responseXML, "xml", "fs" );
+
+                    } else {
+                        jar.reject( id );
+                    }
                 }
+        };
 
-                if ( xhr.status >= 200 && xhr.status < 300 || xhr.status === 304 ) {
-                    jar.resolve( id, xhr.responseXML, "xml", "fs" );
+        // If css will be applied through link inclusion all paths for images
+        // will be relative to this file, which is stored in filesystem
+        // we enable this future only if user really sure he can use it
+        if ( jar.fsCSS ) {
+            filters.css = function( base, name, id ) {
+                var link = document.createElement( "link" );
+                link.href = "filesystem:" + origin + "/temporary/jar/" + base + "/" + name;
+                link.rel = "stylesheet";
+                link.type = "text/css";
 
-                } else {
+                link.addEventListener( "error", function() {
                     jar.reject( id );
-                }
+                });
+
+                link.addEventListener( "load", function() {
+
+                    // Potential danger
+                    window.setTimeout(function() {
+                        jar.resolve( id, link, "css", "fs" );
+                    }, 10 );
+                });
+
+                document.head.appendChild( link );
             };
-        };
-
-        filters.css = function( base, name, id ) {
-            var link = document.createElement( "link" );
-            link.href = "filesystem:" + origin + "/temporary/jar/" + base + "/" + name;
-            link.rel = "stylesheet";
-            link.type = "text/css";
-
-            link.addEventListener( "error", function() {
-                jar.reject( id );
-            });
-
-            link.addEventListener( "load", function() {
-
-                // Potential danger
-                window.setTimeout(function() {
-                    jar.resolve( id, link, "css", "fs" );
-                }, 10 );
-            });
-
-            document.head.appendChild( link );
-        };
+        }
 
     mime.js = mime.javascript;
 
