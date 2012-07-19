@@ -82,9 +82,9 @@
                 }
             }
 
-            jar.when.apply( jar, defs )
+            jar.when.apply( this, defs )
                 .done(function() {
-                    def.resolve();
+                    def.resolve([ this ]);
                 })
                 .fail(function() {
                     def.reject();

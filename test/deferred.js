@@ -31,8 +31,8 @@ asyncTest( "jar.when", 12, function() {
 
     jar.when( def1, def2 ).done(function( def1, def2 ) {
          ok( true, "When worked for resolved Deferred" );
-         strictEqual( def1[ 0 ], "def1", "First deferreds arguments is correctly received" );
-         strictEqual( def2[ 0 ], "def2", "Second deferreds arguments is correctly received" );
+         strictEqual( def1, "def1", "First deferreds arguments is correctly received" );
+         strictEqual( def2, "def2", "Second deferreds arguments is correctly received" );
     });
 
     jar.when.apply( "test", [ def1 ] ).done(function () {
@@ -51,8 +51,8 @@ asyncTest( "jar.when", 12, function() {
 
     jar.when( def5, def6 ).done(function( first, second ) {
 
-        strictEqual( first[ 0 ], "def5", "Callbacks should be execute in sequence they was added" );
-        strictEqual( second[ 0 ], "def6", "Callbacks should be execute in sequence they was added" );
+        strictEqual( first, "def5", "Callbacks should be execute in sequence they was added" );
+        strictEqual( second, "def6", "Callbacks should be execute in sequence they was added" );
     });
 
     def6.resolve([ "def6" ]);
@@ -159,13 +159,13 @@ asyncTest( "Storage related deferreds", 2, function() {
 
     defs[ 0 ] = jar( "lc", "lc" ).always(function() {
         ok ( this.active.state !== "pending", "State of a resolved deferred should not be pending" );
-    }).active;
+    });
 
     defs[ 1 ] = jar( "lc", "lc" ).always(function() {
         this.promise().done(function() {
             ok ( true, "Done callback for promise method should be executed" );
         });
-    }).active;
+    });
 
     jar.when( defs[ 0 ], defs[ 1 ] ).always(function() {
         start();

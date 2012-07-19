@@ -145,7 +145,8 @@
         }
 
         function done( index, doneArgs ) {
-            args[ index ] = slice.call( doneArgs );
+            doneArgs = slice.call( doneArgs );
+            args[ index ] = doneArgs.length == 1 ? doneArgs[ 0 ] : doneArgs;
 
             if ( def.state == "pending" && length == ++executed ) {
                 def.resolve( args );
@@ -163,7 +164,7 @@
         }
 
         for ( var i = 0; i < length; i++ ) {
-            defs[ i ].always( loop( i ), this ).fail( reject, this );
+            ( defs[ i ] || defs[ i ].active ).always( loop( i ), this ).fail( reject, this );
         }
 
         return def;

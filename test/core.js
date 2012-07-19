@@ -1,11 +1,30 @@
 module( "core", { teardown: moduleTeardown } );
 
-asyncTest( "Global stuff", 1, function() {
-    jar( "@_#-!$%^&*()_+=фt" ).done(function() {
-        strictEqual( this.name, "________________t",
-         "Name was successfully changed" );
+asyncTest( "Global stuff", 3, function() {
+    var turtle = jar( "big turtle" ),
 
-        start();
+        // I want to use bear store only with localStorage
+        bear = jar( "sexy bear", "lc" /* idb fs sql */ );
+
+    jar.when( turtle, bear ).done(function( turtle, bear ) {
+        var def = jar.Deferred();
+
+        turtle.set( "set stuff", "bla-blah" ).done(function() {
+            ok( true, "stuff is setted" );
+
+            def.resolve();
+        });
+
+        bear.remove().done(function() {
+            ok( true, "bear is removed" )
+
+            jar( "@_#-!$%^&*()_+=фt" ).done(function() {
+                strictEqual( this.name, "________________t",
+                 "Name was successfully changed" );
+
+                def.done( start );
+            });
+        });
     });
 });
 
