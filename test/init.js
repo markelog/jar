@@ -23,7 +23,8 @@ test( "jar.preference", function() {
         js: [ "idb", "lc" ]
     });
 
-    strictEqual( jar.order.js[ 0 ], "lc", 'Even if idb exist we still will be using lc storage for mozilla' );
+    strictEqual( jar.order.js[ 0 ], "idb",
+        "When user specified storages he wants to use limitations for idb storage in mozilla should not be applied" );
 
     jar.preference();
 

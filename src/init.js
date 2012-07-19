@@ -31,7 +31,7 @@
 
                     // Firefox ask user permission to use indexedDb, because of this, we don't use it in FF
                     // if argument is default argument
-                    if ( value == "idb" && moz && window.mozIndexedDB ) {
+                    if ( value == "idb" && !moz && window.mozIndexedDB ) {
                         continue;
                     }
 
