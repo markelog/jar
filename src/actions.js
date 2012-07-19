@@ -92,7 +92,7 @@
             meta = jar.data._meta[ name ],
             defs = [];
 
-        if ( !meta ) {
+        if ( !meta || meta && !meta.length ) {
             def = this.register();
 
             // Make request async

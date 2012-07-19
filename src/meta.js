@@ -48,8 +48,6 @@
                 type: type
             };
 
-            meta.length++;
-
         } else {
             storage = name;
         }
@@ -59,6 +57,7 @@
             meta.storages[ storage ] = 0;
         }
 
+        meta.length++;
         meta.storages[ storage ]++;
 
         return this;

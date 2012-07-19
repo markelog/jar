@@ -201,17 +201,17 @@
 
     this.fs.clear = function( id, destroy ) {
         var self = this,
-            sub = this.stores.fs.sub;
+            fs = this.stores.fs;
 
         function reject() {
             jar.reject( id );
         }
 
-        sub.removeRecursively(function( entry ) {
+        fs.sub.removeRecursively(function( entry ) {
             if ( !destroy ) {
 
                 // If we have to re-create the same dir
-                sub.getDirectory( self.name, {
+                fs.getDirectory( self.name, {
                     create: true
                 }, function( dir ) {
                     self.stores.fs.sub = dir;
