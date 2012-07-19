@@ -165,12 +165,12 @@ asyncTest( "Load js as text and executed after", 2, function() {
 });
 
 
-asyncTest( "jar.load - if we can't load data that we definetly have make xhr", function() {
+asyncTest( "jar.load - if we fail to load data that we have – make xhr", function() {
     var path = origin + "data/data.js",
         data = {},
-        name = "jar.load - if we can't load data that we definetly have make xhr";
+        name = "jar.load - if we fail to load data that we have – make xhr";
 
-    data[ path ] = { "storage": jar.order.text[ 0 ], "type": "text" };
+    data[ path ] = { "storage": jar.order.js[ 0 ], "type": "js" };
 
     jar( name ).done(function() {
         var name = this.name;
@@ -187,9 +187,8 @@ asyncTest( "jar.load - if we can't load data that we definetly have make xhr", f
             window.js = undefined;
 
             // now lets pretend we have data and url is valid
-
             path = "test.js";
-            jar.data[ name ][ path ] = { "storage": jar.order.text[ 0 ], "type": "text" };
+            jar.data[ name ][ path ] = { "storage": jar.order.js[ 0 ], "type": "js" };
             jar.data._meta[ name ] = { "storages": { "idb":1,"fs":1,"lc":1,"sql":2 }, "length":1 };
 
             jar.load( path, name ).fail(function() {
