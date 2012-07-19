@@ -1,7 +1,7 @@
 module( "core", { teardown: moduleTeardown } );
 
 asyncTest( "Global stuff", 3, function() {
-    var turtle = jar( "big turtle" ),
+    var turtle = jar( "shy turtle" ),
 
         // I want to use bear store only with localStorage
         bear = jar( "sexy bear", "lc" /* idb fs sql */ );
