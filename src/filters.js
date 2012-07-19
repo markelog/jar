@@ -42,7 +42,7 @@
             }
 
             head.appendChild( style );
-            return data;
+            return style;
         },
 
         // from jQuery

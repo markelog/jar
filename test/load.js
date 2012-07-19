@@ -95,7 +95,6 @@ asyncTest( "Explicitly set data-type",  function() {
                                 "jar.load, explicetlly set data-type", "css" ).done(function() {
         var element = jQuery( '<div class="load-test"></div>' ).appendTo( "#qunit-fixture" );
             strictEqual( element.css( "font-size" ), "99px", "css style should be applied" );
-
     });
 
     jsType = jar.load( origin + "data/data.js",

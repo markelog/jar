@@ -22,7 +22,7 @@ window.moduleTeardown = function() {
 }
 
 function checkGetSet( st ) {
-    asyncTest( "Check get and set methods", 71, function() {
+    asyncTest( "Check get and set methods", 72, function() {
         jQuery.ajax({
             url: "//" + window.location.host + window.location.pathname + "data/data.xsl",
             dataType: "xml"
@@ -185,6 +185,7 @@ function checkGetSet( st ) {
                             .get( "css" ).done(function( data, type, storage ) {
                                 var element = jQuery( '<div class="css-test"></div>' ).appendTo( "#qunit-fixture" );
 
+                                ok( data.nodeType, "Data should be a style or link element" );
                                 strictEqual( type, "css", "Data type should be css" );
                                 strictEqual( element.css( "font-size" ), "99px", "css style should be applied" );
                             })

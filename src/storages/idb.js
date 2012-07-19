@@ -175,7 +175,7 @@
             // like javascript code, so instead we return it like text
             // and execute it
             if ( executable[ type ] ) {
-                jar.filters[ type ]( data );
+                data = jar.filters[ type ]( data );
             }
 
             jar.resolve( id, data, type, "idb" );

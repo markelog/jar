@@ -39,6 +39,28 @@
                 }
             };
         };
+
+        filters.css = function( base, name, id ) {
+            var link = document.createElement( "link" );
+            link.href = "filesystem:" + origin + "/temporary/jar/" + base + "/" + name;
+            link.rel = "stylesheet";
+            link.type = "text/css";
+
+            link.addEventListener( "error", function() {
+                jar.reject( id );
+            });
+
+            link.addEventListener( "load", function() {
+
+                // Potential danger
+                window.setTimeout(function() {
+                    jar.resolve( id, link, "css", "fs" );
+                }, 10 );
+            });
+
+            document.head.appendChild( link );
+        };
+
     mime.js = mime.javascript;
 
     this.storages.push( "fs" );
