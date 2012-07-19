@@ -92,7 +92,7 @@
             meta = jar.data._meta[ name ],
             defs = [];
 
-        if ( !meta || meta && !meta.length ) {
+        if ( !meta ) {
             def = this.register();
 
             // Make request async
@@ -144,8 +144,40 @@
         return this;
     };
 
+    jar.destroy = function() {
+        var def = jar.Deferred(),
+            remove = [],
+            create = [];
+
+        function destroy() {
+            remove.push( this.remove() );
+        }
+
+        for ( var store in jar.data ) {
+            if ( store != "_meta" ) {
+                create.push( jar( store ).done( destroy ).active );
+            }
+        }
+
+        jar.when.apply( this, create ).done(function() {
+            jar.when.apply( this, remove ).done(function() {
+                def.resolve();
+
+            }).fail(function() {
+                def.reject();
+            });
+
+        }).fail(function() {
+            def.reject();
+        });
+
+        return def;
+    };
+
     function kill( name ) {
         delete jar.data[ name ];
-        delete jar.data._meta[ name ];
+        if ( jar.data._meta ) {
+            delete jar.data._meta[ name ];
+        }
     }
 }.call( jar.fn );

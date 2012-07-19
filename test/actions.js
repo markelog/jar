@@ -93,3 +93,47 @@ asyncTest( "jar#remove without arguments", function() {
         });
     });
 });
+asyncTest( "jar.destroy", 3, function() {
+    jar( "jar.destroy" ).done(function() {
+        var store, request, index;
+
+        jar.destroy().done(function() {
+
+            if ( jar.fs.db ) {
+
+                // dot was changed to "_"
+                jar.fs.db.getFile( "jar_destroy", {
+                    create: false
+                }, function( entry ) {
+                    ok( false, "Sub dir is still exist" );
+                }, function() {
+                    ok( true, "Sub dir is destroyed" );
+                });
+            }
+
+            if ( jar.prefixes.indexedDB ) {
+
+                try {
+                    store = jar.idb.db.transaction([ this.name ],
+                                            jar.prefixes.IDBTransaction.READ_ONLY !== 0 ? "readonly" : 0 ).objectStore( this.name );
+                    index = store.index( "name" );
+                    request = index.get( name );
+
+                    ok( false, "Data is still exist" )
+                } catch ( _ ) {
+                    ok( true, "Data is not still exist" )
+                }
+            }
+
+            for ( var store in jar.data ) {
+                if ( store != "_meta" ) {
+                    ok( false, "There is some data left" )
+                }
+            }
+
+            ok( true, "Meta-data is destroyed" );
+
+            start();
+        });
+    });
+});

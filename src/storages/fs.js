@@ -189,6 +189,7 @@
         this.stores.fs.sub.getFile( name, {
             create: false
         }, function( entry ) {
+
             entry.remove(function() {
               jar.resolve( id );
 
@@ -199,17 +200,18 @@
     };
 
     this.fs.clear = function( id, destroy ) {
-        var self = this;
+        var self = this,
+            sub = this.stores.fs.sub;
 
         function reject() {
             jar.reject( id );
         }
 
-        this.stores.fs.sub.removeRecursively(function( entry ) {
+        sub.removeRecursively(function( entry ) {
             if ( !destroy ) {
 
                 // If we have to re-create the same dir
-                fs.db.getDirectory( self.name, {
+                sub.getDirectory( self.name, {
                     create: true
                 }, function( dir ) {
                     self.stores.fs.sub = dir;
