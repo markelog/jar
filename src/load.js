@@ -1,20 +1,29 @@
 !function() {
     function xhr( base, path, type, def ) {
+        var request;
 
-        //request = new ( window.XMLHttpRequest, window.ActiveXObject )( "Microsoft.XMLHTTP" ); -- jshint :-(
-        var request = window.XMLHttpRequest ? new window.XMLHttpRequest() : new window.ActiveXObject( "Microsoft.XMLHTTP" );
+        // TODO: add some tests
+        if ( !jar.xhr ) {
+            request = window.XMLHttpRequest ? new window.XMLHttpRequest() : new window.ActiveXObject( "Microsoft.XMLHTTP" );
+
+        } else {
+            request = new jar.xhr();
+        }
 
         request.open( "get", path, true );
         request.send();
 
-        request.onreadystatechange = function() {
-            if ( request.readyState != 4 ) {
+        // For IE9?
+        request.onprogress = function() {};
+
+        request.onload = request.onreadystatechange = function() {
+            if ( request.readyState && request.readyState != 4 ) {
                 return;
             }
 
             var data;
 
-            if ( request.status >= 200 && request.status < 300 || request.status === 304 ) {
+            if ( request.status === undefined || request.status >= 200 && request.status < 300 || request.status === 304 ) {
                 data = type == "xml" ? request.responseXML : request.responseText;
 
                 jar.filters[ type ]( data );
@@ -28,6 +37,8 @@
                 } else {
                     def.reject();
                 }
+
+                request.onload = request.onreadystatechange = null;
             };
 
         return def;
