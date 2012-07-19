@@ -32,7 +32,7 @@
         init: function( name, storage ) {
 
             // Name of a object store must contain only alphabetical symbols
-            this.name = name ? name.replace( rstoreNames, "repl" ) : "jar";
+            this.name = name ? name.replace( rstoreNames, "_" ) : "jar";
             this.deferreds = {};
             this.stores = {};
 
@@ -97,6 +97,6 @@
     jar.fn.init.prototype = jar.fn;
 
     jar.has = function( base, name ) {
-        return !!jar.fn.meta( name, base.replace( rstoreNames, "repl" ) );
+        return !!jar.fn.meta( name, base.replace( rstoreNames, "_" ) );
     };
 }.call( window );
