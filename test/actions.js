@@ -93,13 +93,17 @@ asyncTest( "jar#remove without arguments", function() {
         });
     });
 });
-asyncTest( "jar.destroy", 3, function() {
+asyncTest( "jar.destroy", function() {
     jar( "jar.destroy" ).done(function() {
-        var store, request, index;
+        var store, request, index,
+            self = this,
+            command = "SELECT data FROM " + this.name
+
 
         jar.destroy().done(function() {
 
-            if ( jar.fs.db ) {
+            // test FS api
+            if ( jar.fs ) {
 
                 // dot was changed to "_"
                 jar.fs.db.getFile( "jar_destroy", {
@@ -111,20 +115,33 @@ asyncTest( "jar.destroy", 3, function() {
                 });
             }
 
+            // test indexedDB
             if ( jar.prefixes.indexedDB ) {
-
                 try {
                     store = jar.idb.db.transaction([ this.name ],
                                             jar.prefixes.IDBTransaction.READ_ONLY !== 0 ? "readonly" : 0 ).objectStore( this.name );
                     index = store.index( "name" );
                     request = index.get( name );
 
-                    ok( false, "Data is still exist" )
+                    ok( false, "Data is still exist" );
                 } catch ( _ ) {
-                    ok( true, "Data is not still exist" )
+                    ok( true, "Data is not exist" );
                 }
             }
 
+            // test sql
+            if ( window.openDatabase ) {
+                self.stores.sql.transaction(function( trans ) {
+                    trans.executeSql( command, [], function() {
+                        ok( false, "Data is still exist" );
+
+                    }, function() {
+                        ok( true, "Data is not exist" );
+                    });
+                });
+            }
+
+            // global test
             for ( var store in jar.data ) {
                 if ( store != "_meta" ) {
                     ok( false, "There is some data left" )
