@@ -38,7 +38,8 @@
                     } else {
                         jar.reject( id );
                     }
-                }
+                };
+            }
         };
 
         // If css will be applied through link inclusion all paths for images
