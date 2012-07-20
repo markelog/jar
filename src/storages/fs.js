@@ -76,6 +76,7 @@
         return new proto.init( name, instance );
     };
 
+    this.fs.filters = filters;
     fs = jar.fs = {};
 
     proto = this.fs.prototype = {
