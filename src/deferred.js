@@ -228,7 +228,7 @@
     this.deferreds = {};
 
     this.fn.promise = function() {
-        var def = jar.Deferred(),
+        var when,
             defs = [];
 
         for ( var id in this.deferreds ) {
