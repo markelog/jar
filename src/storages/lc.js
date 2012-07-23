@@ -51,7 +51,7 @@
         try {
             data = lc[ "jar-value-" + this.name + "-" + name ];
 
-            if ( data !== undefined ) {
+            if ( data != null ) {
                 finish( "resolve", id, jar.filters[ type ]( data ), type, "lc" );
 
             // If we have no data
