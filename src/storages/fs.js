@@ -93,6 +93,7 @@
         setup: function() {
             var self = this,
                 name = this.name,
+                stores = this.instance.stores,
                 def = this.def;
 
             function reject() {
@@ -101,22 +102,24 @@
 
             // Create root directory
             requestFileSystem( 0 /* Temporary */, 0, function( entry ) {
-                (fs.db = entry.root).getDirectory( "jar", {
+                entry.root.getDirectory( "jar", {
                     create: true
                 }, function( dir ) {
-                    self.instance.stores.fs = dir;
 
                     // Create sub dir, in it will be written all users files
-                    dir.getDirectory( name, {
+                    ( fs.db = dir ).getDirectory( name, {
                         create: true
                     }, function( sub ) {
-                        dir.sub = sub;
+                        stores.fs = jar.fs.sub = sub;
 
                         def.resolve();
+
+                    }, function () {
+                        def.reject();
                     });
 
-                  }, reject );
                 }, reject );
+            }, reject );
 
             return this;
         }
@@ -131,10 +134,9 @@
 
         name = name.replace( /\//g, "|" );
 
-        this.stores.fs.sub.getFile( name, {
+        this.stores.fs.getFile( name, {
             create: true
         }, function( entry ) {
-
             entry.createWriter(function( writer ) {
                 var bb = new Blob();
 
@@ -172,7 +174,7 @@
             return this;
         }
 
-        this.stores.fs.sub.getFile( name, {}, function( entry ) {
+        this.stores.fs.getFile( name, {}, function( entry ) {
             entry.file(function( file ) {
                 var reader = new FileReader();
 
@@ -194,7 +196,7 @@
             jar.reject( id );
         }
 
-        this.stores.fs.sub.getFile( name, {
+        this.stores.fs.getFile( name, {
             create: false
         }, function( entry ) {
 
@@ -208,26 +210,26 @@
     };
 
     this.fs.clear = function( id, destroy ) {
-        var self = this,
-            fs = this.stores.fs;
+        var self = this;
 
         function reject() {
             jar.reject( id );
         }
 
-        fs.sub.removeRecursively(function( entry ) {
+        this.stores.fs.removeRecursively(function( entry ) {
             if ( !destroy ) {
 
                 // If we have to re-create the same dir
-                fs.getDirectory( self.name, {
+                jar.fs.db.getDirectory( self.name, {
                     create: true
                 }, function( dir ) {
-                    self.stores.fs.sub = dir;
+                    self.stores.fs = dir;
 
                     jar.resolve( id );
                 }, reject );
 
             } else {
+                delete self.stores.fs;
                 jar.resolve( id );
             }
 
@@ -235,4 +237,8 @@
 
         return this;
     };
+
+    function setup( name, def, stores ) {
+
+    }
 }.call( jar.fn );

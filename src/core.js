@@ -17,6 +17,7 @@
     };
 
     jar.storages = [];
+    jar.instances = {};
     jar.prefixes = {
         storageInfo: storageInfo
     };
@@ -34,7 +35,6 @@
             // Name of a object store must contain only alphabetical symbols
             this.name = name ? name.replace( rstoreNames, "_" ) : "jar";
             this.deferreds = {};
-            this.stores = {};
 
             if ( !storage ) {
                 this.order = jar.order;
@@ -49,8 +49,11 @@
             this.storages = storages = storages.split ? storages.split(" ") : storages;
 
             var storage,
+                self = this,
                 def = this.register(),
                 defs = [];
+
+            this.stores = jar.instances[ this.name ] || {};
 
             // Jar store meta-info in lc, if we don't have it – reject call
             if ( !window.localStorage ) {
@@ -64,7 +67,9 @@
 
                 // This check needed if user explicitly specified storage that
                 // he wants to work with, whereas browser don't implement it
-                if ( this[ storage ] ) {
+                //
+                // If jar with the same name was created, do not try to re-create store
+                if ( this[ storage ] && !this.stores[ storage ] ) {
 
                     // Initiate storage
                     defs.push( this[ storage ]( this.name, this ) );
@@ -84,7 +89,11 @@
 
             jar.when.apply( this, defs )
                 .done(function() {
-                    def.resolve([ this ]);
+                    jar.instances[ this.name ] = this.stores;
+
+                    window.setTimeout(function() {
+                        def.resolve([ self ]);
+                    });
                 })
                 .fail(function() {
                     def.reject();

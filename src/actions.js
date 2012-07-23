@@ -123,12 +123,12 @@
 
         } else {
 
-            // Save storages meta-info
+            // Reset all storages length to 1
             when = jar.when.apply( this, defs ).done(function() {
-                jar.data._meta[ name ] = {
-                    storages: {},
-                    length: 0
-                };
+                for ( var storage in meta.storages ) {
+                    meta[ storage ] = 1;
+                }
+                meta.length = 1;
             });
         }
 
@@ -155,7 +155,7 @@
 
         for ( var store in jar.data ) {
             if ( store != "_meta" ) {
-                create.push( jar( store ).done( destroy ).active );
+                create.push( jar( store ).done( destroy ) );
             }
         }
 
@@ -176,6 +176,8 @@
 
     function kill( name ) {
         delete jar.data[ name ];
+        delete jar.instances[ name ];
+
         if ( jar.data._meta ) {
             delete jar.data._meta[ name ];
         }

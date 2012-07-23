@@ -4,7 +4,7 @@ module( "actions", {
 
 checkGetSet();
 
-asyncTest( "Basic actions", function() {
+asyncTest( "jar. Basic actions", 15, function() {
     var first = jar.Deferred(),
         second = jar.Deferred();
 
@@ -25,7 +25,7 @@ asyncTest( "Basic actions", function() {
         });
 
         this.promise().done( function() {
-            start();
+            first.resolve();
         });
     });
 
@@ -33,11 +33,10 @@ asyncTest( "Basic actions", function() {
         ok( jar.data[ this.name ], "Meta is initialized" );
         ok( jar.data._meta[ this.name ], "_meta is initialized" );
 
-        this.remove( "not-existed" ).done(function() {
+        this.remove( "not-existed" ).fail(function() {
             ok( true, "Prop is not exist but its still is done-callback" );
 
             this.clear().done(function() {
-
                 ok( jar.data[ this.name ], "Meta is not removed" );
                 ok( jar.data._meta[ this.name ], "_meta is not removed" );
 
@@ -45,15 +44,15 @@ asyncTest( "Basic actions", function() {
                     ok( !jar.data[ this.name ], "Meta is removed" );
                     ok( !jar.data._meta[ this.name ], "_meta is removed" );
 
-                    this.clear().done(function() {
-                        second.resolve();
-                    });
+                    second.resolve();
                 });
             });
         });
     });
 
-    jar.when( first, second ).done( start );
+    jar.when( first, second ).done( function() {
+        start();
+    });
 });
 
 asyncTest( "Create certain type of storages", 6, function() {
@@ -78,6 +77,7 @@ asyncTest( "Create certain type of storages", 6, function() {
     });
 });
 
+/*
 asyncTest( "jar#remove without arguments", function() {
     var def = jar.Deferred();
 
@@ -93,6 +93,7 @@ asyncTest( "jar#remove without arguments", function() {
         });
     });
 });
+ */
 asyncTest( "jar.destroy", function() {
     jar( "jar.destroy" ).done(function() {
         var store, request, index, promise,

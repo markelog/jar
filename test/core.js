@@ -1,6 +1,6 @@
 module( "core", { teardown: moduleTeardown } );
 
-asyncTest( "Global stuff", 3, function() {
+asyncTest( "Global stuff", function() {
     var turtle = jar( "shy turtle" ),
 
         // I want to use bear store only with localStorage
@@ -16,13 +16,64 @@ asyncTest( "Global stuff", 3, function() {
         });
 
         bear.remove().done(function() {
-            ok( true, "bear is removed" )
+            ok( true, "bear is removed" );
+            ok( !jar.instances[ this.name ], "instance in jar object was removed" );
 
             jar( "@_#-!$%^&*()_+=фt" ).done(function() {
-                strictEqual( this.name, "________________t",
-                 "Name was successfully changed" );
+                strictEqual( this.name, "________________t", "Name was successfully changed" );
+                ok( jar.instances[ this.name ], "instance was created" );
 
                 def.done( start );
+            });
+        });
+    });
+});
+
+asyncTest( "Re-create store", function() {
+    jar( "Re-create store", "lc" ).done(function() {
+        var stores = this.stores;
+
+        jar( "Re-create store", "lc" ).done(function() {
+            ok( this.stores === stores, "When instance with the same name is created once again, it should not re-created storages" );
+            ok( this.stores === jar.instances[ this.name ], "Stores object written in jar object" );
+
+            jar( "Re-create store", "idb" ).done(function() {
+                if ( jar.prefixes.indexedDB ) {
+                    ok( this.stores.idb, "Now we added idb storage in addition to lc" );
+
+                } else {
+                    ok( !this.stores.idb, "We don't have idb for this browser" );
+                    ok( this.stores.lc, "But lc still should be defined" );
+                }
+
+                ok( this.stores === jar.instances[ this.name ], "Stores object written in jar object" );
+                ok( !this.stores.sql, "But sql was not defined, so it should not be used" );
+
+                this.setup( "sql" ).done(function() {
+                    if ( window.openDatabase ) {
+                        ok( this.stores.sql, "Now sql was defined" );
+                        ok( this.stores === jar.instances[ this.name ], "Stores object written in jar object" );
+                    }
+
+                    this.remove().done(function() {
+                        jar( "Re-create store" ).done(function() {
+                            var stores;
+
+                            ok( stores !== jar.instances[ this.name ], "Store in jar prop should be changed by now" );
+                            stores = this.stores;
+
+                            jar( "Re-create store" ).done(function() {
+                                ok( this.stores === stores,
+                                        "When instance with the same name is created once again, it should not re-created storages, without second argument" );
+                                ok( this.stores === jar.instances[ this.name ], "Stores object written in jar object" );
+
+                                // cleanup
+                                this.remove().done( start );
+                            });
+                        });
+                    });
+
+                });
             });
         });
     });

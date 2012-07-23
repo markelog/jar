@@ -23,6 +23,8 @@
     this.lc = function() {
         var def = jar.Deferred();
 
+        this.stores.lc = lc;
+
         // Make sync interface is async
         window.setTimeout(function() {
             def.resolve();

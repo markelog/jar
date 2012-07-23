@@ -73,7 +73,6 @@
             // New way to do it
             if ( idb.open.onupgradeneeded === null ) {
                 request = setVersion(function() {
-                    self.instance.stores.idb = idb.db = this.result;
                     createObjectStore( name );
 
                 }, this.instance );
@@ -218,6 +217,7 @@
     this.idb.clear = function( id, destroy /* internal */ ) {
         var request, store,
             stores = this.stores,
+            self = this,
             name = this.name;
 
         function resolve() {
@@ -229,7 +229,6 @@
         }
 
         try {
-
             // Either clear or destroy
             if ( destroy ) {
                 request = setVersion(function() {
@@ -241,8 +240,10 @@
                 request = store.clear();
             }
 
-            request.onsuccess = resolve;
-            request.onerror = reject;
+            // Need to bind events only through addEventListener method
+            // if we do it through onsomething, chrome might not call it
+            request.addEventListener( "success", resolve );
+            request.addEventListener( "error", reject );
 
         } catch ( _ ) {
             reject();
@@ -261,7 +262,10 @@
                 idb.setVersion = idb.db.setVersion( version() );
             }
 
-            idb.setVersion.addEventListener( "success", fn );
+            idb.setVersion.addEventListener( "success", function() {
+                instance.stores.idb = idb.db = this.source;
+                fn.apply( this, arguments );
+            });
 
         } else {
             if ( idb.open.readyState == "pending" ) {
@@ -295,7 +299,7 @@
     function update( instance ) {
         var request = setVersion(function() {
             createObjectStore( instance.name );
-        });
+        }, instance.instance );
 
         request.addEventListener( "success", function() {
             instance.def.resolve();
