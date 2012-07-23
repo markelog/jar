@@ -237,8 +237,4 @@
 
         return this;
     };
-
-    function setup( name, def, stores ) {
-
-    }
 }.call( jar.fn );
