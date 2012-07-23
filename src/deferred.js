@@ -195,6 +195,10 @@
         return def.reject( args );
     };
 
+    this.Promise = function( deferred ) {
+        return new Promise( deferred || new Deferred );
+    }
+
     this.fn.register = function() {
         var id = new Date().getTime() + (++counter);
 

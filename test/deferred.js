@@ -2,8 +2,10 @@ module( "deferred", {
     teardown: moduleTeardown
 });
 
-asyncTest( "Basics", 1, function() {
-    var def = jar.Deferred();
+asyncTest( "Basics", function() {
+    var promise = jar.Promise(),
+        def = jar.Deferred(),
+        defInPromise = jar.Promise( def );
 
     def.fail(function() {
         ok( true, "Fail-callback is called" );
@@ -14,6 +16,18 @@ asyncTest( "Basics", 1, function() {
     .always( start );
 
     def.reject();
+
+    strictEqual( promise.resolve, undefined, "Promise object does not have a resolve method" );
+    strictEqual( promise.reject, undefined, "Promise object does not have a reject method" );
+
+    defInPromise.fail(function() {
+        ok( true, "Fail-callback is called" );
+    }).done(function() {
+        ok( false, "Done-callback should not be called" );
+    });
+
+    strictEqual( defInPromise.resolve, undefined, "Promise object does not have a resolve method" );
+    strictEqual( defInPromise.reject, undefined, "Promise object does not have a reject method" );
 })
 
 asyncTest( "jar.when", 12, function() {
@@ -170,7 +184,6 @@ asyncTest( "Storage related deferreds", 4, function() {
 
         strictEqual( promise.resolve, undefined, "Promise object does not have a resolve method" );
         strictEqual( promise.reject, undefined, "Promise object does not have a reject method" );
-
     });
 
     jar.when( defs[ 0 ], defs[ 1 ] ).always(function() {
