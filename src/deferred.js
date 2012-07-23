@@ -1,6 +1,7 @@
 !function() {
-    var proto,
+    var proto, array, promise, name,
         counter = 0,
+        methods = [ "done", "fail", "always", "then", "_add" ],
         slice = [].slice;
 
     function Deferred() {
@@ -12,15 +13,15 @@
 
         // Total amount of called callbacks
         this.length = 0;
-        this.state = "pending";
 
-        return this;
+        // By exposing this prop we "diverge" with promise "spec"
+        this.state = "pending";
     }
 
     Deferred.prototype = {
         constructor: Deferred,
 
-        add: function( type, fn, context ) {
+        _add: function( type, fn, context ) {
             var state;
             context = context || jar;
 
@@ -56,7 +57,7 @@
             return this;
         },
 
-        iterate: function( type, args, i /* internal */ ) {
+        _iterate: function( type, args, i /* internal */ ) {
             var value, always,
                 isAlways = type == "always";
 
@@ -78,7 +79,7 @@
             // If successful or failed callbacks is less then "always" callbacks
             // some of the always callbacks will not be called
             if ( i < this.lists.always.length ) {
-                this.iterate( "always", args, i );
+                this._iterate( "always", args, i );
             }
 
             return this;
@@ -87,7 +88,7 @@
         resolve: function( args ) {
             if ( this.state == "pending" ) {
                 this.state = "resolved";
-                this.iterate( "done", this.args = args );
+                this._iterate( "done", this.args = args );
             }
 
             return this;
@@ -96,31 +97,31 @@
         reject: function( args ) {
             if ( this.state == "pending" ) {
                 this.state = "rejected";
-                this.iterate( "fail", this.args = args );
+                this._iterate( "fail", this.args = args );
             }
 
             return this;
         },
 
         done: function( fn, context ) {
-            return this.add( "done", fn, context || this.context );
+            return this._add( "done", fn, context || this.context );
         },
 
         always: function( fn, context ) {
-            return this.add( "always", fn, context || this.context );
+            return this._add( "always", fn, context || this.context );
         },
 
         fail: function( fn, context ) {
-            return this.add( "fail", fn, context || this.context );
+            return this._add( "fail", fn, context || this.context );
         },
 
         then: function( success, error, context ) {
             if ( typeof error == "function" ) {
-                this.add( "done", success, context || this.context )
-                    .add( "fail", error, context || this.context );
+                this._add( "done", success, context || this.context )
+                    ._add( "fail", error, context || this.context );
 
             } else {
-                this.add( "done", success, error || this.context );
+                this._add( "done", success, error || this.context );
             }
 
             return this;
@@ -206,17 +207,17 @@
     };
 
     this.fn.done = function( fn, context ) {
-        this.active.add( "done", fn, context || this );
+        this.active._add( "done", fn, context || this );
         return this;
     };
 
     this.fn.fail = function( fn, context ) {
-        this.active.add( "fail", fn, context || this );
+        this.active._add( "fail", fn, context || this );
         return this;
     };
 
     this.fn.always = function( fn, context ) {
-        this.active.add( "always", fn, context || this );
+        this.active._add( "always", fn, context || this );
         return this;
     };
 
@@ -228,7 +229,7 @@
     this.deferreds = {};
 
     this.fn.promise = function() {
-        var when,
+        var def,
             defs = [];
 
         for ( var id in this.deferreds ) {
@@ -242,6 +243,24 @@
             }
         }
 
-        return jar.when.apply( this, defs );
+        return new Promise( jar.when.apply( this, defs ) );
     };
+
+    function Promise( deferred ) {
+        for ( var prop in deferred ) {
+            if ( deferred.hasOwnProperty( prop ) ) {
+                this[ prop ] = deferred[ prop ];
+            }
+        }
+    }
+
+    promise = Promise.prototype = {
+        constructor: Promise
+    };
+
+    for ( var i = 0, l = methods.length; i < l; i++ ) {
+        name = methods[ i ];
+        promise[ name ] = Deferred.prototype[ name ];
+    }
+
 }.call( jar );

@@ -154,7 +154,7 @@ asyncTest( "jar#done", 7, function() {
     start();
 });
 
-asyncTest( "Storage related deferreds", 2, function() {
+asyncTest( "Storage related deferreds", 4, function() {
     var defs = [];
 
     defs[ 0 ] = jar( "lc", "lc" ).always(function() {
@@ -162,9 +162,15 @@ asyncTest( "Storage related deferreds", 2, function() {
     });
 
     defs[ 1 ] = jar( "lc", "lc" ).always(function() {
-        this.promise().done(function() {
+        var promise = this.promise()
+
+        promise.done(function() {
             ok ( true, "Done callback for promise method should be executed" );
         });
+
+        strictEqual( promise.resolve, undefined, "Promise object does not have a resolve method" );
+        strictEqual( promise.reject, undefined, "Promise object does not have a reject method" );
+
     });
 
     jar.when( defs[ 0 ], defs[ 1 ] ).always(function() {
