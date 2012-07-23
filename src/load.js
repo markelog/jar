@@ -1,6 +1,6 @@
 !function() {
     function xhr( base, path, type, def ) {
-        var request;
+        var request, data;
 
         // TODO: add some tests and make sure this prop really needed
         if ( !jar.xhr ) {
@@ -13,15 +13,29 @@
         request.open( "get", path, true );
         request.send();
 
-        // For IE9?
+        /*
+        // In some IE cases data already present in request object
+        // try...catch needed if data is not there, in this case IE will throw an exception
+        //
+        // TODO: need to investigate and add more tests
+        try {
+            data = type == "xml" ? request.responseXML : request.responseText;
+        } catch ( _ ) {}
+
+        if ( !!data ) {
+            data = jar.filters[ type ]( data );
+            return def.resolve([ data ]);
+        }
+         */
+
+        // If jar.xhr is changed to XDomainRequest onprogress needed to unblock succes event in IE9
+        // TODO: is this stuff needed?
         request.onprogress = function() {};
 
         request.onload = request.onreadystatechange = function() {
             if ( request.readyState && request.readyState != 4 ) {
                 return;
             }
-
-            var data;
 
             if ( request.status === undefined || request.status >= 200 && request.status < 300 || request.status === 304 ) {
                 data = type == "xml" ? request.responseXML : request.responseText;
@@ -40,6 +54,11 @@
 
             request.onload = request.onreadystatechange = null;
         };
+
+        // unstested
+        request.onerror = function() {
+            def.reject();
+        }
 
         return def;
     }
