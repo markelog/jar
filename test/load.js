@@ -112,8 +112,9 @@ asyncTest( "Explicitly set data-type",  function() {
         strictEqual( jar.type( data ), "xml", "Data is returned" );
     });
 
-    wrongType = jar.load(  origin + "data/wrong-type.js",
+    wrongType = jar.load( origin + "data/wrong-type.js",
                         "jar.load, explicetlly set data-type css", "css" ).done(function() {
+
         strictEqual( js, undefined, "Variable is not assigned" );
 
     });
