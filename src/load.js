@@ -2,7 +2,7 @@
     function xhr( base, path, type, def ) {
         var request;
 
-        // TODO: add some tests
+        // TODO: add some tests and make sure this prop really needed
         if ( !jar.xhr ) {
             request = window.XMLHttpRequest ? new window.XMLHttpRequest() : new window.ActiveXObject( "Microsoft.XMLHTTP" );
 
@@ -34,9 +34,9 @@
                     this.set( path, data, type );
                 });
 
-                } else {
-                    def.reject();
-                }
+            } else {
+                def.reject();
+            }
 
                 request.onload = request.onreadystatechange = null;
             };
@@ -63,7 +63,6 @@
             base = base || "jar";
 
             if ( jar.has( base, path ) ) {
-                def = jar.Deferred();
 
                 // jar.order[ type ] – we work only with one specific storage
                 jar( base, jar.order[ type ] ).done(function() {
@@ -78,6 +77,7 @@
                 make();
             }
 
+            // We should return promise object instead of deferred, but we should do that after perf tests
             return def;
         };
 }.call( jar );
