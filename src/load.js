@@ -38,8 +38,8 @@
                 def.reject();
             }
 
-                request.onload = request.onreadystatechange = null;
-            };
+            request.onload = request.onreadystatechange = null;
+        };
 
         return def;
     }
