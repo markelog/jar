@@ -95,12 +95,11 @@ asyncTest( "jar#remove without arguments", function() {
 });
 asyncTest( "jar.destroy", function() {
     jar( "jar.destroy" ).done(function() {
-        var store, request, index,
+        var store, request, index, promise,
             self = this,
             command = "SELECT data FROM " + this.name
 
-
-        jar.destroy().done(function() {
+        promise = jar.destroy().done(function() {
 
             // test FS api
             if ( jar.fs ) {
@@ -152,5 +151,8 @@ asyncTest( "jar.destroy", function() {
 
             start();
         });
+
+        strictEqual( promise.resolve, undefined, "Promise object does not have a resolve method" );
+        strictEqual( promise.reject, undefined, "Promise object does not have a reject method" );
     });
 });

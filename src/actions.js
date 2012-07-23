@@ -171,7 +171,7 @@
             def.reject();
         });
 
-        return def;
+        return jar.Promise( def );
     };
 
     function kill( name ) {
