@@ -178,7 +178,7 @@ asyncTest( "jar.load - if we fail to load data that we have – make xhr", funct
 
         // let's pretend we have data
         jar.data[ name ] = data;
-        jar.data._meta[ name ] = { "storages": { "idb":1,"fs":1,"lc":1,"sql":2 }, "length":1 };
+        jar.data._meta[ name ] = { "storages": { "lc": 1 }, "length":1 };
 
         // when actually we don't
         jar.load( path, name ).done(function( info ) {
@@ -190,7 +190,7 @@ asyncTest( "jar.load - if we fail to load data that we have – make xhr", funct
             // now lets pretend we have data and url is valid
             path = "test.js";
             jar.data[ name ][ path ] = { "storage": jar.order.js[ 0 ], "type": "js" };
-            jar.data._meta[ name ] = { "storages": { "idb":1,"fs":1,"lc":1,"sql":2 }, "length":1 };
+            jar.data._meta[ name ] = { "storages": { "lc": 1 }, "length":1 };
 
             jar.load( path, name ).fail(function() {
                 ok( true, "This request should fail" );
