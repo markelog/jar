@@ -77,7 +77,6 @@ asyncTest( "Create certain type of storages", 6, function() {
     });
 });
 
-/*
 asyncTest( "jar#remove without arguments", function() {
     var def = jar.Deferred();
 
@@ -93,7 +92,7 @@ asyncTest( "jar#remove without arguments", function() {
         });
     });
 });
- */
+
 asyncTest( "jar.destroy", function() {
     jar( "jar.destroy" ).done(function() {
         var store, request, index, promise,
