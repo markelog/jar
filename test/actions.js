@@ -4,7 +4,7 @@ module( "actions", {
 
 checkGetSet();
 
-asyncTest( "jar. Basic actions", 15, function() {
+asyncTest( "Basic actions", 15, function() {
     var first = jar.Deferred(),
         second = jar.Deferred();
 
