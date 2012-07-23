@@ -123,7 +123,6 @@ asyncTest( "Explicitly set data-type",  function() {
     });
 });
 
-/*
 asyncTest( "Load js as text and executed after", 2, function() {
     function testit() {
         var first, second;
@@ -137,8 +136,9 @@ asyncTest( "Load js as text and executed after", 2, function() {
                 "text");
 
         jar.when( first, second ).done(function() {
+
             for ( var i = 0, l = arguments.length; i < l; i++ ) {
-                jar.filters.js( arguments[ i ][ 0 ] );
+                jar.filters.js( arguments[ i ] );
             }
 
             ok( step, "Variable is defined" );
@@ -164,7 +164,6 @@ asyncTest( "Load js as text and executed after", 2, function() {
             });
     });
 });
- */
 
 asyncTest( "jar.load - if we fail to load data that we have – make xhr", function() {
     var path = origin + "data/data.js",
