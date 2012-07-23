@@ -58,7 +58,7 @@
         // unstested
         request.onerror = function() {
             def.reject();
-        }
+        };
 
         return def;
     }
