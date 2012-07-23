@@ -72,7 +72,6 @@ asyncTest( "Re-create store", function() {
                             });
                         });
                     });
-
                 });
             });
         });
