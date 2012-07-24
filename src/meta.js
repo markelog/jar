@@ -2,6 +2,10 @@
     var lc = localStorage,
         data = lc[ "jar-meta" ];
 
+    if ( !( jar.support = !!jar.text.json ) ) {
+        return;
+    }
+
     jar.data = data = data ? jar.filters.json( data ) : {};
     jar.iversion = lc[ "jar-iversion" ] || 1;
 

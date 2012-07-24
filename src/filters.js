@@ -1,5 +1,5 @@
 !function() {
-    var xml,
+    var xml, js,
         head = document.head || document.getElementsByTagName( "head" )[ 0 ],
         gEval = window.execScript || eval;
 
@@ -21,13 +21,15 @@
         };
     }
 
-    this.filters = {
-        json: JSON.parse,
+    js = function( data ) {
+        gEval( data );
+        return data;
+    };
 
-        javascript: function( data ) {
-            gEval( data );
-            return data;
-        },
+    this.filters = {
+        json: window.JSON ? window.JSON.parse : js,
+
+        javascript: js,
 
         css: function( data ) {
             var style = document.createElement( "style" );
@@ -92,7 +94,7 @@
     this.filters.js = this.filters.javascript;
 
     this.text = {
-        json: JSON.stringify,
+        json: window.JSON ? window.JSON.stringify : null,
         xml: xml,
         text: window.String
     };
