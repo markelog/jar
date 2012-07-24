@@ -10,24 +10,6 @@
             request = new jar.xhr();
         }
 
-        request.open( "get", path, true );
-        request.send();
-
-        /*
-        // In some IE cases data already present in request object
-        // try...catch needed if data is not there, in this case IE will throw an exception
-        //
-        // TODO: need to investigate and add more tests
-        try {
-            data = type == "xml" ? request.responseXML : request.responseText;
-        } catch ( _ ) {}
-
-        if ( !!data ) {
-            data = jar.filters[ type ]( data );
-            return def.resolve([ data ]);
-        }
-         */
-
         // If jar.xhr is changed to XDomainRequest onprogress needed to unblock succes event in IE9
         // TODO: is this stuff needed?
         request.onprogress = function() {};
@@ -59,6 +41,9 @@
         request.onerror = function() {
             def.reject();
         };
+
+        request.open( "get", path, true );
+        request.send();
 
         return def;
     }
