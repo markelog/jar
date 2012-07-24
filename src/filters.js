@@ -32,6 +32,11 @@
         css: function( data ) {
             var style = document.createElement( "style" );
 
+            // We have to append style element before write styles inside
+            // sometimes ie will get confuse
+            // TODO: invistegate and add test for it
+            head.appendChild( style );
+
             if ( style.styleSheet === undefined ) {
                 style.innerHTML = data;
 
@@ -41,7 +46,6 @@
                 style.styleSheet.cssText = data;
             }
 
-            head.appendChild( style );
             return style;
         },
 
