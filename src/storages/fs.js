@@ -70,6 +70,7 @@
 
     mime.js = mime.javascript;
 
+    this.support.fs = true;
     this.storages.push( "fs" );
 
     this.fs = function( name, instance ) {

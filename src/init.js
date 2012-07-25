@@ -22,7 +22,7 @@
     jar.preference = function( preferences, moz ) {
         var value, preference,
             order = {},
-            storages = jar.fn.storages.toString();
+            support = jar.fn.support;
 
         preferences = preferences || preferable;
 
@@ -32,8 +32,7 @@
             for ( var i = 0, l = preference.length; i < l; i++ ) {
                 value = preference[ i ];
 
-                // We don't use indexOf for Array, because of lack support for it in IE8
-                if ( ~storages.indexOf( value ) ) {
+                if ( value in support ) {
 
                     // Firefox ask user permission to use indexedDb, because of this, we don't use it in FF
                     // if argument is default argument

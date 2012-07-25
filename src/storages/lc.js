@@ -6,6 +6,7 @@
         return;
     }
 
+    this.support.lc = true;
     this.storages.push( "lc" );
 
     // Use case for async and sync interfaces should be identical

@@ -29,6 +29,7 @@
         readwrite = IDBTransaction.READ_WRITE || "readwrite",
         readonly = IDBTransaction.READ_ONLY !== 0 ? "readonly" : 0;
 
+    this.support.idb = true;
     this.storages.push( "idb" );
 
     this.idb = function( name ) {

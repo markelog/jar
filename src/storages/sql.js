@@ -5,6 +5,7 @@
         return;
     }
 
+    this.support.sql = true;
     this.storages.push( "sql" );
 
     this.sql = function( name, instance ) {

@@ -4,6 +4,15 @@ module( "lc", {
 
 checkGetSet( "lc" );
 
+asyncTest( "localStorage references", 2, function() {
+    jar( "localStorage references", "lc" ).done(function() {
+        ok( this.stores.lc, "References for lc store was created" );
+        ok( ~this.storages.indexOf( "lc" ), "References in array storages should be present" );
+
+        start();
+    });
+});
+
 asyncTest( "Simple set and get", 7, function() {
     var values = {
             text: "test",

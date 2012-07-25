@@ -116,3 +116,23 @@ asyncTest( "jar.has", 3, function() {
         });
     });
 });
+
+asyncTest( "Test fail-callback when storage is not supported", function() {
+    var lcAsync,
+        lc = window.localStorage,
+        async = jar( "Test fail-callback when storage is not supported", "not existed storages" )
+            .fail(function () {
+                ok( true, "Fail-callback should be called" );
+                ok( async, "This variable should be defined" );
+
+                window.localStorage = null;
+                lcAsync = jar( "Test fail-callback when storage is not supported", "not existed storages" ).fail(function() {
+                    ok( true, "jar can't work without localStorage" );
+                    ok( lcAsync, "This variable should be defined" );
+
+                    // cleanup
+                    window.localStorage = lc;
+                    start();
+                });
+            });
+});

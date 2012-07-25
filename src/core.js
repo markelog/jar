@@ -28,6 +28,8 @@
         version: 0,
 
         storages: [],
+        support: {},
+
         types: [ "xml", "html", "javascript", "js", "css", "text", "json" ],
 
         init: function( name, storage ) {
@@ -51,13 +53,16 @@
             var storage,
                 self = this,
                 def = this.register(),
+                rejects = [],
                 defs = [];
 
             this.stores = jar.instances[ this.name ] || {};
 
             // Jar store meta-info in lc, if we don't have it – reject call
             if ( !window.localStorage ) {
-                def.reject();
+                window.setTimeout(function() {
+                    def.reject();
+                });
                 return this;
             }
 
@@ -67,15 +72,20 @@
 
                 // This check needed if user explicitly specified storage that
                 // he wants to work with, whereas browser don't implement it
-                //
-                // If jar with the same name was created, do not try to re-create store
-                if ( this[ storage ] && !this.stores[ storage ] ) {
+                if ( storage in this.support ) {
 
-                    // Initiate storage
-                    defs.push( this[ storage ]( this.name, this ) );
+                    // If jar with the same name was created, do not try to re-create store
+                    if ( !this.stores[ storage ] ) {
 
-                    // Initiate meta-data for this storage
-                    this.log( storage );
+                        // Initiate storage
+                        defs.push( this[ storage ]( this.name, this ) );
+
+                        // Initiate meta-data for this storage
+                        this.log( storage );
+                    }
+
+                } else {
+                    rejects.push( storage );
                 }
             }
 
@@ -87,18 +97,24 @@
                 }
             }
 
-            jar.when.apply( this, defs )
-                .done(function() {
-                    jar.instances[ this.name ] = this.stores;
-
-                    window.setTimeout(function() {
-                        def.resolve([ self ]);
-                    });
-                })
-                .fail(function() {
+            if ( rejects.length == storages.length ) {
+                window.setTimeout(function() {
                     def.reject();
                 });
 
+            } else {
+                jar.when.apply( this, defs )
+                    .done(function() {
+                        jar.instances[ this.name ] = this.stores;
+
+                        window.setTimeout(function() {
+                            def.resolve([ self ]);
+                        });
+                    })
+                    .fail(function() {
+                        def.reject();
+                    });
+            }
             return this;
         }
     };
