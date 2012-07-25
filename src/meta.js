@@ -1,21 +1,38 @@
 !function() {
-    var lc = localStorage,
-        data = lc[ "jar-meta" ];
+    var test,
+        data = {},
+        lc = window.localStorage;
 
-    if ( !( jar.support = !!jar.text.json ) ) {
+    if ( !( jar.support = !!jar.text.json ) || !lc ) {
         return;
     }
 
+    try {
+        test = lc[ "test" ];
+        lc.setItem( "test", "test" );
+
+        if ( test ) {
+            lc.test = test;
+
+        } else {
+            lc.removeItem( "test" );
+        }
+
+        data = lc[ "jar-meta" ];
+        jar.iversion = lc[ "jar-iversion" ] || 1;
+    } catch ( _ ) {}
+
     jar.data = data = data ? jar.filters.json( data ) : {};
-    jar.iversion = lc[ "jar-iversion" ] || 1;
 
     if ( !data._meta ) {
         data._meta = {};
     }
 
     function unload() {
-        lc[ "jar-meta" ] = jar.text.json( jar.data );
-        lc[ "jar-iversion" ] = jar.iversion;
+        try {
+            lc[ "jar-meta" ] = jar.text.json( jar.data );
+            lc[ "jar-iversion" ] = jar.iversion;
+        } catch ( _ ) {}
     }
 
     if ( window.onbeforeunload == null ) {
@@ -24,9 +41,6 @@
         } else {
             window.attachEvent( "beforeunload", unload );
         }
-    } else {
-        window.history.navigationMode = "compatible";
-        window.addEventListener( "unload", unload, false );
     }
 
     // Log meta-data
