@@ -49,39 +49,39 @@
     }
 
     jar.load = function( path, base, type ) {
-            var def = jar.Deferred();
+        var def = jar.Deferred();
 
-            if ( arguments.length != 3 ) {
-                type = path.split( "." ).pop();
-            }
+        if ( arguments.length != 3 ) {
+            type = path.split( "." ).pop();
+        }
 
-            function make() {
-                xhr( base, path, type, def );
-            }
+        function make() {
+            xhr( base, path, type, def );
+        }
 
-            // Quick hack, should be changed
-            if ( type == "xsl" ) {
-                type = "xml";
-            }
+        // Quick hack, should be changed
+        if ( type == "xsl" ) {
+            type = "xml";
+        }
 
-            base = base || "jar";
+        base = base || "jar";
 
-            if ( jar.has( base, path ) ) {
+        if ( jar.has( base, path ) ) {
 
-                // jar.order[ type ] – we work only with one specific storage
-                jar( base, jar.order[ type ] ).done(function() {
-                    this.get( path ).done(function( data ) {
-                        def.resolve([ data ]);
+            // jar.order[ type ] – we work only with one specific storage
+            jar( base, jar.order[ type ] ).done(function() {
+                this.get( path ).done(function( data ) {
+                    def.resolve([ data ]);
 
-                // if we have data but we can't get it
-                    }).fail( make );
+            // if we have data but we can't get it
                 }).fail( make );
+            }).fail( make );
 
-            } else {
-                make();
-            }
+        } else {
+            make();
+        }
 
-            // We should return promise object instead of deferred, but we should do that after perf tests
-            return def;
-        };
+        // We should return promise object instead of deferred, but we should do that after perf tests
+        return def;
+    };
 }.call( jar );
