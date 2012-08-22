@@ -58,7 +58,7 @@ asyncTest( "jar.when", 12, function() {
     });
 
     jar.when( def3, def4 ).always(function() {
-        strictEqual( def4.state, "pending", "If one of the deferreds was rejected, call fail-callbacks without waiting for others deferreds" );
+        strictEqual( def4.state(), "pending", "If one of the deferreds was rejected, call fail-callbacks without waiting for others deferreds" );
     });
 
     def3.reject();
@@ -168,17 +168,19 @@ asyncTest( "jar#done", 7, function() {
     start();
 });
 
-asyncTest( "Storage related deferreds", 4, function() {
+asyncTest( "Storage related deferreds", 5, function() {
     var defs = [];
 
     defs[ 0 ] = jar( "lc", "lc" ).always(function() {
-        ok ( this.active.state !== "pending", "State of a resolved deferred should not be pending" );
+        ok ( this.active.state() !== "pending", "State of a resolved deferred should not be pending" );
     });
 
     defs[ 1 ] = jar( "lc", "lc" ).always(function() {
-        var promise = this.promise()
+        var that = this,
+            promise = this.promise();
 
         promise.done(function() {
+            strictEqual( that, this, "Context in promise is correct" );
             ok ( true, "Done callback for promise method should be executed" );
         });
 
@@ -189,4 +191,58 @@ asyncTest( "Storage related deferreds", 4, function() {
     jar.when( defs[ 0 ], defs[ 1 ] ).always(function() {
         start();
     });
+});
+
+asyncTest( "Promise", function() {
+    var def = jar.Deferred(),
+        promise = jar.Promise( def );
+
+    ok( !promise.resolve, "Promise does not have resolve method" );
+    ok( !promise.reject, "Promise does not have reject method" );
+
+    promise.done(function() {
+        ok( true, "Done callback worked before def was resolved" );
+    });
+
+    strictEqual( def.state(), "pending", "Deferred is pending" );
+    strictEqual( promise.state(), "pending", "Promise is pending too" );
+
+    def.resolve();
+
+    promise.done(function() {
+        ok( true, "Done callback worked after def was resolved" );
+        start();
+    });
+
+    strictEqual( def.state(), "resolved", "Deferred is resolved" );
+    strictEqual( promise.state(), "resolved", "Promise is resolved too" );
+});
+
+asyncTest( "Arguments and context", function() {
+    var def = jar.Deferred(),
+        dfd = jar.Deferred(),
+        promise = jar.Promise( dfd );
+
+    def.done(function() {
+        strictEqual( this.test, 1 );
+
+    }, { test: 1 }).done(function() {
+        strictEqual( this.test, 2 );
+        start();
+
+    }, { test: 2 });
+
+    def.resolve();
+
+    promise.done(function() {
+        strictEqual( this.test, 1 );
+
+    }, { test: 1 }).done(function() {
+        strictEqual( this.test, 2 );
+        start();
+
+    }, { test: 2 });
+
+    dfd.resolve();
+
 });
