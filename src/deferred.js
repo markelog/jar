@@ -232,7 +232,7 @@
 
         // Remove resolved deferreds
         this.active.always(function() {
-            //delete this.deferreds[ id ];
+            delete this.deferreds[ id ];
             delete jar.deferreds[ id ];
 
         }, this );
