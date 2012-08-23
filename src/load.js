@@ -1,6 +1,6 @@
 !function() {
     function xhr( base, path, type, def ) {
-        var request, data;
+        var request, data, event;
 
         // TODO: add some tests and make sure this prop really needed
         if ( !jar.xhr ) {
@@ -14,10 +14,16 @@
         // TODO: is this stuff needed?
         request.onprogress = function() {};
 
-        request.onload = request.onreadystatechange = function() {
+        // We can't do
+        // request.onreadystatechange = request.onload = our function
+        // because of this in Opera < 12 event will be called twice
+        event = request.onreadystatechange ? "onreadystatechange" : "onload";
+        request[ event ] = function() {
             if ( request.readyState && request.readyState != 4 ) {
                 return;
             }
+
+            request.onload = request.onreadystatechange = null;
 
             if ( request.status === undefined || request.status >= 200 && request.status < 300 || request.status === 304 ) {
                 data = type == "xml" ? request.responseXML : request.responseText;
@@ -33,8 +39,6 @@
             } else {
                 def.reject();
             }
-
-            request.onload = request.onreadystatechange = null;
         };
 
         // unstested

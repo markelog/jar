@@ -7,7 +7,6 @@
     }
 
     this.support.lc = true;
-    this.storages.push( "lc" );
 
     // Use case for async and sync interfaces should be identical
     // We have to make sync localStorage interface to an async

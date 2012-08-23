@@ -1,8 +1,10 @@
 !function() {
 
-    // Yeah, stupid, ugly browser detection, but Firefox ask user permission to use IndexedDB
-    // we can't possibly detect that
-    var isMoz = !!~window.navigator.userAgent.indexOf( "Firefox" ),
+    var indexOf = [].indexOf,
+
+        // Yeah, stupid, ugly browser detection, but Firefox ask user permission to use IndexedDB
+        // we can't possibly detect that
+        isMoz = !!~window.navigator.userAgent.indexOf( "Firefox" ),
         vendor = window.navigator.vendor,
         preferable = {
             js: [ "fs", "idb", "sql", "lc" ],
@@ -23,6 +25,13 @@
         var value, preference,
             order = {},
             support = jar.fn.support;
+
+        jar.fn.storages = [];
+
+        if ( typeof preferences == "boolean" ) {
+            moz = preferences;
+            preferences = undefined;
+        }
 
         preferences = preferences || preferable;
 
@@ -46,8 +55,33 @@
             }
         }
 
+        for ( value in support ) {
+            if ( value == "idb" && isMoz && !moz ) {
+                continue;
+            }
+
+            if ( !jar.isUsed( value ) ) {
+                jar.fn.storages.push( value );
+            }
+        }
+
         order.javascript = order.js;
         jar.order = order;
+    };
+
+    // We have two types of storages – when browser not implement the storage and indexedDB in Firefox
+    jar.isUsed = function( storage ) {
+        if ( indexOf ) {
+            return !!~indexOf.call( jar.fn.storages, storage );
+        }
+
+        for ( var i = 0, l = jar.fn.storages; i < l; i++ ) {
+            if ( i in jar.fn.storages && jar.fn.storages[ i ] === storage ) {
+                return true;
+            }
+        }
+
+        return false;
     };
 
     jar.preference();

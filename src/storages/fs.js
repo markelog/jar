@@ -71,7 +71,6 @@
     mime.js = mime.javascript;
 
     this.support.fs = true;
-    this.storages.push( "fs" );
 
     this.fs = function( name, instance ) {
         return new proto.init( name, instance );
@@ -217,24 +216,28 @@
             jar.reject( id );
         }
 
-        this.stores.fs.removeRecursively(function( entry ) {
-            if ( !destroy ) {
+        if ( this.stores.fs ) {
+            this.stores.fs.removeRecursively(function( entry ) {
+                if ( !destroy ) {
 
-                // If we have to re-create the same dir
-                jar.fs.db.getDirectory( self.name, {
-                    create: true
-                }, function( dir ) {
-                    self.stores.fs = dir;
+                    // If we have to re-create the same dir
+                    jar.fs.db.getDirectory( self.name, {
+                        create: true
+                    }, function( dir ) {
+                        self.stores.fs = dir;
 
+                        jar.resolve( id );
+                    }, reject );
+
+                } else {
+                    delete self.stores.fs;
                     jar.resolve( id );
-                }, reject );
+                }
 
-            } else {
-                delete self.stores.fs;
-                jar.resolve( id );
-            }
-
-        }, reject );
+            }, reject );
+        } else {
+            jar.resolve( id );
+        }
 
         return this;
     };

@@ -3,6 +3,8 @@ module( "init", {
 });
 
 test( "jar.preference", function() {
+    jar.preference();
+
     var isMoz = !!~window.navigator.userAgent.indexOf( "Firefox" ),
         vendor = window.navigator.vendor,
         xml = jar.order.xml[ 0 ];
@@ -40,5 +42,28 @@ test( "jar.preference", function() {
 
     strictEqual( jar.order.xml[ 0 ], xml, "Settings should get back to default value" );
 
+    if ( isMoz ) {
+        ok( !jar.isUsed( "idb" ), "IndexedDB is not used in Firefox" );
+
+    } else if ( jar.fn.support.idb ) {
+        ok( jar.isUsed( "idb" ), "IndexedDB can be used" );
+    }
+
+    if ( jar.fn.support.fs ) {
+        ok( jar.isUsed( "fs" ), "FileSystem can be used" );
+    }
+
+    if ( jar.fn.support.sql ) {
+        ok( jar.isUsed( "sql" ), "Web SQL can be used" );
+    }
+
+    jar.preference( true );
+
+    if ( isMoz ) {
+        ok( jar.isUsed( "idb" ), "IndexedDB is used in Firefox" );
+        ok( !!~jQuery.inArray( "idb", jar.fn.storages ), "IndexedDB is used in Firefox" );
+    }
+
+    jar.preference();
 });
 

@@ -30,7 +30,6 @@
         readonly = IDBTransaction.READ_ONLY !== 0 ? "readonly" : 0;
 
     this.support.idb = true;
-    this.storages.push( "idb" );
 
     this.idb = function( name ) {
         return new proto.init( name, this );
@@ -78,9 +77,11 @@
 
                 }, this.instance );
 
-                request.addEventListener( "success", function() {
+                request.done(function() {
                     self.def.resolve();
                 });
+
+                request.fail( reject );
 
             // Old way
             } else {
@@ -90,7 +91,7 @@
                     update( this );
                 }
 
-                // This will not be executed if db already exist
+                // This will not execute if db already exist
                 (request = idb.open).addEventListener( "success", function() {
 
                     // Create link in jar for new db
@@ -98,9 +99,10 @@
 
                     update( self );
                 });
+
+                request.addEventListener( "error", reject );
             }
 
-            request.addEventListener( "error", reject );
             return this;
         }
     };
@@ -216,7 +218,7 @@
     };
 
     this.idb.clear = function( id, destroy /* internal */ ) {
-        var request, store,
+        var request, store, clear,
             stores = this.stores,
             self = this,
             name = this.name;
@@ -229,43 +231,59 @@
             jar.reject( id );
         }
 
-        try {
-            // Either clear or destroy
-            if ( destroy ) {
-                request = setVersion(function() {
+        // Either clear or destroy
+        if ( destroy ) {
+            request = setVersion(function() {
+                if ( contains( name ) ) {
                     idb.db.deleteObjectStore( name );
-                }, this );
+                }
+            }, this );
+
+        } else {
+            if ( contains( name ) ) {
+                store = idb.db.transaction([ name ], readwrite ).objectStore( name );
+                clear = store.clear();
+
+                clear.addEventListener( "success", resolve );
+                clear.addEventListener( "error", reject );
+                return this;
 
             } else {
-                store = idb.db.transaction([ name ], readwrite ).objectStore( name );
-                request = store.clear();
+                resolve();
+                return this;
             }
-
-            // Need to bind events only through addEventListener method
-            // if we do it through onsomething, chrome might not call it
-            request.addEventListener( "success", resolve );
-            request.addEventListener( "error", reject );
-
-        } catch ( _ ) {
-            reject();
         }
+
+        request.done( resolve ).fail( reject );
 
         return this;
     };
 
-    function setVersion( fn, instance ) {
+    function setVersion( success, instance, isTrans ) {
+        var state,
+            v = jar.Deferred();
 
         // Old way to set database version
         if ( idb.db && idb.db.setVersion ) {
+            state = idb.v && idb.v.state();
 
-            // If we have active request attach to it, if not create new one
-            if ( !idb.setVersion || idb.setVersion.readyState == 2 /* done */ ) {
+            // If we have active request – attach to it, if not – create new one
+            if ( !idb.setVersion || idb.setVersion.readyState == "done" ) {
+
+                if ( state && state == "pending" ) {
+                    return idb.v;
+                }
+
                 idb.setVersion = idb.db.setVersion( version() );
             }
 
             idb.setVersion.addEventListener( "success", function() {
                 instance.stores.idb = idb.db = this.source;
-                fn.apply( this, arguments );
+                success();
+
+                this.result.addEventListener( "complete", function() {
+                    v.resolve();
+                });
             });
 
         } else {
@@ -278,7 +296,11 @@
 
             idb.setVersion.addEventListener( "upgradeneeded", function() {
                 instance.stores.idb = idb.db = this.result;
-                fn.apply( this, arguments );
+                success.apply( this, arguments );
+
+                idb.setVersion.addEventListener( "success", function() {
+                    v.resolve();
+                });
             });
         }
 
@@ -294,7 +316,11 @@
             }
         });
 
-        return idb.setVersion;
+        idb.setVersion.addEventListener( "error", function( a,b ) {
+            v.reject();
+        });
+
+        return idb.v = v;
     }
 
     function update( instance ) {
@@ -302,21 +328,16 @@
             createObjectStore( instance.name );
         }, instance.instance );
 
-        request.addEventListener( "success", function() {
+        request.done(function() {
             instance.def.resolve();
-        });
 
-        request.addEventListener( "blocked", function() {
-            instance.def.reject();
-        });
-
-        request.addEventListener( "error", function() {
+        }).fail(function() {
             instance.def.reject();
         });
     }
 
     function contains( name ) {
-        return idb.db && idb.db.objectStoreNames.contains( name );
+        return idb.db.objectStoreNames.contains( name );
     }
 
     function createObjectStore( name ) {

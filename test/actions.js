@@ -55,27 +55,29 @@ asyncTest( "Basic actions", 15, function() {
     });
 });
 
-asyncTest( "Create certain type of storages", 6, function() {
-    jar( "test", "idb" ).done(function() {
-        strictEqual( this.storages[ 0 ], "idb", "Create only idb type of storage" );
+if ( jar.isUsed( "idb" ) && jar.isUsed( "fs" ) ) {
+    asyncTest( "Create certain type of storages", 6, function() {
+        jar( "test", "idb" ).done(function() {
+            strictEqual( this.storages[ 0 ], "idb", "Create only idb type of storage" );
 
-        jar( "test", "fs" ).done(function() {
-            strictEqual( this.storages[ 0 ], "fs", "Create only fs type of storage" );
+            jar( "test", "fs" ).done(function() {
+                strictEqual( this.storages[ 0 ], "fs", "Create only fs type of storage" );
 
-            jar( "test", "lc" ).done(function() {
-                strictEqual( this.storages[ 0 ], "lc", "Create only lc type of storage" );
+                jar( "test", "lc" ).done(function() {
+                    strictEqual( this.storages[ 0 ], "lc", "Create only lc type of storage" );
 
-                jar( "test", "idb fs lc" ).done(function() {
-                    strictEqual( this.storages[ 0 ], "idb", "Create idb type of storage" );
-                    strictEqual( this.storages[ 1 ], "fs", "Create fs type of storage" );
-                    strictEqual( this.storages[ 2 ], "lc", "Create lc type of storage" );
+                    jar( "test", "idb fs lc" ).done(function() {
+                        strictEqual( this.storages[ 0 ], "idb", "Create idb type of storage" );
+                        strictEqual( this.storages[ 1 ], "fs", "Create fs type of storage" );
+                        strictEqual( this.storages[ 2 ], "lc", "Create lc type of storage" );
 
-                    start();
+                        start();
+                    });
                 });
             });
         });
     });
-});
+}
 
 asyncTest( "jar#remove without arguments", function() {
     var def = jar.Deferred();
@@ -99,7 +101,7 @@ asyncTest( "jar.destroy", function() {
             self = this,
             command = "SELECT data FROM " + this.name
 
-        promise = jar.destroy().done(function() {
+        jar.destroy().done(function() {
 
             // test FS api
             if ( jar.fs ) {
@@ -150,9 +152,9 @@ asyncTest( "jar.destroy", function() {
             ok( true, "Meta-data is destroyed" );
 
             start();
+        }).fail(function() {
+            ok( false, "jar.destroy did not work" );
+            start();
         });
-
-        strictEqual( promise.resolve, undefined, "Promise object does not have a resolve method" );
-        strictEqual( promise.reject, undefined, "Promise object does not have a reject method" );
     });
 });

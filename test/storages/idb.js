@@ -1,131 +1,142 @@
-if ( jar.prefixes.indexedDB) {
-    module( "idb", {
-        teardown: moduleTeardown,
-    });
 
-    asyncTest( "Basic ref", 1, function() {
-        jar().done(function() {
-            ok( this.stores.idb, "idb storage created" );
+function idb() {
+    if ( jar.prefixes.indexedDB ) {
+        jar.preference( true );
 
-            start();
-        });
-    });
-
-    asyncTest( "Parallel store creation should work", 2, function() {
-        jar( "idb-1", "idb" ).done(function() {
-            ok( true, "First store created" );
+        module( "idb", {
+            teardown: moduleTeardown
         });
 
-        jar( "idb-2", "idb" ).done(function() {
-            ok( true, "Second store created" );
+        asyncTest( "Basic ref",  function() {
+            jar( "Basic ref", "idb" ).done(function() {
+                ok( this.stores.idb, "idb storage created" );
 
-            // Assuming this request will be the last one
-            start();
+            }).fail(function() {
+                ok( false, "idb storage is not created" );
+
+            }).always( start );
         });
-    });
 
-    asyncTest( "indexedDB references", 2, function() {
-        jar( "indexedDB references", "idb" ).done(function() {
-            ok( this.stores.idb, "References for idb store was created" );
-            ok( ~this.storages.indexOf( "idb" ), "References in array storages should be present" );
+        asyncTest( "Parallel store creation should work", 3, function() {
+            var first = jar( "Parallel store creation should work-1", "idb" ).done(function() {
+                    ok ( jar.idb.db.objectStoreNames.contains( "Parallel_store_creation_should_work_1" ), "First store is created")
+                }),
 
-            start();
+                second = jar( "Parallel store creation should work-2", "idb" ).done(function() {
+                    ok ( jar.idb.db.objectStoreNames.contains( "Parallel_store_creation_should_work_2" ), "Second store is created")
+                });
+
+            jar.when( first, second ).done(function() {
+                ok( true, "Both stores are created" );
+            }).always( start );
         });
-    });
 
-    checkGetSet( "idb" );
+        asyncTest( "indexedDB references", 2, function() {
+            jar( "indexedDB references", "idb" ).done(function() {
+                ok( this.stores.idb, "References for idb store was created" );
+                ok( ~this.storages.indexOf( "idb" ), "References in array storages should be present" );
+            }).always( start );
+        });
 
-    asyncTest( "Complete removal of object store", 4, function() {
-        var remove = jar.Deferred(),
-            checkRemove = jar.Deferred();
+        checkGetSet( "idb" );
 
-        jar( "idb-1", "idb" )
-            .done(function() {
+        asyncTest( "Complete removal of object store", 4, function() {
+            var remove = jar.Deferred(),
+                checkRemove = jar.Deferred();
+
+            jar( "idb-1", "idb" )
+                .done(function() {
+                    this.set( "1", "2" ).done(function() {
+                        this.get( "1" ).done(function( data ) {
+                            this.remove()
+                                .done(function() {
+                                    checkRemoved.call( this ).always(function() {
+                                        checkRemove.resolve();
+                                    })
+
+                                    .always(function() {
+                                        ok( !jar.idb.db.objectStoreNames.contains( this.name ), "Store was completely removed" );
+                                    });
+                                })
+                                .fail(function() {
+                                    ok( false, "Store was not completely removed" );
+                                })
+                                .always(function() {
+                                    remove.resolve();
+                                });
+                        });
+                    });
+                })
+                .fail(function() {
+                    ok( false, "Can't create object store" );
+                });
+
+                jar.when( remove, checkRemove ).always( start );
+        });
+
+        asyncTest( "Clear object store", 1, function() {
+            jar( "idb-2", "idb" ).done(function() {
+                this.set( "1", "2" ).done(function() {
+                    this.clear()
+                        .done(function() {
+                            this.get( "1" )
+                                .done(function() {
+                                    ok( false, "Data was not cleared" );
+                                })
+                                .fail(function() {
+                                    ok( true, "Data was cleared" );
+                                })
+                                .always( start );
+                        })
+                        .fail(function() {
+                            ok( false, "Store was not cleared" );
+                            start();
+                        });
+                });
+            });
+        });
+
+        asyncTest( "Complete removal of object store after it was removed", 4, function() {
+            var setup = jar.Deferred(),
+                checkRemove = jar.Deferred();
+
+            jar( "idb-3", "idb" ).done(function() {
                 this.set( "1", "2" ).done(function() {
                     this.get( "1" ).done(function( data ) {
-                        this.remove()
-                            .done(function() {
-                                checkRemoved.call( this ).always(function() {
-                                    checkRemove.resolve();
-                                })
-
-                                .always(function() {
-                                    ok( !jar.idb.db.objectStoreNames.contains( this.name ), "Store was completely removed" );
-                                });
-                            })
-                            .fail(function() {
-                                ok( false, "Store was not completely removed" );
-                            })
-                            .always(function() {
-                                remove.resolve();
+                        this.remove().done(function() {
+                            console.log(1)
+                            checkRemoved.call( this ).always(function() {
+                                checkRemove.resolve();
                             });
+
+                            this.setup( "idb" )
+                                .done(function() {
+                                    setup.resolve();
+
+                                    ok( jar.idb.db.objectStoreNames.contains( this.name ), "Store was setted, after being removed" );
+                                })
+                                .fail(function() {
+                                    ok( false, "Store was not setted, after being removed" );
+                                })
+                                .always( start );
+                        }).fail(function() {
+                            ok( false, "Store was not removed" );
+                            start();
+                        })
                     });
                 });
-            })
-            .fail(function() {
-                ok( false, "Can't create object store" );
+            });
+
+            jar.when( setup, checkRemove ).always( function() {
                 start();
             });
-
-            jar.when( remove, checkRemove ).always( function() {
-                start();
-            });
-    });
-
-    asyncTest( "Clear object store", 1, function() {
-        jar( "idb-2", "idb" ).done(function() {
-            this.set( "1", "2" ).done(function() {
-                this.clear()
-                    .done(function() {
-                        this.get( "1" )
-                            .done(function() {
-                                ok( false, "Data was not cleared" );
-                            })
-                            .fail(function() {
-                                ok( true, "Data was cleared" );
-                            })
-                            .always( start );
-                    })
-                    .fail(function() {
-                        ok( false, "Store was not cleared" );
-                        start();
-                    });
-            });
         });
-    });
+    }
+}
 
-    asyncTest( "Complete removal of object store after it was removed", 4, function() {
-        var setup = jar.Deferred(),
-            checkRemove = jar.Deferred();
+if ( ~window.navigator.userAgent.indexOf( "Firefox" ) ) {
+  window.setTimeout( idb, 100 );
 
-        jar( "idb-3", "idb" ).done(function() {
-            this.set( "1", "2" ).done(function() {
-                this.get( "1" ).done(function( data ) {
-                    this.remove().done(function() {
-                        checkRemoved.call( this ).always(function() {
-                            checkRemove.resolve();
-                        });
-
-                        this.setup( "idb" )
-                            .done(function() {
-                                setup.resolve();
-
-                                ok( jar.idb.db.objectStoreNames.contains( this.name ), "Store was setted, after being removed" );
-                            })
-                            .fail(function() {
-                                ok( false, "Store was not setted, after being removed" );
-                            })
-                            .always( start );
-                    }).fail(function() {
-                        ok( false, "Store was not removed" );
-                        start();
-                    })
-                });
-            });
-        });
-
-        jar.when( setup, checkRemove ).always( function() {
-            start();
-        });
-    });
+} else {
+    idb();
 }

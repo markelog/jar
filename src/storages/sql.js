@@ -6,7 +6,6 @@
     }
 
     this.support.sql = true;
-    this.storages.push( "sql" );
 
     this.sql = function( name, instance ) {
         return new proto.init( name, instance );
@@ -144,7 +143,12 @@
             jar.resolve( id );
         }
 
-        function reject() {
+        function reject( trans, error ) {
+
+            // code == 5 – no such table
+            if ( error.code == 5 ) {
+                return resolve();
+            }
             jar.reject( id );
         }
 

@@ -19,7 +19,11 @@
         }
 
         data = lc[ "jar-meta" ];
-        jar.iversion = lc[ "jar-iversion" ] || 1;
+        jar.iversion = lc[ "jar-iversion" ];
+
+        // IE10 wtf? This will not work – lc[ "jar-iversion" ] || 1
+        jar.iversion = +lc[ "jar-iversion" ] || 1;
+
     } catch ( _ ) {}
 
     jar.data = data = data ? jar.filters.json( data ) : {};

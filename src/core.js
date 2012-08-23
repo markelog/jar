@@ -34,7 +34,7 @@
 
         init: function( name, storage ) {
 
-            // Name of a object store must contain only alphabetical symbols
+            // Name of a object store must contain only alphabetical symbols or low dash
             this.name = name ? name.replace( rstoreNames, "_" ) : "jar";
             this.deferreds = {};
 
@@ -72,7 +72,7 @@
 
                 // This check needed if user explicitly specified storage that
                 // he wants to work with, whereas browser don't implement it
-                if ( storage in this.support ) {
+                if ( jar.isUsed( storage ) ) {
 
                     // If jar with the same name was created, do not try to re-create store
                     if ( !this.stores[ storage ] ) {

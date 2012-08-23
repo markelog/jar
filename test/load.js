@@ -66,7 +66,8 @@ asyncTest( "jar.load - xsl", function() {
     var path = origin + "data/data.xsl";
 
     jar( "jar.load - xsl" ).done(function() {
-        this.clear().done(function() {
+       this.clear().done(function() {
+
 
             // through xhr-request
             jar.load( path, "jar.load - xsl" ).done(function( data, base ) {
@@ -91,32 +92,27 @@ asyncTest( "jar.load - xsl", function() {
 asyncTest( "Explicitly set data-type",  function() {
     var css, jsType, xml, wrongType;
 
-    css = jar.load( origin + "data/data.css",
-                                "jar.load, explicetlly set data-type", "css" ).done(function() {
-        var element = jQuery( '<div class="load-test"></div>' ).appendTo( "#qunit-fixture" );
-            strictEqual( element.css( "font-size" ), "99px", "css style should be applied" );
+    css = jar.load( origin + "data/data.css", "jar.load, explicetlly set data-type", "css" )
+        .done(function() {
+            var element = jQuery( '<div class="load-test"></div>' ).appendTo( "#qunit-fixture" );
+                strictEqual( element.css( "font-size" ), "99px", "css style should be applied" );
+        });
 
-    });
+    jsType = jar.load( origin + "data/data.js", "jar.load, explicetlly set data-type", "js" )
+        .done(function() {
+            ok( window.js, "Variable is assigned" );
 
-    jsType = jar.load( origin + "data/data.js",
-                        "jar.load, explicetlly set data-type", "js" ).done(function() {
-                ok( js, "Variable is assigned" );
+            // cleanup
+            window.js = undefined;
+        });
 
-                // cleanup
-                window.js = undefined;
-    });
+    wrongType = jar.load( origin + "data/wrong-type.js", "jar.load, explicetlly set data-type css", "css" )
+        .done(function( data ) {
+            strictEqual( window.js, undefined, "Variable is not assigned" );
+        });
 
-    xml = jar.load( origin + "data/data.xml",
-        "jar.load, explicitly set data-type" ).done(function( data ) {
-
+    xml = jar.load( origin + "data/data.xml", "jar.load, explicitly set data-type" ).done(function( data ) {
         strictEqual( jar.type( data ), "xml", "Data is returned" );
-    });
-
-    wrongType = jar.load( origin + "data/wrong-type.js",
-                        "jar.load, explicetlly set data-type css", "css" ).done(function() {
-
-        strictEqual( js, undefined, "Variable is not assigned" );
-
     });
 
     jar.when( css, jsType, xml, wrongType ).always(function() {
@@ -128,16 +124,10 @@ asyncTest( "Load js as text and executed after", 2, function() {
     function testit() {
         var first, second;
 
-        first = jar.load( origin + "data/stepinit.js",
-            "Load js as text and executed after",
-            "text");
-
-        second = jar.load( origin + "data/step.js",
-                "Load js as text and executed after",
-                "text");
+        first = jar.load( origin + "data/stepinit.js", "Load js as text and executed after", "text");
+        second = jar.load( origin + "data/step.js", "Load js as text and executed after", "text");
 
         jar.when( first, second ).done(function() {
-
             for ( var i = 0, l = arguments.length; i < l; i++ ) {
                 jar.filters.js( arguments[ i ] );
             }
@@ -162,7 +152,7 @@ asyncTest( "Load js as text and executed after", 2, function() {
                 setTimeout(function() {
                     start();
                 }, 100 );
-            });
+            })
     });
 });
 

@@ -1,24 +1,10 @@
+// For tests we should be able to check indexedDB in Firefox too
+jar.preference( true );
+
 window.moduleTeardown = function() {
-    /*if ( jar.idb.db ) {
-        jar.idb.db.close();
-    }
+    stop()
 
-    var deleteDB = jar.prefixes.indexedDB.deleteDatabase( "jar" );
-
-    deleteDB.onsuccess = function() {
-        start();
-    }
-
-    deleteDB.onerror = function() {
-        window.location.reload();
-    }
-
-    deleteDB.onblocked = function() {
-        window.location.reload();
-    }
-
-    stop();
-     */
+    jar.destroy().always( start );
 }
 
 function checkGetSet( st ) {

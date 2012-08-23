@@ -4,11 +4,10 @@ asyncTest( "Global stuff", function() {
     var turtle = jar( "shy turtle" ),
 
         // I want to use bear store only with localStorage
-        bear = jar( "sexy bear", "lc" /* idb fs sql */ );
+        bear = jar( "sexy bear", "lc" );
 
     jar.when( turtle, bear ).done(function( turtle, bear ) {
         var def = jar.Deferred();
-
         turtle.set( "set stuff", "bla-blah" ).done(function() {
             ok( true, "stuff is setted" );
 
@@ -24,11 +23,10 @@ asyncTest( "Global stuff", function() {
                 ok( jar.instances[ this.name ], "instance was created" );
 
                 def.done( start );
-            });
+            })
         });
     });
 });
-
 asyncTest( "Re-create store", function() {
     jar( "Re-create store", "lc" ).done(function() {
         var stores = this.stores;
@@ -37,7 +35,7 @@ asyncTest( "Re-create store", function() {
             ok( this.stores === stores, "When instance with the same name is created once again, it should not re-created storages" );
             ok( this.stores === jar.instances[ this.name ], "Stores object written in jar object" );
 
-            jar( "Re-create store", "idb" ).done(function() {
+            jar( "Re-create store", "idb" ).always(function() {
                 if ( jar.prefixes.indexedDB ) {
                     ok( this.stores.idb, "Now we added idb storage in addition to lc" );
 
@@ -49,7 +47,7 @@ asyncTest( "Re-create store", function() {
                 ok( this.stores === jar.instances[ this.name ], "Stores object written in jar object" );
                 ok( !this.stores.sql, "But sql was not defined, so it should not be used" );
 
-                this.setup( "sql" ).done(function() {
+                this.setup( "sql" ).always(function() {
                     if ( window.openDatabase ) {
                         ok( this.stores.sql, "Now sql was defined" );
                         ok( this.stores === jar.instances[ this.name ], "Stores object written in jar object" );
@@ -78,10 +76,11 @@ asyncTest( "Re-create store", function() {
     });
 });
 
+
 test( "Check jar.type", function() {
     var xmlStr = "<xml>test</xml>";
 
-    if ( document.implementation  && document.implementation.createDocument ) {
+    if ( document.implementation && document.implementation.createDocument ) {
         strictEqual( jar.type( document.implementation.createDocument( "http://www.w3.org/1999/xhtml", "html", null ) ),
             "html", "This type of data should be html" );
     }
@@ -116,7 +115,6 @@ asyncTest( "jar.has", 3, function() {
         });
     });
 });
-
 asyncTest( "Test fail-callback when storage is not supported", function() {
     var lcAsync,
         lc = window.localStorage,
@@ -136,3 +134,4 @@ asyncTest( "Test fail-callback when storage is not supported", function() {
                 });
             });
 });
+
