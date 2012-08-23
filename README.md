@@ -1,17 +1,23 @@
-<h1>Jar</h1>
+<h1>jar.js</h1>
 <p>
-Jar is another wrapper for localStorage. But it also let you use Filesystem API, IndexedDB and SQLite.
-Some people have strong opinions about storages in browsers should be async-based, this api encapsulates all
-async-based api's under the hood, fallbacking on localStorage only if it really have to.
+Jar is another wrapper for localStorage, but it also let you use FileSystem API, IndexedDB and SQLite (Web SQL).
 
-Jar let you store different kind of data – css, js, xml, html... etc. It will choose for you, what storage type
-will fit more appropriate for different data type. Or let you download, cache and execute some files, like
-js, css or html for example.
+Some people have <a href="https://hacks.mozilla.org/2012/03/there-is-no-simple-solution-for-local-storage/">strong</a>
+<a href="http://www.nczonline.net/blog/2012/04/25/the-performance-of-localstorage-revisited/">opinions</a> about storages in browsers should be async-based, this API encapsulates all
+async-based API's under the hood, fallbacking on localStorage only if it really have to.
 </p>
 
-<h2>Getting Started</h2>
-<p>Jar architecture based on Promise/A proposal, for example:</p>
+<p>
+Jar let you store different kind of data – css, js, xml, html... etc. It will choose for you, what storage
+will fit more appropriate for different data-type (or you can specify what storages you want to use).
+Or let you download, cache and execute some files, like js and css.
+</p>
 
+<h2>Browsers</h2>
+Firefox, Chrome, IE8+, Opera
+
+<h2>About</h2>
+<p>Jar architecture based on Promise/A proposal, for example:</p>
 
 ```javascript
 jar()
@@ -32,15 +38,15 @@ jar()
     });
 ```
 
-<p>then after you created store you can write stuff in it:</p>
+<p>then, after you created the store you can write stuff in it:</p>
 
 ```javascript
 // If argument is passed, it will became the name of your store
-jar( "jar is cool" ).done(function() {
+jar( "awesome store" ).done(function() {
     var store = this;
 
     this.set( "name of some awesome content", "awesome content" ).done(function() {
-        console.log( "content is written" );
+        console.log( "awesome" );
     });
 });
 ```
@@ -53,7 +59,7 @@ store.set( "div", node ).done(function( type ) {
 });
 ```
 
-<p>and you can get it the same way you put it:</p>
+<p>you can get it the same way you put it:</p>
 ```javascript
 store.get( "div" ).done(function( div ) {
     console.log( div.nodeName ); // DIV
@@ -93,7 +99,7 @@ store.clear().done(function() {
 });
 
 store.remove().done(function() {
-    // if you call jar#remove without arguments it will destroy "jar is cool" store
+    // if you call jar#remove without arguments it will destroy "awesome" store
 });
 
 // speaking of destroying things
@@ -105,8 +111,8 @@ jar.destroy().done(function() {
 <p>if you want to cache your css, js files its cool too:</p>
 ```javascript
 jar.load( "alert.js" ).done(function() {
-    // downloaded and executed, next time it will be downloaded and executed from
-    // Filesystem API, or IndexedDD or SQ.. well, you never know
+    // downloaded and executed, next time jar will take and execute this data from
+    // FileSystem API, or IndexedDD or SQ.. well, you never know
 });
 ```
 
@@ -125,7 +131,11 @@ jar.when( turtle, bear ).done(function( turtle, bear ) {
 
 <p>you can specify what storage type you want to use:</p>
 ```javascript
-// if we don't have Filesystem API (fs) use indexedDB storage (idb)
-// and even when if idb is not implemented – fallback to localStorage (lc)
+// if we don't have FileSystem API (fs) use indexedDB storage (idb)
+// and even if idb is not implemented – fallback to localStorage (lc)
 jar( "something gotta work", "fs idb lc" );
 ```
+
+<h2>Similar libraries</h2>
+<a href="https://github.com/WebReflection/db">db</a>
+<a href="http://brian.io/lawnchair/">lawnchair</a>
