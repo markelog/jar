@@ -3,30 +3,27 @@
   "title": "jar",
   "description": "-",
   "version": "0.1.0",
-  "homepage": "",
+  "keywords": [ "localStorage", "IndexedDB", "Web SQL", "FileSystem API" ],
+  "homepage": "http://github.com/orkel/jar.git",
   "author": {
     "name": "Oleg",
     "email": "markelog@gmail.com"
   },
   "repository": {
     "type": "git",
-    "url": "git://github.yandex-team.ru/arkel/jar.git"
-  },
-  "bugs": {
-    "url": ""
+    "url": "git://github.com/orkel/jar.git"
   },
   "licenses": [
     {
-      "type": "MIT",
-      "url": "/blob/master/LICENSE-MIT"
-    },
-    {
-      "type": "GPL",
-      "url": "/blob/master/LICENSE-GPL"
+        "type": "Apache-2.0",
+        "url": "http://www.apache.org/licenses/LICENSE-2.0"
     }
+
   ],
-  "dependencies": {
-    "jquery": "-"
-  },
-  "keywords": []
+  "dependencies": {},
+  "devDependencies": {
+    "grunt": ">=0.3.9",
+    "qunit": ">=1.0",
+    "jQuery": ">=1.4"
+  }
 }
