@@ -259,9 +259,10 @@
         return this;
     };
 
-    function setVersion( success, instance, isTrans ) {
-        var state,
-            v = jar.Deferred();
+    function setVersion( success, instance, v ) {
+        v = v || jar.Deferred();
+
+        var state;
 
         // Old way to set database version
         if ( idb.db && idb.db.setVersion ) {
@@ -270,18 +271,31 @@
             // If we have active request – attach to it, if not – create new one
             if ( !idb.setVersion || idb.setVersion.readyState == "done" ) {
 
-                if ( state && state == "pending" ) {
-                    return idb.v;
-                }
+                // readystate might be "done", but it just means that versionchange transaction
+                // was succesfull, it does not mean it was completed (wtf right?),
+                // our deferred will be resolved only when everything is done
+                if ( state != "pending" ) {
+                    idb.setVersion = idb.db.setVersion( version() );
 
-                idb.setVersion = idb.db.setVersion( version() );
+                } else {
+                    idb.v.done(function() {
+                        setVersion( success, instance, v );
+                    });
+
+                    // we should not do anything until versionchange transaction is not completed
+                    return v;
+                }
             }
 
             idb.setVersion.addEventListener( "success", function() {
                 instance.stores.idb = idb.db = this.source;
+
+                // We can change store only in versionchange transaction
                 success();
 
                 this.result.addEventListener( "complete", function() {
+
+                    // But we cannot change version of base until it's not completed
                     v.resolve();
                 });
             });

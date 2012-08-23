@@ -40,7 +40,7 @@ function idb() {
 
         checkGetSet( "idb" );
 
-        asyncTest( "Complete removal of object store", 4, function() {
+        asyncTest( "Complete removal of object store", 5, function() {
             var remove = jar.Deferred(),
                 checkRemove = jar.Deferred();
 
@@ -50,6 +50,8 @@ function idb() {
                         this.get( "1" ).done(function( data ) {
                             this.remove()
                                 .done(function() {
+                                    ok( !jar.idb.db.objectStoreNames.contains( this.name ), "Store was removed" );
+
                                     checkRemoved.call( this ).always(function() {
                                         checkRemove.resolve();
                                     })
@@ -96,7 +98,7 @@ function idb() {
             });
         });
 
-        asyncTest( "Complete removal of object store after it was removed", 4, function() {
+        asyncTest( "Complete removal of object store after it was removed", 5, function() {
             var setup = jar.Deferred(),
                 checkRemove = jar.Deferred();
 
@@ -104,7 +106,8 @@ function idb() {
                 this.set( "1", "2" ).done(function() {
                     this.get( "1" ).done(function( data ) {
                         this.remove().done(function() {
-                            console.log(1)
+                            ok( !jar.idb.db.objectStoreNames.contains( this.name ), "Store was removed" );
+
                             checkRemoved.call( this ).always(function() {
                                 checkRemove.resolve();
                             });
