@@ -4,12 +4,10 @@
         methods = [ "done", "fail", "always", "then", "state", "context" ],
         slice = [].slice;
 
-
    function add( data ) {
         var state = data.state,
             context = data.context || jar,
             type = data.type,
-            context = data.context,
             args = data.args,
             fn = data.fn,
             dfd = data.dfd;
@@ -40,7 +38,7 @@
         });
 
         return dfd;
-    };
+    }
 
     function iterate( type, args, dfd, meta, i /* internal */ ) {
         var value, always,
@@ -68,7 +66,7 @@
         }
 
         return dfd;
-    };
+    }
 
     function Deferred() {
         var data,
@@ -276,8 +274,6 @@
             }
         }
 
-        t = jar.when.apply( this, defs );
-
-        return new Promise( t );
+        return new Promise( jar.when.apply( this, defs ) );
     };
 }.call( jar );
