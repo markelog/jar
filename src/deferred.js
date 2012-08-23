@@ -1,6 +1,5 @@
 !function() {
-    var proto, array, promise, name,
-        counter = 0,
+    var counter = 0,
         methods = [ "done", "fail", "always", "then", "state", "context" ],
         slice = [].slice;
 
