@@ -116,7 +116,7 @@ jar.load( "alert.js" ).done(function() {
 });
 ```
 
-<p>if you want to know when two deferreds is done or failed you can use jar.when:</p>
+<p>if you want to know when two deferreds are done or failed you can use <code>jar.when</code>:</p>
 ```javascript
 var turtle = jar( "shy turtle" ),
 
